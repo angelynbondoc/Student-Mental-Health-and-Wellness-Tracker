@@ -11,6 +11,7 @@ multiple screens to find relevant content. The left panel further reduces cognit
 load by surfacing recommended discussions, recently visited groups, and shared 
 interests upfront — so students spend less mental effort searching and more time 
 engaging with content that supports their well-being.
+
 ---
 
 ## 2. Core Feature Screen
