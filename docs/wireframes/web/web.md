@@ -1,57 +1,48 @@
 # Wireframes — KM Rationale Annotations
 
+---
 
 ## 1. Home / Dashboard
 ![Home Dashboard](Dashboard.png)
 
-**Decision:** Designed a community-style feed as the main dashboard where students can view peer posts, join discussions, and share coping strategies for mental and emotional well-being. A left panel was added to display recommended program discussions, recently visited discussion groups, and shared interest communities for quick and personalized navigation.
-
-**Rationale:** Students dealing with mental health challenges benefit from knowing they are not alone. A shared dashboard fosters peer support by allowing students to see others' experiences, participate in discussions about school life, shared interest and discover coping strategies shared by their peers promoting a sense of community and emotional well-being.
-
-**Alternatives considered:** A private personal dashboard showing only the 
-student's own entries and stats.
-
-**Trade-off:** A community-facing dashboard increases student engagement and peer support but requires content moderation to ensure posts remain appropriate and safe for all users.
-
+The community-style feed presents peer posts, discussions, and coping strategies 
+in a single scrollable view, eliminating the need for students to navigate across 
+multiple screens to find relevant content. The left panel further reduces cognitive 
+load by surfacing recommended discussions, recently visited groups, and shared 
+interests upfront — so students spend less mental effort searching and more time 
+engaging with content that supports their well-being.
 ---
 
 ## 2. Core Feature Screen
 ![Core Feature](CoreFeatureScreen.png)
 
-**Decision:** Designed an interactive post engagement system that allows students to comment, share, like, and dislike posts within the discussion feed.
-
-**Rationale:** Providing interaction tools such as comments, shares, and reactions encourages active participation among students. These features create a more engaging and supportive environment where students can validate each other's experiences, respond to shared coping strategies, and amplify helpful content across the community.
-
-**Alternatives considered:** A read-only feed where students can only view posts without any interaction, or a simplified reaction-only system with no comments.
-
-**Trade-off:** Adding interaction features increases student engagement and community connection but introduces the need for moderation to prevent 
-inappropriate comments or misuse of dislike functionality.
+This screen supports both the Externalization and Combination modes of the 
+SECI framework. Students externalize tacit knowledge by writing comments 
+and sharing their own reactions to posts. The share functionality supports 
+Combination by allowing students to redistribute and recombine existing 
+explicit knowledge — spreading helpful coping strategies and discussions 
+further across the community network.
 
 ---
 
 ## 3. Search / Retrieve Screen
 ![Search Retrieve](Search.png)
 
-**Decision:** Designed a search screen that includes a search history log and a most searched topics section to help students quickly find relevant content and discussions.
-
-**Rationale:** Students often revisit topics related to their mental health concerns or look for content that resonates with their current emotional state. Including search history saves time by allowing students to quickly return to previously explored content, while the most searched topics section surfaces popular and relevant discussions — helping students feel connected to shared experiences within the community specific past entries for reflection or reporting.
-
-**Alternatives considered:** A plain search bar with no history or topic 
-suggestions, or a category-based browsing system without a search function.
-
-**Trade-off:** Displaying search history and trending topics improves 
-discoverability and saves time but raises privacy considerations, as students may be sensitive about their search activity being stored or visible.
+The search screen reflects a two-tier knowledge taxonomy. The most searched 
+topics section represents a community-generated taxonomy — organically 
+shaped by collective student behavior — while the search history provides 
+a personalized taxonomy based on the individual student's own 
+knowledge-seeking patterns. Together they offer both broad community-level 
+and narrow personal-level knowledge retrieval pathways.
 
 ---
 
 ## 4. User Profile / Settings
 ![User Profile](UserProfile.png)
 
-**Decision:** Designed a profile screen that consolidates the student's username, own posts, comments, and recent discussion groups in one place, with quick actions for editing, deleting posts and comments, and leaving discussion communities.
-
-**Rationale:** Students need full control over their own content and community involvement, especially in a mental health context where privacy and personal boundaries are important. Centralizing post management, comment history, and discussion group activity in the profile screen empowers students to manage their digital presence and disengage from communities that no longer serve their well-being — without navigating through multiple screens.
-
-**Alternatives considered:** Spreading post and comment management across 
-separate settings pages, or requiring students to manage their content directly from the feed without a dedicated profile view.
-
-**Trade-off:**  Consolidating all content management into the profile screen simplifies navigation and gives students greater autonomy over their data, but may result in a more complex and content-heavy profile layout that requires careful UI organization to remain intuitive.
+In a mental health KM platform, giving students ownership and control 
+over their own knowledge contributions is essential for building trust 
+and encouraging continued participation. A profile screen that empowers 
+students to manage, update, and remove their content respects personal 
+boundaries and privacy — which are critical considerations when the 
+knowledge being shared is sensitive and emotionally personal in nature.
