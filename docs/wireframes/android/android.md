@@ -2,7 +2,7 @@
 
 
 ## 1. Home / Dashboard
-![Home Dashboard](Dashboard.png)
+![Home Dashboard](DashBoard.png)
 
 **Decision:** Designed a community-style feed as the main dashboard where students can view peer posts, join discussions, and share coping strategies for mental and emotional well-being.
 
