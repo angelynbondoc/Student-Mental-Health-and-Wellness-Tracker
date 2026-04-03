@@ -1,1 +1,0 @@
-# Student-Mental-Health-and-Wellness-Tracker
