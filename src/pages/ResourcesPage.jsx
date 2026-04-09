@@ -2,7 +2,14 @@ import { useState, useEffect } from "react";
 import ResourceCard from "../components/ResourceCard";
 import { MOCK_RESOURCES } from "../mockData";
 
-// SECI — COMBINATION: Curated coping knowledge aggregated in one place.
+// ============================================================
+// PAGE: ResourcesPage
+// SECI CONNECTION — COMBINATION:
+//   Aggregates curated coping strategies from multiple sources
+//   into one organized reference — explicit knowledge combined
+//   into new structured knowledge (the SECI Combination stage).
+// ============================================================
+
 function ResourcesPage() {
   const [resources, setResources] = useState([]);
 

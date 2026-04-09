@@ -4,65 +4,66 @@ import CommentItem from "./CommentItem";
 // ============================================================
 // COMPONENT: PostCard
 // SECI CONNECTION — SOCIALIZATION:
-//   The core unit of peer-to-peer knowledge sharing. Each card
-//   displays a community member's lived experience and allows
-//   others to validate it (upvote) or respond (comment).
+//   The core unit of peer knowledge sharing. Tacit experiences
+//   become visible and validatable by the community.
 //
-// WHY PostCard NO LONGER OWNS upvotes OR comments IN STATE:
-//   This is the core bug fix. Previously PostCard used useState
-//   for upvotes and comments — local state that was destroyed
-//   every time the user navigated away (component unmount).
-//   Now PostCard is a "controlled component" — like a controlled
-//   <input>, it displays whatever its parent tells it to (via
-//   props) and reports user actions upward via callbacks.
-//   It owns NO persistent data of its own.
+// KEY CONCEPT — DERIVED VALUE for upvote count:
+//   We no longer read post.upvotes (it doesn't exist anymore).
+//   Instead: upvoteCount = reactions.filter(r => r.type === 'upvote').length
+//   This is computed fresh on every render from the source-of-truth
+//   reactions array. It's always mathematically correct.
+//   SQL equivalent: SELECT COUNT(*) FROM reactions
+//                   WHERE post_id = X AND type = 'upvote'
 //
-// PROPS RECEIVED:
-//   - post: single post object (contains upvotes count from App)
-//   - comments: pre-filtered array of comments for this post
-//   - hasUpvoted: boolean — has current user upvoted this post?
-//   - onUpvote(postId): callback to App.jsx to increment upvotes
-//   - onAddComment(newComment): callback to App.jsx to add comment
-//
-// THE ONE useState STILL HERE — newCommentText:
-//   The text input for typing a reply is temporary UI state —
-//   it only needs to exist while the user is typing and clears
-//   after submission. It does NOT need to persist across
-//   navigation, so it's fine to keep it local here.
+// PROPS:
+//   - post           : post object (no upvotes field)
+//   - comments       : pre-filtered comments for this post
+//   - reactions      : pre-filtered reactions for this post
+//   - hasUpvoted     : did current user already upvote?
+//   - communityName  : resolved community label string
+//   - currentUserId  : for attaching author_id to new comments
+//   - onUpvote       : callback → App.jsx
+//   - onAddComment   : callback → App.jsx
 // ============================================================
 
-function PostCard({ post, comments, hasUpvoted, onUpvote, onAddComment }) {
-  // This is the ONLY local state PostCard should own —
-  // the temporary value of the comment text input field.
-  // It is intentionally ephemeral (resets on unmount is fine).
+function PostCard({
+  post,
+  comments,
+  reactions,
+  hasUpvoted,
+  communityName,
+  currentUserId,
+  onUpvote,
+  onAddComment,
+}) {
+  // Only local state: temporary comment input text.
+  // Intentionally resets on unmount — that behavior is correct here.
   const [newCommentText, setNewCommentText] = useState("");
 
-  // ---- HANDLER: Upvote ----
-  // We don't manage the count here anymore — we just tell App.jsx
-  // "the user clicked upvote on THIS post" by passing up the ID.
-  // App.jsx will update the posts array and pass the new count
-  // back down via the post.upvotes prop on the next render.
+  // ---- DERIVED VALUE: Upvote Count ----
+  // Calculated from the reactions prop, not stored anywhere.
+  const upvoteCount = reactions.filter((r) => r.type === "upvote").length;
+
   const handleUpvote = () => {
-    if (hasUpvoted) return; // Guard: already voted, do nothing
-    onUpvote(post.id);      // Lift the action up to App.jsx
+    if (hasUpvoted) return;
+    onUpvote(post.id);
   };
 
   // ---- HANDLER: Add Comment ----
-  // Builds a comment object matching the 'comments' Data Contract,
-  // then passes it up to App.jsx via the onAddComment callback.
+  // Builds a comment matching the updated schema (now includes author_id)
   const handleAddComment = () => {
-    if (!newCommentText.trim()) return; // Guard: no empty comments
+    if (!newCommentText.trim()) return;
 
-    // Build comment object strictly following the Data Contract schema
     const newComment = {
-      id: crypto.randomUUID(),          // Simulates Supabase auto-UUID
-      post_id: post.id,                 // Foreign key — links to parent post
+      id: crypto.randomUUID(),
+      post_id: post.id,
+      author_id: currentUserId,         // ← required by updated Data Contract
       content: newCommentText,
       created_at: new Date().toISOString(),
     };
 
-    onAddComment(newComment); // Lift up to App.jsx to persist in master array
-    setNewCommentText("");    // Clear the local input field after submit
+    onAddComment(newComment);
+    setNewCommentText("");
   };
 
   const formatDate = (isoString) =>
@@ -82,15 +83,31 @@ function PostCard({ post, comments, hasUpvoted, onUpvote, onAddComment }) {
 
   return (
     <div style={cardStyle}>
-      <p style={{ fontSize: "12px", color: "#999", margin: "0 0 4px 0" }}>
+      {/* Community badge — from the communities lookup in HomePage */}
+      {communityName && (
+        <span
+          style={{
+            fontSize: "11px",
+            backgroundColor: "#e8e6ff",
+            color: "#6c63ff",
+            padding: "2px 8px",
+            borderRadius: "99px",
+            marginBottom: "6px",
+            display: "inline-block",
+          }}
+        >
+          # {communityName}
+        </span>
+      )}
+
+      <p style={{ fontSize: "12px", color: "#999", margin: "6px 0 4px 0" }}>
         {post.is_anonymous ? "🕵️ Anonymous" : "👤 Community Member"} ·{" "}
         {formatDate(post.created_at)}
       </p>
 
       <p style={{ margin: "8px 0", fontSize: "15px" }}>{post.content}</p>
 
-      {/* Upvote button — reads upvote count directly from post prop,
-          which is now controlled by App.jsx and persists navigation */}
+      {/* Upvote button — count derived from reactions array */}
       <button
         onClick={handleUpvote}
         disabled={hasUpvoted}
@@ -101,15 +118,13 @@ function PostCard({ post, comments, hasUpvoted, onUpvote, onAddComment }) {
           borderRadius: "4px",
           padding: "6px 12px",
           cursor: hasUpvoted ? "not-allowed" : "pointer",
-          marginRight: "8px",
         }}
       >
-        ▲ Upvote {post.upvotes}
+        ▲ Upvote {upvoteCount}
       </button>
 
       <hr style={{ margin: "12px 0", borderColor: "#eee" }} />
 
-      {/* Comments Section — renders from props, not local state */}
       <div>
         <strong style={{ fontSize: "13px" }}>
           💬 Replies ({comments.length})

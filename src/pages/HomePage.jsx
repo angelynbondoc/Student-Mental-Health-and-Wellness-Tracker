@@ -1,27 +1,26 @@
 import PostCard from "../components/PostCard";
 
 // ============================================================
-// PAGE: HomePage
+// PAGE: HomePage — Community Feed
 // SECI CONNECTION — SOCIALIZATION:
-//   The feed where community members share lived experiences.
+//   Central hub where members exchange lived experiences.
 //
-// WHY HomePage IS NOW SIMPLER:
-//   Previously, HomePage used useEffect + useState to load and
-//   own mock data. Now that App.jsx owns all posts and comments,
-//   HomePage is purely a "pass-through" — it receives data as
-//   props and forwards them to PostCard. It no longer needs
-//   useEffect or its own loading state because the data is
-//   already loaded and alive in App.jsx above it.
-//
-// PROPS RECEIVED FROM App.jsx:
-//   - posts: the full merged array of all posts
-//   - comments: all comments (will be filtered per post below)
-//   - upvotedPostIds: Set of post IDs the user already upvoted
-//   - onUpvote: handler to call when a post is upvoted
-//   - onAddComment: handler to call when a comment is submitted
+// WHY THIS PAGE IS NOW A THIN PASS-THROUGH:
+//   All data lives in App.jsx. HomePage just receives props
+//   and forwards the right slices to each PostCard. It does
+//   NOT own state or fetch data — that responsibility was
+//   lifted up to App.jsx so it survives tab navigation.
 // ============================================================
 
-function HomePage({ posts, comments, upvotedPostIds, onUpvote, onAddComment }) {
+function HomePage({
+  posts,
+  comments,
+  reactions,
+  communities,
+  currentUserId,
+  onUpvote,
+  onAddComment,
+}) {
   return (
     <div>
       <h2 style={{ marginBottom: "4px" }}>🌿 Community Feed</h2>
@@ -34,21 +33,37 @@ function HomePage({ posts, comments, upvotedPostIds, onUpvote, onAddComment }) {
           No posts yet. Be the first to share! 💬
         </p>
       ) : (
-        posts.map((post) => (
-          <PostCard
-            key={post.id}
-            post={post}
-            // Filter the master comments array to only this post's comments.
-            // This mirrors a SQL WHERE comment.post_id = post.id query.
-            comments={comments.filter((c) => c.post_id === post.id)}
-            // Tell this PostCard whether the user already upvoted it
-            hasUpvoted={upvotedPostIds.has(post.id)}
-            // Pass the App-level handlers down — PostCard will call
-            // these with the relevant data when the user interacts
-            onUpvote={onUpvote}
-            onAddComment={onAddComment}
-          />
-        ))
+        posts.map((post) => {
+          // Pre-filter all arrays to only this post's related data.
+          // WHY filter here: PostCard stays reusable and receives
+          // only what it needs — mirrors a SQL JOIN with a WHERE clause.
+
+          const postComments = comments.filter((c) => c.post_id === post.id);
+          const postReactions = reactions.filter((r) => r.post_id === post.id);
+
+          // Has the current user already upvoted this specific post?
+          const hasUpvoted = postReactions.some(
+            (r) => r.user_id === currentUserId && r.type === "upvote"
+          );
+
+          // Resolve community name from community_id foreign key.
+          // ?. (optional chaining) prevents crash if no match found.
+          const community = communities.find((c) => c.id === post.community_id);
+
+          return (
+            <PostCard
+              key={post.id}
+              post={post}
+              comments={postComments}
+              reactions={postReactions}
+              hasUpvoted={hasUpvoted}
+              communityName={community?.name}
+              currentUserId={currentUserId}
+              onUpvote={onUpvote}
+              onAddComment={onAddComment}
+            />
+          );
+        })
       )}
     </div>
   );

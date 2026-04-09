@@ -1,98 +1,80 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import MobileLayout from "./components/MobileLayout";
 import HomePage from "./pages/HomePage";
 import CreatePage from "./pages/CreatePage";
 import JournalPage from "./pages/JournalPage";
 import ResourcesPage from "./pages/ResourcesPage";
-import { MOCK_POSTS, MOCK_COMMENTS } from "./mockData";
+import {
+  MOCK_POSTS,
+  MOCK_COMMENTS,
+  MOCK_REACTIONS,
+  MOCK_COMMUNITIES,
+} from "./mockData";
 
 // ============================================================
-// ROOT COMPONENT: App.jsx
+// ROOT COMPONENT: App.jsx — Single Source of Truth
 //
-// WHY App.jsx NOW OWNS posts AND comments:
-//   React Router unmounts a page component when you navigate
-//   away from it. Any useState inside that component is wiped.
-//   The fix is "lifting state up" to the nearest ancestor that
-//   is NEVER unmounted — App.jsx. Since App.jsx wraps ALL routes,
-//   it stays alive for the entire session, so state persists
-//   across tab navigation.
+// WHY ALL STATE LIVES HERE:
+//   App.jsx is never unmounted during tab navigation.
+//   Any state inside a page component (HomePage, CreatePage)
+//   gets destroyed when the user navigates away. By lifting
+//   all shared state here, data persists across the entire
+//   session regardless of which tab is active.
 //
-// STATE OWNED HERE:
-//   - posts: the full list of posts (including upvote counts)
-//   - comments: all comments across all posts
-//   - upvotedPostIds: a Set tracking which posts THIS user
-//     has already upvoted (enforces one-vote-per-post rule)
-//
-// PATTERN — "Lift State, Pass Handlers":
-//   App.jsx owns the data. Child components receive data as
-//   props and report changes via callback functions (handlers).
-//   Children never mutate state directly — they ask the parent
-//   to do it. This is the standard React data flow pattern.
+// CURRENT_USER_ID simulates Supabase auth.user.id.
+// In Phase 3, replace this with: supabase.auth.getUser()
 // ============================================================
+
+const CURRENT_USER_ID = "user-uuid-current";
 
 function App() {
-  // ---- Master Posts Array ----
-  // Initialized with mock data directly (no useEffect needed here
-  // since App.jsx never unmounts — we load it once at startup).
+  // Master posts array — no longer stores upvote count
   const [posts, setPosts] = useState(MOCK_POSTS);
 
-  // ---- Master Comments Array ----
-  // Holds ALL comments for ALL posts. We filter by post_id when
-  // passing down to individual PostCard components.
+  // Master comments array — includes author_id per new schema
   const [comments, setComments] = useState(MOCK_COMMENTS);
 
-  // ---- Upvoted Post Tracker ----
-  // WHY a Set: A Set automatically prevents duplicates and has
-  // O(1) lookup with .has() — perfect for checking "has this
-  // user already upvoted post X?" without looping the array.
-  // We store post IDs here, not upvote counts (counts live in posts).
-  const [upvotedPostIds, setUpvotedPostIds] = useState(new Set());
+  // Master reactions array — each upvote is its own record here.
+  // Upvote counts are DERIVED from this at render time, not stored.
+  const [reactions, setReactions] = useState(MOCK_REACTIONS);
+
+  // Communities — read-only in Phase 1, no setter needed
+  const [communities] = useState(MOCK_COMMUNITIES);
 
   // ---- HANDLER: Add New Post ----
-  // Called by CreatePostForm via CreatePage.
-  // Prepends the new post so it appears at the top of the feed.
+  // Prepends so newest posts appear at the top of the feed
   const handleNewPost = (newPost) => {
-    setPosts((prevPosts) => [newPost, ...prevPosts]);
+    setPosts((prev) => [newPost, ...prev]);
   };
 
-  // ---- HANDLER: Upvote a Post ----
-  // Called by PostCard when the upvote button is clicked.
-  // WHY we pass postId as an argument: the handler lives in App.jsx
-  // but needs to know WHICH post to update. The child passes its
-  // own post.id up to identify itself.
+  // ---- HANDLER: Upvote (Refactored) ----
+  // Instead of incrementing post.upvotes, we INSERT a new record
+  // into the reactions array. This mirrors how the real Supabase
+  // INSERT INTO reactions (...) query will work in Phase 3.
   const handleUpvote = (postId) => {
-    // Guard: if this post is already in our upvoted set, do nothing
-    if (upvotedPostIds.has(postId)) return;
-
-    // Update the posts array — find the matching post and increment
-    // its upvotes. WHY map() instead of mutating directly:
-    // React requires state to be replaced with a NEW array/object,
-    // not mutated in place. map() returns a new array where only
-    // the matching post object is replaced with a new object
-    // (spread + override), leaving all other posts untouched.
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === postId
-          ? { ...post, upvotes: post.upvotes + 1 } // new object, +1 upvote
-          : post // all other posts unchanged
-      )
+    // Guard: prevent double-voting by checking reactions array.
+    // .some() short-circuits on first match — faster than .filter()
+    const alreadyReacted = reactions.some(
+      (r) => r.post_id === postId && r.user_id === CURRENT_USER_ID
     );
+    if (alreadyReacted) return;
 
-    // Record this postId as upvoted so the button locks.
-    // WHY new Set(prev): Sets are reference types. We must create a
-    // new Set (not mutate the old one) to trigger a React re-render.
-    setUpvotedPostIds((prev) => new Set(prev).add(postId));
+    const newReaction = {
+      id: crypto.randomUUID(),
+      post_id: postId,
+      user_id: CURRENT_USER_ID,
+      type: "upvote",
+      created_at: new Date().toISOString(),
+    };
+
+    // Append — triggers re-render so PostCard recalculates upvoteCount
+    setReactions((prev) => [...prev, newReaction]);
   };
 
-  // ---- HANDLER: Add a Comment ----
-  // Called by PostCard when the Reply button is clicked.
-  // Appends the new comment to the master comments array.
-  // Since comments are filtered by post_id at render time,
-  // this new comment will automatically appear under the
-  // correct post without any extra routing logic.
+  // ---- HANDLER: Add Comment ----
   const handleAddComment = (newComment) => {
-    setComments((prevComments) => [...prevComments, newComment]);
+    setComments((prev) => [...prev, newComment]);
   };
 
   return (
@@ -104,7 +86,9 @@ function App() {
             <HomePage
               posts={posts}
               comments={comments}
-              upvotedPostIds={upvotedPostIds}
+              reactions={reactions}
+              communities={communities}
+              currentUserId={CURRENT_USER_ID}
               onUpvote={handleUpvote}
               onAddComment={handleAddComment}
             />
@@ -112,7 +96,13 @@ function App() {
         />
         <Route
           path="create"
-          element={<CreatePage onPostSubmit={handleNewPost} />}
+          element={
+            <CreatePage
+              onPostSubmit={handleNewPost}
+              communities={communities}
+              currentUserId={CURRENT_USER_ID}
+            />
+          }
         />
         <Route path="journal" element={<JournalPage />} />
         <Route path="resources" element={<ResourcesPage />} />

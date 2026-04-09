@@ -1,10 +1,9 @@
 // ============================================================
-// COMPONENT: ResourceCard
+// COMPONENT: ResourceCard — Presentational only, no state.
 // SECI CONNECTION — COMBINATION:
-//   Combination = merging multiple pieces of EXPLICIT knowledge
-//   into new organized knowledge. The Resources page aggregates
-//   curated coping strategies from various sources into one
-//   accessible reference — exactly what Combination describes.
+//   Curated coping strategies from multiple sources merged
+//   into one organized reference. Combination = aggregating
+//   explicit knowledge into new structured knowledge.
 // ============================================================
 
 function ResourceCard({ resource }) {

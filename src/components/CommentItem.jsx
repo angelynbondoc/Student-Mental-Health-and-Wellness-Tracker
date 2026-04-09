@@ -1,21 +1,17 @@
 // ============================================================
-// COMPONENT: CommentItem
-// A pure "presentational" component — it receives one comment
-// object as a prop and renders it. It has NO state of its own.
-//
-// WHY SEPARATE FROM PostCard:
-//   Separation of Concerns. PostCard manages the LOGIC (adding
-//   comments, upvoting). CommentItem only handles the DISPLAY
-//   of a single comment. This makes both easier to maintain,
-//   test, and hand off to the UI/UX designer later.
-//
+// COMPONENT: CommentItem — Presentational only, no state.
 // SECI CONNECTION — SOCIALIZATION:
-//   Comments are peer-to-peer knowledge sharing. One person's
-//   tacit experience (emotional support, lived advice) is
-//   transmitted directly to someone who needs it.
+//   Peer-to-peer replies are tacit knowledge passed directly
+//   from one person to another who needs it.
 // ============================================================
 
 function CommentItem({ comment }) {
+  const formatDate = (isoString) =>
+    new Date(isoString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
+
   const style = {
     backgroundColor: "#f0eeff",
     borderLeft: "3px solid #6c63ff",
@@ -24,12 +20,6 @@ function CommentItem({ comment }) {
     borderRadius: "4px",
     fontSize: "14px",
   };
-
-  const formatDate = (isoString) =>
-    new Date(isoString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    });
 
   return (
     <div style={style}>

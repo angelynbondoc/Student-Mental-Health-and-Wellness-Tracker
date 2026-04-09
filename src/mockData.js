@@ -1,69 +1,140 @@
 // ============================================================
-// MOCK DATA — Sprint 1 Simulation Layer
-// WHY THIS EXISTS: Our Supabase backend isn't ready yet.
-// Instead of blocking development, we simulate the database
-// by exporting plain JavaScript arrays that mirror the exact
-// schema from our Data Contracts. When Dev 2 finishes the
-// backend, we only need to swap these arrays with real
-// Supabase fetch calls — the component logic stays the same.
+// MOCK DATA — Refactored to match Dev 2's finalized schema
+// Simulates our Supabase database tables as local JS arrays.
+// When the backend is ready, these get replaced with real
+// Supabase fetch calls — component logic stays untouched.
 // ============================================================
 
-// Mirrors the 'posts' table schema from Data Contracts.
-// 'upvotes' starts at different values to simulate real data variety.
+// ---- COMMUNITIES ----
+export const MOCK_COMMUNITIES = [
+  {
+    id: "community-uuid-001",
+    name: "Academic Stress",
+    category: "Stressors",
+    created_by: "user-uuid-admin",
+    created_at: "2025-01-01T00:00:00Z",
+  },
+  {
+    id: "community-uuid-002",
+    name: "Coping Strategies",
+    category: "Wellness",
+    created_by: "user-uuid-admin",
+    created_at: "2025-01-01T00:00:00Z",
+  },
+  {
+    id: "community-uuid-003",
+    name: "Daily Affirmations",
+    category: "Positivity",
+    created_by: "user-uuid-admin",
+    created_at: "2025-01-01T00:00:00Z",
+  },
+];
+
+// ---- POSTS ----
+// REMOVED: upvotes integer (now derived from reactions[])
+// ADDED:   community_id (FK → communities), is_flagged (moderation)
 export const MOCK_POSTS = [
   {
     id: "post-uuid-001",
     author_id: "user-uuid-abc",
+    community_id: "community-uuid-001",
     content:
       "I've been feeling really overwhelmed with school lately. Does anyone else struggle with balancing academics and mental health? I feel like I'm drowning.",
     is_anonymous: true,
-    upvotes: 14,
+    is_flagged: false,
     created_at: "2025-06-10T08:30:00Z",
   },
   {
     id: "post-uuid-002",
     author_id: "user-uuid-def",
+    community_id: "community-uuid-002",
     content:
       "Today I tried the 5-4-3-2-1 grounding technique during my anxiety attack and it actually worked! 5 things you see, 4 you touch, 3 you hear, 2 you smell, 1 you taste. Highly recommend.",
     is_anonymous: false,
-    upvotes: 42,
+    is_flagged: false,
     created_at: "2025-06-09T14:00:00Z",
   },
   {
     id: "post-uuid-003",
     author_id: "user-uuid-ghi",
+    community_id: "community-uuid-003",
     content:
       "Reminder: It's okay to not be okay. You don't have to perform happiness for anyone.",
     is_anonymous: true,
-    upvotes: 88,
+    is_flagged: false,
     created_at: "2025-06-08T20:15:00Z",
   },
 ];
 
-// Mirrors the 'comments' table. Each comment has a post_id
-// foreign key so we can filter which comments belong to which post.
+// ---- COMMENTS ----
+// ADDED: author_id — now required by the updated Data Contract
 export const MOCK_COMMENTS = [
   {
     id: "comment-uuid-001",
     post_id: "post-uuid-001",
+    author_id: "user-uuid-def",
     content: "You are not alone. I feel this every semester.",
     created_at: "2025-06-10T09:00:00Z",
   },
   {
     id: "comment-uuid-002",
     post_id: "post-uuid-001",
+    author_id: "user-uuid-ghi",
     content: "Have you tried talking to the school counselor? It helped me.",
     created_at: "2025-06-10T09:45:00Z",
   },
   {
     id: "comment-uuid-003",
     post_id: "post-uuid-002",
+    author_id: "user-uuid-abc",
     content: "Saving this. I always forget the steps during a panic attack!",
     created_at: "2025-06-09T15:30:00Z",
   },
 ];
 
-// Mirrors the 'mood_journal' table from Data Contracts.
+// ---- REACTIONS ----
+// NEW TABLE — replaces the upvotes integer on posts.
+// Each upvote is its own record with user_id + post_id + type.
+// Upvote count = filter this array by post_id and type === 'upvote'
+export const MOCK_REACTIONS = [
+  {
+    id: "reaction-uuid-001",
+    post_id: "post-uuid-001",
+    user_id: "user-uuid-def",
+    type: "upvote",
+    created_at: "2025-06-10T09:10:00Z",
+  },
+  {
+    id: "reaction-uuid-002",
+    post_id: "post-uuid-001",
+    user_id: "user-uuid-ghi",
+    type: "upvote",
+    created_at: "2025-06-10T10:00:00Z",
+  },
+  {
+    id: "reaction-uuid-003",
+    post_id: "post-uuid-002",
+    user_id: "user-uuid-abc",
+    type: "upvote",
+    created_at: "2025-06-09T15:00:00Z",
+  },
+  {
+    id: "reaction-uuid-004",
+    post_id: "post-uuid-003",
+    user_id: "user-uuid-abc",
+    type: "upvote",
+    created_at: "2025-06-09T21:00:00Z",
+  },
+  {
+    id: "reaction-uuid-005",
+    post_id: "post-uuid-003",
+    user_id: "user-uuid-def",
+    type: "upvote",
+    created_at: "2025-06-09T21:05:00Z",
+  },
+];
+
+// ---- JOURNAL ENTRIES ---- (unchanged)
 export const MOCK_JOURNAL_ENTRIES = [
   {
     id: "journal-uuid-001",
@@ -83,8 +154,7 @@ export const MOCK_JOURNAL_ENTRIES = [
   },
 ];
 
-// Supplementary mock data for the Resources page.
-// This doesn't have a strict DB contract yet, so we keep it simple.
+// ---- RESOURCES ---- (unchanged)
 export const MOCK_RESOURCES = [
   {
     id: "resource-uuid-001",

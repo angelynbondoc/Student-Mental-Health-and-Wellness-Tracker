@@ -1,27 +1,22 @@
 import { NavLink, Outlet } from "react-router-dom";
 
 // ============================================================
-// COMPONENT: MobileLayout
-// SECI CONNECTION: This is the main shell of the app.
-// It structures how knowledge flows between sections:
-//   - Home (Socialization) → Read shared community experiences
-//   - Create (Externalization) → Articulate personal feelings into posts
-//   - Journal (Internalization) → Privately reflect and absorb insights
-//   - Resources (Combination) → Curated coping knowledge
+// COMPONENT: MobileLayout — App Shell with Bottom Tab Nav
 //
-// WHY <Outlet />: React Router's <Outlet> is a placeholder that
-// renders whichever child page is currently active based on the URL.
-// Think of MobileLayout as a picture frame — <Outlet> is the
-// canvas inside that changes depending on which tab you click.
+// SECI CONNECTION:
+//   Each tab maps to a SECI knowledge process:
+//   Home       → Socialization  (share lived experiences)
+//   Create     → Externalization (write tacit feelings into text)
+//   Journal    → Internalization (private reflection)
+//   Resources  → Combination    (curated explicit knowledge)
 //
-// WHY bottom tab nav: We design mobile-first because our target
-// users (students) are primarily on phones. Bottom tabs are
-// thumb-friendly and a standard mobile UX pattern.
+// WHY <Outlet />:
+//   React Router renders the currently active child route
+//   inside <Outlet>. MobileLayout is the picture frame;
+//   Outlet is the canvas that swaps per tab.
 // ============================================================
 
 function MobileLayout() {
-  // Inline styles object — simulates a "mobile phone" viewport
-  // so we can develop and test the layout even on a desktop browser.
   const shellStyle = {
     maxWidth: "480px",
     margin: "0 auto",
@@ -37,8 +32,7 @@ function MobileLayout() {
     flex: 1,
     overflowY: "auto",
     padding: "16px",
-    // Extra bottom padding so content is never hidden behind the nav bar
-    paddingBottom: "80px",
+    paddingBottom: "80px", // prevents content hiding behind nav bar
   };
 
   const navBarStyle = {
@@ -53,10 +47,7 @@ function MobileLayout() {
     padding: "10px 0",
   };
 
-  // NavLink from react-router-dom automatically applies an
-  // "active" class when the current URL matches its 'to' prop.
-  // We use a callback style for 'style' to dynamically change
-  // the color of the active tab — visual feedback for the user.
+  // NavLink callback style: highlights the active tab in purple
   const getLinkStyle = ({ isActive }) => ({
     textDecoration: "none",
     color: isActive ? "#6c63ff" : "#888",
@@ -70,12 +61,9 @@ function MobileLayout() {
 
   return (
     <div style={shellStyle}>
-      {/* The scrollable content area — renders the active page */}
       <div style={contentAreaStyle}>
         <Outlet />
       </div>
-
-      {/* Bottom Tab Navigation Bar */}
       <nav style={navBarStyle}>
         <NavLink to="/" end style={getLinkStyle}>
           <span>🏠</span>

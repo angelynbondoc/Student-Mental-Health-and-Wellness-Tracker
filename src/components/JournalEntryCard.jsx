@@ -1,11 +1,9 @@
 // ============================================================
-// COMPONENT: JournalEntryCard
+// COMPONENT: JournalEntryCard — Presentational only, no state.
 // SECI CONNECTION — INTERNALIZATION:
-//   Internalization = converting explicit knowledge back into
-//   tacit knowledge through personal reflection and experience.
-//   The journal is where users read their own past entries and
-//   absorb patterns in their own mental health over time.
-//   "Learning by reflecting" is the KM process here.
+//   Users reflect on past entries to absorb patterns in their
+//   own mental health over time. Reading your own writing IS
+//   the knowledge internalization process.
 // ============================================================
 
 function JournalEntryCard({ entry }) {
@@ -28,14 +26,12 @@ function JournalEntryCard({ entry }) {
 
   return (
     <div style={cardStyle}>
-      {/* Render the prompt that was answered — from 'prompt_answered' schema key */}
       <p style={{ fontSize: "12px", color: "#aaa", margin: "0 0 6px 0" }}>
         📅 {formatDate(entry.created_at)}
       </p>
       <p style={{ fontSize: "13px", fontStyle: "italic", color: "#888", margin: "0 0 8px 0" }}>
         Prompt: "{entry.prompt_answered}"
       </p>
-      {/* The actual journal entry — from 'entry_text' schema key */}
       <p style={{ fontSize: "15px", margin: 0 }}>{entry.entry_text}</p>
     </div>
   );

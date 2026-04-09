@@ -3,60 +3,60 @@ import { useState } from "react";
 // ============================================================
 // COMPONENT: CreatePostForm
 // SECI CONNECTION — EXTERNALIZATION:
-//   This is the most important SECI touchpoint in the app.
-//   Externalization = converting TACIT knowledge (inner feelings,
-//   personal struggles) into EXPLICIT knowledge (written text
-//   that others can read, learn from, and engage with).
-//   The act of writing a post IS the KM process in action.
+//   Writing a post converts tacit knowledge (inner feelings)
+//   into explicit knowledge (text others can read and learn
+//   from). The act of typing IS the KM process in action.
 //
 // PROPS:
-//   - onPostSubmit: a callback function passed in by the parent
-//     page (CreatePage). When the form submits, it calls this
-//     function with the new post object, so the parent can add
-//     it to the shared posts list. This is called "lifting state up"
-//     — child components don't manage shared data; they report
-//     changes upward to the parent.
+//   - onPostSubmit: callback to App.jsx to add the new post
+//   - communities: array used to populate the community picker
+//   - currentUserId: the logged-in user's ID for author_id
+//
+// NEW IN THIS REFACTOR:
+//   - community_id: user selects a community before posting
+//   - is_flagged: defaults to false on all new posts
+//   - author_id: now included using currentUserId prop
 // ============================================================
 
-function CreatePostForm({ onPostSubmit }) {
-  // Controlled state for the textarea — every keystroke updates this
+function CreatePostForm({ onPostSubmit, communities = [], currentUserId }) {
   const [content, setContent] = useState("");
-
-  // Controlled state for the checkbox — true = post anonymously
   const [isAnonymous, setIsAnonymous] = useState(false);
-
-  // UI state: show a success message after submitting
   const [submitted, setSubmitted] = useState(false);
 
+  // Controlled state for the community dropdown.
+  // Default to the first community if available.
+  const [selectedCommunityId, setSelectedCommunityId] = useState(
+    communities[0]?.id || ""
+  );
+
   const handleSubmit = () => {
-    // Guard: Prevent submitting blank posts
     if (!content.trim()) {
       alert("Please write something before posting.");
       return;
     }
+    if (!selectedCommunityId) {
+      alert("Please select a community.");
+      return;
+    }
 
-    // Build the new post object — STRICTLY following the 'posts' Data Contract.
-    // Every key here matches a column in the posts DB table.
+    // Build post object strictly following the updated Data Contract.
+    // No 'upvotes' field — votes now live in the reactions table.
     const newPost = {
-      id: crypto.randomUUID(),        // Simulates Supabase auto-UUID
-      author_id: "user-uuid-current", // Placeholder — will be auth.user.id later
-      content: content,               // From textarea
-      is_anonymous: isAnonymous,      // From checkbox
-      upvotes: 0,                     // New posts start at 0 upvotes
+      id: crypto.randomUUID(),
+      author_id: currentUserId,
+      community_id: selectedCommunityId,   // ← NEW: from dropdown
+      content: content,
+      is_anonymous: isAnonymous,
+      is_flagged: false,                   // ← NEW: always false on creation
       created_at: new Date().toISOString(),
     };
 
-    // "Lift state up" — pass the new post to the parent component.
-    // The parent (HomePage via CreatePage) will add it to the posts list.
-    onPostSubmit(newPost);
-
-    // Reset form fields to empty state after submission
+    onPostSubmit(newPost); // Lift up to App.jsx
     setContent("");
     setIsAnonymous(false);
-
-    // Show a temporary success message
+    setSelectedCommunityId(communities[0]?.id || "");
     setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000); // Hide after 3 seconds
+    setTimeout(() => setSubmitted(false), 3000);
   };
 
   return (
@@ -66,7 +66,30 @@ function CreatePostForm({ onPostSubmit }) {
         Your story could be exactly what someone else needs to hear today.
       </p>
 
-      {/* Textarea — controlled input bound to 'content' state */}
+      {/* Community Picker — NEW */}
+      <label style={{ fontSize: "14px", display: "block", marginBottom: "6px" }}>
+        Post to Community:
+      </label>
+      <select
+        value={selectedCommunityId}
+        onChange={(e) => setSelectedCommunityId(e.target.value)}
+        style={{
+          width: "100%",
+          padding: "8px",
+          borderRadius: "6px",
+          border: "1px solid #ccc",
+          marginBottom: "12px",
+          fontSize: "14px",
+        }}
+      >
+        {communities.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.name}
+          </option>
+        ))}
+      </select>
+
+      {/* Post Content Textarea */}
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
@@ -96,7 +119,6 @@ function CreatePostForm({ onPostSubmit }) {
         </label>
       </div>
 
-      {/* Submit Button */}
       <button
         onClick={handleSubmit}
         style={{
@@ -113,7 +135,6 @@ function CreatePostForm({ onPostSubmit }) {
         Post to Community
       </button>
 
-      {/* Success feedback message — only shown for 3 seconds post-submit */}
       {submitted && (
         <p style={{ color: "green", marginTop: "10px", textAlign: "center" }}>
           ✅ Your post has been shared. Thank you for your courage.

@@ -2,7 +2,20 @@ import { useState, useEffect } from "react";
 import JournalEntryCard from "../components/JournalEntryCard";
 import { MOCK_JOURNAL_ENTRIES } from "../mockData";
 
-// SECI — INTERNALIZATION: Users reflect on their own past entries.
+// ============================================================
+// PAGE: JournalPage
+// SECI CONNECTION — INTERNALIZATION:
+//   Private reflection space. Reading past entries helps users
+//   absorb and internalize patterns in their own well-being.
+//
+// WHY useEffect + local state is fine here:
+//   Journal entries are private to the user and not shared
+//   across any other page/component. There is no risk of
+//   data loss from unmounting because we reload from the
+//   mock array every time the page mounts — and in Phase 3,
+//   this will fetch fresh from Supabase on every visit anyway.
+// ============================================================
+
 function JournalPage() {
   const [entries, setEntries] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

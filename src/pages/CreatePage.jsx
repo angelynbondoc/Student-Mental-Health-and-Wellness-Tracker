@@ -1,18 +1,19 @@
 import CreatePostForm from "../components/CreatePostForm";
 
 // ============================================================
-// PAGE: CreatePage
-// A thin wrapper page for the CreatePostForm component.
-// The actual logic lives inside CreatePostForm — this page
-// just provides the route target and page-level heading.
-// onPostSubmit will be wired up in App.jsx via shared state
-// (for now, we pass a simple console.log as placeholder).
+// PAGE: CreatePage — Thin wrapper for CreatePostForm.
+// SECI CONNECTION — EXTERNALIZATION:
+//   The page where tacit feelings become explicit community posts.
 // ============================================================
 
-function CreatePage({ onPostSubmit }) {
+function CreatePage({ onPostSubmit, communities, currentUserId }) {
   return (
     <div>
-      <CreatePostForm onPostSubmit={onPostSubmit} />
+      <CreatePostForm
+        onPostSubmit={onPostSubmit}
+        communities={communities}
+        currentUserId={currentUserId}
+      />
     </div>
   );
 }
