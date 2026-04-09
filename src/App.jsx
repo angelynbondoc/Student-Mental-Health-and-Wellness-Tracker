@@ -1,113 +1,88 @@
-import { useState } from "react";
-import { Routes, Route } from "react-router-dom";
-import MobileLayout from "./components/MobileLayout";
-import HomePage from "./pages/HomePage";
-import CreatePage from "./pages/CreatePage";
-import JournalPage from "./pages/JournalPage";
-import ResourcesPage from "./pages/ResourcesPage";
+// =============================================================================
+// App.jsx — Single source of truth. Holds ALL global state.
+// Batch 3 adds: notifications, directMessages + InboxPage route
+// FIX: Restored missing /create route and CreatePage import
+// =============================================================================
+import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+import AppContext from './AppContext';
+import MobileLayout from './components/MobileLayout';
+import HomePage from './pages/HomePage';
+import CreatePage from './pages/CreatePage';       // ← RESTORED
+import JournalPage from './pages/JournalPage';
+import ResourcesPage from './pages/ResourcesPage';
+import HabitsPage from './pages/HabitsPage';
+import InboxPage from './pages/InboxPage';
+
 import {
-  MOCK_POSTS,
-  MOCK_COMMENTS,
-  MOCK_REACTIONS,
-  MOCK_COMMUNITIES,
-} from "./mockData";
+  INITIAL_PROFILES,
+  INITIAL_COMMUNITIES,
+  INITIAL_POSTS,
+  INITIAL_COMMENTS,
+  INITIAL_REACTIONS,
+  INITIAL_MOOD_JOURNAL,
+  INITIAL_RESOURCES,
+  INITIAL_HABITS,
+  INITIAL_HABIT_LOGS,
+  INITIAL_NOTIFICATIONS,
+  INITIAL_DIRECT_MESSAGES,
+} from './Mockdata';
 
-// ============================================================
-// ROOT COMPONENT: App.jsx — Single Source of Truth
-//
-// WHY ALL STATE LIVES HERE:
-//   App.jsx is never unmounted during tab navigation.
-//   Any state inside a page component (HomePage, CreatePage)
-//   gets destroyed when the user navigates away. By lifting
-//   all shared state here, data persists across the entire
-//   session regardless of which tab is active.
-//
-// CURRENT_USER_ID simulates Supabase auth.user.id.
-// In Phase 3, replace this with: supabase.auth.getUser()
-// ============================================================
-
-const CURRENT_USER_ID = "user-uuid-current";
+const CURRENT_USER = {
+  id: 'user-1',
+  display_name: 'Test Student',
+  role: 'student', // change to 'admin' to reveal admin UI
+};
 
 function App() {
-  // Master posts array — no longer stores upvote count
-  const [posts, setPosts] = useState(MOCK_POSTS);
+  // ── Batch 1 ────────────────────────────────────────────────────────────────
+  const [profiles,    setProfiles]    = useState(INITIAL_PROFILES);
+  const [communities, setCommunities] = useState(INITIAL_COMMUNITIES);
+  const [posts,       setPosts]       = useState(INITIAL_POSTS);
+  const [comments,    setComments]    = useState(INITIAL_COMMENTS);
+  const [reactions,   setReactions]   = useState(INITIAL_REACTIONS);
 
-  // Master comments array — includes author_id per new schema
-  const [comments, setComments] = useState(MOCK_COMMENTS);
+  // ── Batch 2 ────────────────────────────────────────────────────────────────
+  const [moodJournal, setMoodJournal] = useState(INITIAL_MOOD_JOURNAL);
+  const [resources,   setResources]   = useState(INITIAL_RESOURCES);
+  const [habits,      setHabits]      = useState(INITIAL_HABITS);
+  const [habitLogs,   setHabitLogs]   = useState(INITIAL_HABIT_LOGS);
 
-  // Master reactions array — each upvote is its own record here.
-  // Upvote counts are DERIVED from this at render time, not stored.
-  const [reactions, setReactions] = useState(MOCK_REACTIONS);
+  // ── Batch 3 ────────────────────────────────────────────────────────────────
+  const [notifications,  setNotifications]  = useState(INITIAL_NOTIFICATIONS);
+  const [directMessages, setDirectMessages] = useState(INITIAL_DIRECT_MESSAGES);
 
-  // Communities — read-only in Phase 1, no setter needed
-  const [communities] = useState(MOCK_COMMUNITIES);
-
-  // ---- HANDLER: Add New Post ----
-  // Prepends so newest posts appear at the top of the feed
-  const handleNewPost = (newPost) => {
-    setPosts((prev) => [newPost, ...prev]);
-  };
-
-  // ---- HANDLER: Upvote (Refactored) ----
-  // Instead of incrementing post.upvotes, we INSERT a new record
-  // into the reactions array. This mirrors how the real Supabase
-  // INSERT INTO reactions (...) query will work in Phase 3.
-  const handleUpvote = (postId) => {
-    // Guard: prevent double-voting by checking reactions array.
-    // .some() short-circuits on first match — faster than .filter()
-    const alreadyReacted = reactions.some(
-      (r) => r.post_id === postId && r.user_id === CURRENT_USER_ID
-    );
-    if (alreadyReacted) return;
-
-    const newReaction = {
-      id: crypto.randomUUID(),
-      post_id: postId,
-      user_id: CURRENT_USER_ID,
-      type: "upvote",
-      created_at: new Date().toISOString(),
-    };
-
-    // Append — triggers re-render so PostCard recalculates upvoteCount
-    setReactions((prev) => [...prev, newReaction]);
-  };
-
-  // ---- HANDLER: Add Comment ----
-  const handleAddComment = (newComment) => {
-    setComments((prev) => [...prev, newComment]);
+  const contextValue = {
+    currentUser: CURRENT_USER,
+    profiles,    setProfiles,
+    communities, setCommunities,
+    posts,       setPosts,
+    comments,    setComments,
+    reactions,   setReactions,
+    moodJournal, setMoodJournal,
+    resources,   setResources,
+    habits,      setHabits,
+    habitLogs,   setHabitLogs,
+    notifications,  setNotifications,
+    directMessages, setDirectMessages,
   };
 
   return (
-    <Routes>
-      <Route path="/" element={<MobileLayout />}>
-        <Route
-          index
-          element={
-            <HomePage
-              posts={posts}
-              comments={comments}
-              reactions={reactions}
-              communities={communities}
-              currentUserId={CURRENT_USER_ID}
-              onUpvote={handleUpvote}
-              onAddComment={handleAddComment}
-            />
-          }
-        />
-        <Route
-          path="create"
-          element={
-            <CreatePage
-              onPostSubmit={handleNewPost}
-              communities={communities}
-              currentUserId={CURRENT_USER_ID}
-            />
-          }
-        />
-        <Route path="journal" element={<JournalPage />} />
-        <Route path="resources" element={<ResourcesPage />} />
-      </Route>
-    </Routes>
+    <AppContext.Provider value={contextValue}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<MobileLayout />}>
+            <Route index             element={<HomePage />} />
+            <Route path="create"     element={<CreatePage />} />   {/* ← RESTORED */}
+            <Route path="journal"    element={<JournalPage />} />
+            <Route path="resources"  element={<ResourcesPage />} />
+            <Route path="habits"     element={<HabitsPage />} />
+            <Route path="inbox"      element={<InboxPage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AppContext.Provider>
   );
 }
 
