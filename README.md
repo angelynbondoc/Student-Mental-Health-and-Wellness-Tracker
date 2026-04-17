@@ -1,23 +1,27 @@
-# Student Mental Health & Wellness Tracker
+# Student Mental Health and Wellness Tracker
 
-A KM-driven anonymous student wellness platform based on the SECI model.
+## Cloud Backend Setup (Sprint 1)
 
-## Tech Stack
-- Frontend: React + Vite
-- Database & Auth: Supabase (PostgreSQL)
-- Server-side Logic: Supabase Edge Functions
+This project uses a live Supabase Cloud instance for the database, authentication, and serverless Edge Functions. 
 
-## Local Setup
+### Prerequisites
+1. Node.js installed on your machine.
+2. A `.env` file configured with the production Supabase keys.
 
-1. Clone the repo
-2. `cd src && npm install`
-3. Copy `.env.example` to `.env` and fill in your Supabase credentials
-4. `npm run dev`
+### Wiring up the Frontend
+1. Clone the repository and navigate to the project root.
+2. Run `npm install` to install frontend dependencies.
+3. Create a `.env.local` file in your frontend root directory and add the following keys (request these from Dev 2):
+   ```env
+   VITE_SUPABASE_URL=https://<your-project-ref>.supabase.co
+   VITE_SUPABASE_ANON_KEY=<the-cloud-anon-key>
 
-## Folder Structure
-- `/src` — Application source code
-- `/docs` — Project documentation, wireframes, ADRs
-- `/tests` — Test files
+## Authentication & Data Fetching API Contracts
+* Registration: Do NOT use supabase.auth.signUp(). You must send a POST request with the email and password directly to:
+https://<your-project-ref>.supabase.co/functions/v1/validate-neu-email
 
-## Deployment
-_To be documented after deployment._
+* Anonymous Posting: When fetching the feed, you must query the posts_view instead of the raw posts table to ensure anonymous author IDs are correctly masked by the database.
+
+* Search Function: Do not fetch all posts to filter on the client. Call the custom RPC function to search and log history simultaneously:
+```
+await supabase.rpc('log_and_search', { search_term: 'your query' })
