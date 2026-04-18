@@ -29,7 +29,7 @@
 
 ---
 
-## What Each Member Is Working On This Week
+## What Each Member Is Working On The Upcoming Week
 
 | Member | Task |
 |--------|------|
