@@ -10,7 +10,7 @@ import { generateUUID } from '../../Mockdata';
 export default function usePostCard(post) {
   const {
     currentUser,
-    posts,     setPosts,
+    setPosts,
     comments,  setComments,
     reactions, setReactions,
   } = useContext(AppContext);

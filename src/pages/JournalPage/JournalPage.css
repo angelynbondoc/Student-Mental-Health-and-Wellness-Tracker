@@ -1,0 +1,38 @@
+/* =============================================================================
+   JournalPage.css — page-specific styles only.
+   Shared: page-shell, form-card, field-label, field-input, field-textarea,
+           btn-submit, notice--green, content-card, empty-state (shared.css)
+   ============================================================================= */
+
+/* ── Mood selector ────────────────────────────────────────────────────────── */
+.jp-mood-row { display: flex; gap: 8px; }
+.jp-mood-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  gap: 5px; padding: 10px 4px; border-radius: 10px;
+  border: 1.5px solid transparent; background: var(--color-input-bg);
+  cursor: pointer; transition: all 0.15s ease;
+}
+.jp-mood-btn:hover { background: var(--color-primary-light); border-color: var(--color-primary); }
+.jp-mood-btn--active {
+  background: var(--color-primary-light); border-color: var(--color-accent);
+  box-shadow: 0 2px 8px rgba(46,125,50,0.16); transform: scale(1.06);
+}
+.jp-mood-emoji { font-size: 22px; line-height: 1; }
+.jp-mood-label { font-family: var(--font-body); font-size: 10px; color: var(--color-text-faint); text-align: center; }
+.jp-mood-btn--active .jp-mood-label { color: var(--color-primary); font-weight: 600; }
+
+/* ── Past entries ─────────────────────────────────────────────────────────── */
+.jp-past-heading {
+  font-family: var(--font-heading); font-size: 16px; font-weight: 600;
+  color: var(--color-text); margin: 0 0 16px;
+}
+.jp-entry-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.jp-entry-emoji  { font-size: 20px; }
+.jp-entry-mood   { font-family: var(--font-heading); font-size: 13px; font-weight: 600; color: var(--color-text); flex: 1; }
+.jp-entry-date   { font-family: var(--font-body); font-size: 11px; color: var(--color-text-faint); }
+.jp-entry-text   { font-family: var(--font-body); font-size: 14px; color: var(--color-text-body); line-height: 1.65; margin: 0 0 8px; }
+.jp-entry-meta   { font-family: var(--font-body); font-size: 12px; color: var(--color-text-faint); margin: 4px 0 0; }
+.jp-meta-label   { font-weight: 600; color: var(--color-text-muted); }
+
+@media (max-width: 768px) { .jp-mood-row { gap: 6px; } }
+@media (max-width: 480px) { .jp-mood-emoji { font-size: 20px; } .jp-mood-label { font-size: 9px; } }

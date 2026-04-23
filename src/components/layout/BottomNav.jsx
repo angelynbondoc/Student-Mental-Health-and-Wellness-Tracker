@@ -1,8 +1,3 @@
-// =============================================================================
-// BottomNav.jsx
-// Mobile-only fixed bottom tab bar.
-// Hidden on desktop via CSS — see MobileLayout.css (.neu-bottom-nav).
-// =============================================================================
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import NAV_LINKS from './navLinks';
@@ -10,7 +5,7 @@ import NAV_LINKS from './navLinks';
 export default function BottomNav() {
   return (
     <nav className="neu-bottom-nav">
-      {NAV_LINKS.map(({ to, label, icon: Icon }) => (
+      {NAV_LINKS.map(({ to, label,icon:Icon }) => (
         <NavLink
           key={to}
           to={to}
