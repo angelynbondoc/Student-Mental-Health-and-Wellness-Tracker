@@ -11,6 +11,158 @@ import { generateUUID } from '../Mockdata';
 
 const STREAK_EMOJI = ['🌱', '🔥', '⚡', '🏆'];
 
+const STYLES = `
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=DM+Sans:wght@400;500&display=swap');
+
+  .neu-habits {
+    width: 100%;
+    padding: 32px 40px;
+    background: #FAFAFA;
+    min-height: calc(100vh - 56px);
+    display: flex; 
+    flex-direction: column; 
+    align-items: center;
+  }
+  .neu-habits-inner { max-width: 720px;
+    width: 100%}
+  .neu-habits-heading {
+    font-family: 'Poppins', sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: #1A1A1A;
+    margin: 0 0 4px;
+  }
+  .neu-habits-sub {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: #9E9E9E;
+    margin: 0 0 28px;
+  }
+  .neu-habits-list { display: flex; flex-direction: column; gap: 10px; }
+  .neu-habits-empty {
+    font-family: 'DM Sans', sans-serif;
+    color: #9E9E9E;
+    font-size: 14px;
+    text-align: center;
+    padding: 48px 0;
+    font-style: italic;
+  }
+  .neu-habit-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 16px 20px;
+    border: 1px solid #E8E8E8;
+    transition: box-shadow 0.15s ease;
+  }
+  .neu-habit-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.07); }
+  /* Done state: primary tint + left green border */
+  .neu-habit-card--done {
+    background: #E8F5E9;
+    border-left: 3px solid #2E7D32;
+  }
+  .neu-habit-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+  }
+  .neu-habit-emoji { font-size: 26px; flex-shrink: 0; }
+  .neu-habit-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: #1A1A1A;
+    margin: 0;
+  }
+  .neu-habit-streak {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: #9E9E9E;
+    margin: 2px 0 0;
+  }
+  .neu-check-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 100px;
+    border: 1px solid #E8E8E8;
+    background: #FFFFFF;
+    color: #616161;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+  }
+  .neu-check-btn:hover { border-color: #2E7D32; color: #2E7D32; background: #E8F5E9; }
+  /* Done button — solid primary green */
+  .neu-check-btn--done {
+    background: #2E7D32;
+    color: #FFFFFF;
+    border-color: #2E7D32;
+  }
+  .neu-check-btn--done:hover { background: #1B5E20; border-color: #1B5E20; color: #FFFFFF; }
+
+  /* Admin box — gold dashed border (accent, authority cue) */
+  .neu-admin-box {
+    margin-top: 36px;
+    padding: 20px;
+    border-radius: 12px;
+    background: #FFFDE7;
+    border: 1.5px dashed #F5C400;
+  }
+  .neu-admin-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #7C5800;
+    margin: 0 0 12px;
+  }
+  .neu-admin-row { display: flex; gap: 10px; }
+  .neu-admin-input {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #F5C400;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: #1A1A1A;
+    background: #FFFFFF;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .neu-admin-input:focus {
+    border-color: #2E7D32;
+    box-shadow: 0 0 0 3px rgba(46,125,50,0.10);
+  }
+  .neu-admin-add-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    background: #F5C400;
+    color: #1A1A1A;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s ease;
+  }
+  .neu-admin-add-btn:hover { background: #E0B000; }
+
+  @media (max-width: 768px) { .neu-habits { padding: 24px 20px; } }
+  @media (max-width: 480px) {
+    .neu-habits { padding: 18px 16px; }
+    .neu-admin-row { flex-direction: column; }
+    .neu-admin-add-btn { width: 100%; }
+  }
+`;
+
 export default function HabitsPage() {
   const {
     currentUser,
@@ -44,11 +196,11 @@ export default function HabitsPage() {
       setHabitLogs((prev) => [
         ...prev,
         {
-          id: generateUUID(),
-          habit_id: habitId,
-          user_id: currentUser.id,
+          id:             generateUUID(),
+          habit_id:       habitId,
+          user_id:        currentUser.id,
           completed_date: todayStr,
-          created_at: new Date().toISOString(),
+          created_at:     new Date().toISOString(),
         },
       ]);
     }
@@ -80,96 +232,65 @@ export default function HabitsPage() {
     habitLogs.filter((log) => log.habit_id === habitId).length;
 
   return (
-    <div style={styles.page}>
-      <h2 style={styles.heading}>My Habits</h2>
-      <p style={styles.subheading}>Track your daily wellness rituals ✨</p>
+    <>
+      <style>{STYLES}</style>
+      <div className="neu-habits">
+        <div className="neu-habits-inner">
+          <h2 className="neu-habits-heading">My Habits</h2>
+          <p className="neu-habits-sub">Track your daily wellness rituals ✨</p>
 
-      <div style={styles.list}>
-        {myHabits.length === 0 && (
-          <p style={styles.empty}>No habits yet. Ask an admin to add some!</p>
-        )}
-        {myHabits.map((habit) => {
-          const logged = isLoggedToday(habit.id);
-          const count  = completionCount(habit.id);
-          const emoji  = STREAK_EMOJI[Math.min(count, STREAK_EMOJI.length - 1)];
-          return (
-            <div key={habit.id} style={{ ...styles.card, ...(logged ? styles.cardDone : {}) }}>
-              <div style={styles.cardLeft}>
-                <span style={styles.emoji}>{emoji}</span>
-                <div>
-                  <p style={styles.habitName}>{habit.habit_name}</p>
-                  <p style={styles.streakLabel}>
-                    {count} total {count === 1 ? 'completion' : 'completions'}
-                  </p>
+          <div className="neu-habits-list">
+            {myHabits.length === 0 && (
+              <p className="neu-habits-empty">No habits yet. Ask an admin to add some!</p>
+            )}
+            {myHabits.map((habit) => {
+              const logged = isLoggedToday(habit.id);
+              const count  = completionCount(habit.id);
+              const emoji  = STREAK_EMOJI[Math.min(count, STREAK_EMOJI.length - 1)];
+              return (
+                <div
+                  key={habit.id}
+                  className={`neu-habit-card${logged ? ' neu-habit-card--done' : ''}`}
+                >
+                  <div className="neu-habit-left">
+                    <span className="neu-habit-emoji">{emoji}</span>
+                    <div>
+                      <p className="neu-habit-name">{habit.habit_name}</p>
+                      <p className="neu-habit-streak">
+                        {count} total {count === 1 ? 'completion' : 'completions'}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    className={`neu-check-btn${logged ? ' neu-check-btn--done' : ''}`}
+                    onClick={() => handleToggleLog(habit.id)}
+                  >
+                    {logged ? '✓ Done' : 'Mark Done'}
+                  </button>
                 </div>
-              </div>
-              <button
-                style={{ ...styles.checkBtn, ...(logged ? styles.checkBtnDone : {}) }}
-                onClick={() => handleToggleLog(habit.id)}
-              >
-                {logged ? '✓ Done' : 'Mark Done'}
-              </button>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* ── ADMIN-ONLY FORM — not mounted for students at all ──────────── */}
-      {currentUser.role === 'admin' && (
-        <div style={styles.adminBox}>
-          <p style={styles.adminLabel}>🛡️ Admin — Add New Habit</p>
-          <div style={styles.adminRow}>
-            <input
-              style={styles.input}
-              type="text"
-              placeholder="e.g. Journal before bed"
-              value={newHabitName}
-              onChange={(e) => setNewHabitName(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAddHabit()}
-            />
-            <button style={styles.addBtn} onClick={handleAddHabit}>+ Add</button>
+              );
+            })}
           </div>
+
+          {/* ── ADMIN-ONLY FORM — not mounted for students at all ──────────── */}
+          {currentUser.role === 'admin' && (
+            <div className="neu-admin-box">
+              <p className="neu-admin-label">🛡️ Admin — Add New Habit</p>
+              <div className="neu-admin-row">
+                <input
+                  className="neu-admin-input"
+                  type="text"
+                  placeholder="e.g. Journal before bed"
+                  value={newHabitName}
+                  onChange={(e) => setNewHabitName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddHabit()}
+                />
+                <button className="neu-admin-add-btn" onClick={handleAddHabit}>+ Add</button>
+              </div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 }
-
-const styles = {
-  page:       { padding: '20px 16px', fontFamily: 'sans-serif' },
-  heading:    { fontSize: 22, fontWeight: 700, margin: 0 },
-  subheading: { fontSize: 13, color: '#666', marginTop: 4, marginBottom: 20 },
-  list:       { display: 'flex', flexDirection: 'column', gap: 12 },
-  empty:      { color: '#999', fontSize: 14, textAlign: 'center', marginTop: 20 },
-  card: {
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    background: '#fff', borderRadius: 14, padding: '14px 16px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
-  },
-  cardDone:    { background: '#f0fdf4', borderLeft: '4px solid #22c55e' },
-  cardLeft:    { display: 'flex', alignItems: 'center', gap: 12 },
-  emoji:       { fontSize: 28 },
-  habitName:   { fontSize: 15, fontWeight: 600, margin: 0 },
-  streakLabel: { fontSize: 11, color: '#888', margin: '2px 0 0' },
-  checkBtn: {
-    fontSize: 12, fontWeight: 600, padding: '8px 14px',
-    borderRadius: 20, border: '2px solid #d1d5db',
-    background: '#fff', cursor: 'pointer', color: '#555',
-  },
-  checkBtnDone: { background: '#22c55e', color: '#fff', border: '2px solid #22c55e' },
-  adminBox: {
-    marginTop: 28, padding: '16px', borderRadius: 14,
-    background: 'linear-gradient(135deg, #fffbeb, #fef3c7)',
-    border: '1.5px dashed #f59e0b',
-  },
-  adminLabel: { fontSize: 13, fontWeight: 700, color: '#92400e', marginBottom: 10 },
-  adminRow:   { display: 'flex', gap: 10 },
-  input: {
-    flex: 1, padding: '10px 14px', borderRadius: 10,
-    border: '1.5px solid #d1d5db', fontSize: 14, outline: 'none',
-  },
-  addBtn: {
-    padding: '10px 18px', borderRadius: 10, border: 'none',
-    background: '#f59e0b', color: '#fff', fontWeight: 700, fontSize: 14, cursor: 'pointer',
-  },
-};

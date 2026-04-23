@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import AppContext from './AppContext';
-import MobileLayout from './components/MobileLayout';
+import  {MobileLayout}  from './components/layout';
 import HomePage from './pages/HomePage';
 import CreatePage from './pages/CreatePage';       // ← RESTORED
 import JournalPage from './pages/JournalPage';
@@ -31,7 +31,7 @@ import {
 
 const CURRENT_USER = {
   id: 'user-1',
-  display_name: 'Test Student',
+  display_name: 'username_<role>',
   role: 'student', // change to 'admin' to reveal admin UI
 };
 
