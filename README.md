@@ -29,6 +29,8 @@ await supabase.auth.signInWithOAuth({
   }
 });
 
+---
+
 * (Note: Database-level triggers will forcefully reject any non-@neu.edu.ph emails that attempt to bypass this frontend UI).
 
 - Anonymous Posting: When fetching the feed, you must query the posts_view instead of the raw posts table to ensure anonymous author IDs are correctly masked by the database.
