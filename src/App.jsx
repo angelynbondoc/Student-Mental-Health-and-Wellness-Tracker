@@ -15,6 +15,7 @@ import ResourcesPage from "./pages/ResourcesPage/ResourcesPage";
 import HabitsPage from "./pages/HabitsPage/HabitsPage";
 import InboxPage from "./pages/InboxPage/InboxPage";
 import LoginPage from "./pages/LoginPage/LoginPage";
+import ProfilePage from "./pages/ProfilePage/ProfilePage";
 
 import {
   INITIAL_PROFILES,
@@ -98,6 +99,7 @@ function App() {
             <Route path="/resources" element={<ResourcesPage />} />
             <Route path="/habits" element={<HabitsPage />} />
             <Route path="/inbox" element={<InboxPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Routes>
       </BrowserRouter>

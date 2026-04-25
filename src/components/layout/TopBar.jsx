@@ -2,9 +2,17 @@
 // TopBar.jsx
 // Sticky top navigation bar — app name, user chip, notifications bell.
 // =============================================================================
-import React from 'react';
-import {Bell} from 'lucide-react'
-export default function TopBar({ displayName, isAdmin, unreadCount, onBellClick }) {
+import React from "react";
+import { Bell, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+export default function TopBar({
+  displayName,
+  isAdmin,
+  unreadCount,
+  onBellClick,
+  onProfileClick,
+}) {
+  const navigate = useNavigate();
   return (
     <header className="neu-topbar">
       <div className="neu-topbar-left">
@@ -17,6 +25,14 @@ export default function TopBar({ displayName, isAdmin, unreadCount, onBellClick 
           {displayName}
           {isAdmin && <span className="neu-admin-badge">Admin</span>}
         </span>
+
+        <button
+          className="neu-profile-btn"
+          onClick={() => navigate("/profile")}
+          aria-label="Go to profile"
+        >
+          <User size={18} strokeWidth={2} />
+        </button>
 
         <button
           className="neu-bell-btn"
