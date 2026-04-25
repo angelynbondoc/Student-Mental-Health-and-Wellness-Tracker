@@ -17,6 +17,8 @@ import InboxPage from "./pages/InboxPage/InboxPage";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import ProfilePage from "./pages/ProfilePage/ProfilePage";
 
+import AdminRouteGuard from "./components/AdminRouteGuard";
+
 import {
   INITIAL_PROFILES,
   INITIAL_COMMUNITIES,
@@ -100,6 +102,20 @@ function App() {
             <Route path="/habits" element={<HabitsPage />} />
             <Route path="/inbox" element={<InboxPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+
+            {/* Admin route */}
+            <Route 
+              path="/admin" 
+              element={
+                <AdminRouteGuard>
+                  
+                  <div style={{ padding: "2rem", textAlign: "center" }}>
+                    <h2>Admin Dashboard Placeholder</h2>
+                    <p>UI/UX needs to build this page.</p>
+                  </div>
+                </AdminRouteGuard>
+              } 
+            />
           </Route>
         </Routes>
       </BrowserRouter>
