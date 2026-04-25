@@ -96,3 +96,15 @@
 * **What I changed, rejected, or improved — and WHY:** I executed the command, staged the new untracked migration file, and immediately pushed it to the remote Git repository. I ensured that the README.md was updated with explicit instructions for Dev 1 on how to run supabase db push and functions serve.
 
 * **What I learned or decided:** Infrastructure as Code (IaC) is critical. Dashboard clicks are ephemeral; if backend architecture isn't codified in migration files, the team's environments will immediately desynchronize.
+
+**Entry 9: Pivoting to Google Workspace SSO & Database-Level Domain Enforcement**
+
+* **Date & Task:** April 25, 2026 - Pivoting from a custom password-based Edge Function to Google OAuth, and securing the backend from domain bypass vulnerabilities.
+
+* **The Prompt:** "Since the university already uses Google Workspace, how do we pivot to Google OAuth? Also, how do we guarantee that users can't just use a personal Gmail account if we delete the old Edge Function?"
+
+* **What the AI produced:** The AI guided me through configuring Google Cloud Platform credentials and provided the frontend `signInWithOAuth` function with the `hd: 'neu.edu.ph'` parameter. Crucially, it provided a SQL script to upgrade my existing `handle_new_user` trigger to enforce the domain check natively.
+
+* **What I changed, rejected, or improved — and WHY:** I realized that relying solely on the frontend `hd` parameter is a massive security flaw, as malicious users could intercept the API call and strip the parameter out. I deployed the upgraded PostgreSQL trigger to forcefully reject non-NEU emails at the database layer before the user profile is ever created. I then permanently deleted the obsolete Edge Function to reduce attack surface and cloud bloat.
+
+* **What I learned or decided:** Frontend validation is merely a suggestion; true security must be enforced at the database level. Shifting domain validation from an Edge Function directly into a PostgreSQL trigger resulted in a faster, more resilient, and passwordless Zero-Trust architecture.

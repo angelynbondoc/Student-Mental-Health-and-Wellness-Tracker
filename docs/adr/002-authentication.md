@@ -1,64 +1,49 @@
-# ADR-002: Authentication Approach and Registration Security
+# ADR-002: Authentication Architecture Pivot to Google OAuth & Zero-Trust Database Triggers
 
-**Date**: April 16, 2026
-**Status**: Decided
+**Date**: April 25, 2026
+**Status**: Decided & Refactored (Supersedes previous Edge Function architecture)
 
 ## Context
 
-The application requires a secure authentication system that strictly limits registration to users with a valid @neu.edu.ph institutional email address. While the platform allows for anonymous interactions (posting and commenting without displaying names), the underlying accounts must be verified students to maintain a safe, moderated environment. The system must prevent malicious actors from registering with personal emails (e.g., @gmail.com) via API manipulation or frontend bypasses.
+The application requires a secure authentication system that strictly limits registration to users with a valid `@neu.edu.ph` institutional email address. Initially, this was handled via a custom Deno Edge Function. However, since the university already utilizes Google Workspace for student emails, managing custom passwords and standalone validation endpoints introduces unnecessary friction and maintenance overhead. The system must natively authenticate users while maintaining an absolute, impenetrable block against personal emails (e.g., `@gmail.com`) attempting to bypass the frontend UI via API manipulation.
 
 ## Options Considered
 
-**Option A — Client-Side Validation + Standard Supabase signUp: Validate the email string in the React frontend before calling the native Supabase authentication method.**
+**Option A — Client-Side Validation + Standard Supabase signUp:** Validate the email string in the React frontend before calling the native Supabase authentication method. *(Rejected: Frontend validation can be bypassed by intercepting the network request).*
 
-**Option B — Native Supabase Auth Hooks (before_user_created): Intercept the registration at the database level using a webhook tied to the Supabase GoTrue container.**
+**Option B — Custom Server-Side Registration Endpoint via Edge Function:** Handle sign-ups through a dedicated Deno Edge Function using the Supabase Admin API. *(Previously Chosen, Now Deprecated: Resolved security and Docker networking issues, but required users to manually manage passwords instead of utilizing existing institutional SSO).*
 
-**Option C — Custom Server-Side Registration Endpoint via Edge Function *(Chosen)*: Bypass the public Supabase registration entirely and handle sign-ups through a dedicated Deno Edge Function using the Supabase Admin API.**
+**Option C — Google Workspace SSO + Database-Level Domain Enforcement (Chosen):** Utilize Supabase's native Google OAuth provider to authenticate users without passwords, combined with a PostgreSQL `BEFORE INSERT` or `AFTER INSERT` trigger on the `auth.users` table to natively reject unauthorized domains at the database layer.
 
 ---
 
 ## Decision
 
-**We will use Option C. Registration will be handled entirely server-side via a custom Supabase Edge Function (validate-neu-email). The frontend will send credentials directly to this endpoint. The function will validate the domain, and if valid, use the SUPABASE_SERVICE_ROLE_KEY to bypass Row Level Security and forcefully create the user in the database.**
+**We will use Option C. Authentication will be handled exclusively via Google Workspace SSO. To guarantee zero-trust security, we have deployed a PostgreSQL trigger (`handle_new_user`) that acts as a database-level bouncer. If a user attempts to bypass the frontend UI and authenticate with a non-institutional email, the database will raise an exception and forcefully reject the transaction.**
 
 ---
 
 ## Justification
 
-## Why Not Option A (Client-Side Validation)
+### The Shift to Passwordless SSO
+By pivoting to Google OAuth with the `hd: 'neu.edu.ph'` parameter, we drastically improve the user experience. Students no longer need to create or remember a separate password for the wellness tracker, and the frontend team is relieved of managing complex registration state and password reset flows. 
 
-Validating the email domain exclusively on the frontend (React) is a critical security vulnerability. While it provides a good user experience by showing immediate error messages, a malicious user can easily bypass the frontend logic by intercepting the network request or using a tool like Postman to send a POST request directly to the public Supabase Auth endpoint. This would allow unauthorized non-institutional emails to flood the database. Security must be enforced on the server.
-
-## Why Not Option B (Native Supabase Auth Hooks)
-
-Supabase provides native Auth Hooks designed specifically for this use case. However, during development, we encountered significant infrastructure limitations when running the Supabase CLI locally via Windows Docker Desktop (WSL2). The Supabase GoTrue (Auth) container requires specific loopback addresses (127.0.0.1 or localhost) for HTTP webhooks. Because the Edge Runtime lives in a separate container, resolving the internal network route caused a "hook timeout after retry" fatal error. While this architecture works flawlessly in the cloud production environment, it completely blocks local development and testing for the team.
-
----
-
-## Why Option C (Custom Edge Function with Admin API)
-
-This approach provides the absolute highest level of security while completely sidestepping the local Docker networking paradox.
-
-Security: By creating our own endpoint, the frontend never touches the public Supabase signUp method. The validation logic is locked securely in the backend backend. If an invalid email is sent, the function returns a 403 Forbidden and the database remains untouched.
-
-Execution: If the email is valid, the function utilizes the SUPABASE_SERVICE_ROLE_KEY. This key operates with administrative privileges, allowing the function to securely provision the user account on behalf of the system.
-
-Developer Experience: This endpoint can be served locally via supabase functions serve and works seamlessly across all operating systems, ensuring the frontend developers can test registration without fighting Docker network configurations.
+### The Necessity of the Database Trigger
+While the frontend `hd` parameter asks Google to restrict the login screen to the institutional domain, a malicious actor could intercept the API request and strip this parameter out, attempting to inject a personal Gmail account into the system. By shifting the domain validation from the deprecated Edge Function directly into a PostgreSQL trigger, we achieve a Zero-Trust architecture. The database itself physically refuses to store any account that does not end in `@neu.edu.ph`, rendering frontend bypass attacks completely useless.
 
 ---
 
 ## Consequences
 
 **What this makes easier:**
-
-- Guarantees 100% security against API abuse and frontend bypass attempts.
-- Resolves all local development networking issues, allowing the team to work efficiently.
-- Centralizes all registration business logic into a single, highly readable TypeScript file.
+- Eliminates password management and storage liabilities.
+- Reduces cloud infrastructure bloat by allowing us to permanently delete the custom `validate-neu-email` Edge Function.
+- Provides absolute, database-level guarantee of institutional domain compliance.
+- Allows Dev 1 to replace complex form inputs with a single "Login with Google" button.
 
 **What this makes harder:**
-- The frontend team (Dev 1) cannot use the standard supabase.auth.signUp() method found in standard tutorials. They must be explicitly instructed to send a POST request to the custom validate-neu-email Edge Function instead.
-- Requires the endpoint to be configured with verify_jwt = false in the config.toml file to allow unauthenticated users to reach the sign-up logic.
+- Requires configuring and maintaining Google Cloud Platform (GCP) OAuth credentials.
 
 ---
 
-*This ADR was documented and implemented during Sprint 1.*
+*This ADR was updated during the Sprint 1 architecture pivot.*

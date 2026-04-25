@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.0] - Authentication Architecture Pivot - 2026-04-25
+
+### Changed
+- **Authentication Flow:** Completely deprecated the custom `validate-neu-email` Edge Function and password-based registration. Pivoted the platform to utilize Google Workspace Single Sign-On (SSO) via Supabase Native OAuth.
+- **Security Enforcement:** Upgraded the `handle_new_user` PostgreSQL trigger. The database now natively acts as the domain security, rejecting any `auth.users` insertions where the email does not end in `@neu.edu.ph`. This secures the backend against unauthorized `@gmail.com` injections bypassing the frontend UI.
+
 ## [1.0.0] - Sprint 1 (Backend Infrastructure) - 2026-04-16
 
 ### Added
