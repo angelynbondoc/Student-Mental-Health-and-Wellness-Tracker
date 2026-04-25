@@ -1,0 +1,49 @@
+/* =============================================================================
+   HabitsPage.css — page-specific styles only.
+   All shared styles (page-shell, content-card, btn-pill, btn-submit,
+   empty-state, notice--gold, field-input) live in shared.css.
+   ============================================================================= */
+
+/* ── Habit card layout ────────────────────────────────────────────────────── */
+.hp-list    { display: flex; flex-direction: column; gap: 10px; }
+.hp-card    { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.hp-left    { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; }
+.hp-emoji   { font-size: 26px; flex-shrink: 0; }
+.hp-name    { font-family: var(--font-heading); font-size: 15px; font-weight: 500; color: var(--color-text); margin: 0; }
+.hp-streak  { font-family: var(--font-body); font-size: 11px; color: var(--color-text-faint); margin: 2px 0 0; }
+
+/* ── Admin box ────────────────────────────────────────────────────────────── */
+.hp-admin-box {
+  margin-top: 36px;
+  padding: 20px;
+  border-radius: 12px;
+  background: var(--color-accent-bg);
+  border: 1.5px dashed var(--color-accent);
+}
+.hp-admin-label {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 600;
+  color: #7C5800;
+  margin: 0 0 12px;
+}
+.hp-admin-row { display: flex; gap: 10px; }
+.hp-admin-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  background: var(--color-accent);
+  color: var(--color-text);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+.hp-admin-btn:hover { background: #E0B000; }
+
+@media (max-width: 480px) {
+  .hp-admin-row { flex-direction: column; }
+  .hp-admin-btn { width: 100%; }
+}
