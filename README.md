@@ -1,16 +1,41 @@
-# React + Vite
+# Student Mental Health and Wellness Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Cloud Backend Setup (Sprint 1)
 
-Currently, two official plugins are available:
+This project uses a live Supabase Cloud instance for the database, authentication, and serverless Edge Functions. 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### Prerequisites
+1. Node.js installed on your machine.
+2. A `.env` file configured with the production Supabase keys.
 
-## React Compiler
+### Wiring up the Frontend
+1. Clone the repository and navigate to the project root.
+2. Run `npm install` to install frontend dependencies.
+3. Create a `.env.local` file in your frontend root directory and add the following keys (request these from Dev 2):
+   ```env
+   VITE_SUPABASE_URL=https://<your-project-ref>.supabase.co
+   VITE_SUPABASE_ANON_KEY=<the-cloud-anon-key>
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Authentication & Data Fetching API Contracts
+* Registration & Login: We now use Google Workspace SSO exclusively. Do NOT use standard email/password inputs. You must trigger the Google OAuth flow and enforce the hosted domain:
+```javascript
+await supabase.auth.signInWithOAuth({
+  provider: 'google',
+  options: {
+    queryParams: {
+      prompt: 'select_account',
+      hd: 'neu.edu.ph' // Asks the UI to restrict to school emails
+    }
+  }
+});
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+* (Note: Database-level triggers will forcefully reject any non-@neu.edu.ph emails that attempt to bypass this frontend UI).
+
+- Anonymous Posting: When fetching the feed, you must query the posts_view instead of the raw posts table to ensure anonymous author IDs are correctly masked by the database.
+
+- Search Function: Do not fetch all posts to filter on the client. Call the custom RPC function to search and log history simultaneously:
+
+```javascript
+await supabase.rpc('log_and_search', { search_term: 'your query' })
