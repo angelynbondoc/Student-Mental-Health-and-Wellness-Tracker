@@ -1,0 +1,45 @@
+/* =============================================================================
+   ResourcesPage.css — page-specific styles only.
+   Shared: page-shell, page-inner, page-heading, page-sub, empty-state (shared.css)
+   ============================================================================= */
+
+/* ── Category block ───────────────────────────────────────────────────────── */
+.rp-category-block { margin-bottom: 32px; }
+.rp-category-heading {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+  padding-left: 12px; border-left: 3px solid var(--color-accent);
+}
+.rp-category-title {
+  font-family: var(--font-heading); font-size: 14px; font-weight: 600;
+  color: var(--color-text); margin: 0; flex: 1;
+}
+.rp-category-count {
+  font-family: var(--font-body); font-size: 11px; font-weight: 600;
+  background: var(--color-primary-light); color: var(--color-primary);
+  border-radius: 100px; padding: 2px 10px;
+}
+
+/* ── Resource accordion card ──────────────────────────────────────────────── */
+.rp-card {
+  background: var(--color-surface); border-radius: 10px;
+  margin-bottom: 8px; border: 1px solid var(--color-border);
+  overflow: hidden; transition: box-shadow 0.15s ease;
+}
+.rp-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.07); }
+.rp-card__btn {
+  width: 100%; display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 18px; background: none; border: none; cursor: pointer;
+  font-family: var(--font-heading); font-size: 13px; font-weight: 500;
+  color: var(--color-text); text-align: left; transition: background 0.15s ease;
+}
+.rp-card__btn:hover { background: var(--color-input-bg); }
+.rp-chevron {
+  font-size: 15px; color: var(--color-text-faint);
+  transition: transform 0.2s ease; flex-shrink: 0; margin-left: 8px;
+}
+.rp-chevron--open { transform: rotate(180deg); color: var(--color-primary); }
+.rp-card__content {
+  font-family: var(--font-body); font-size: 13px; color: var(--color-text-body);
+  line-height: 1.7; padding: 0 18px 16px;
+  border-top: 1px solid var(--color-input-bg); margin: 0;
+}

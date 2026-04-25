@@ -1,121 +1,126 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+// =============================================================================
+// App.jsx — Single source of truth. Holds ALL global state.
+// Batch 3 adds: notifications, directMessages + InboxPage route
+// FIX: Restored missing /create route and CreatePage import
+// =============================================================================
+import React, { useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+import AppContext from "./AppContext"; // ✅ same folder
+import { MobileLayout } from "./components/layout";
+import HomePage from "./pages/HomePage/HomePage";
+import CreatePage from "./pages/CreatePage";
+import JournalPage from "./pages/JournalPage/JournalPage";
+import ResourcesPage from "./pages/ResourcesPage/ResourcesPage";
+import HabitsPage from "./pages/HabitsPage/HabitsPage";
+import InboxPage from "./pages/InboxPage/InboxPage";
+import LoginPage from "./pages/LoginPage/LoginPage";
+import ProfilePage from "./pages/ProfilePage/ProfilePage";
+
+import AdminRouteGuard from "./components/AdminRouteGuard";
+
+import {
+  INITIAL_PROFILES,
+  INITIAL_COMMUNITIES,
+  INITIAL_POSTS,
+  INITIAL_COMMENTS,
+  INITIAL_REACTIONS,
+  INITIAL_MOOD_JOURNAL,
+  INITIAL_RESOURCES,
+  INITIAL_HABITS,
+  INITIAL_HABIT_LOGS,
+  INITIAL_NOTIFICATIONS,
+  INITIAL_DIRECT_MESSAGES,
+} from "./mockData"; // ✅ same folder
+
+const CURRENT_USER = {
+  id: "user-1",
+  display_name: "username_<role>",
+  role: "student", // change to 'admin' to reveal admin UI
+};
 
 function App() {
-  const [count, setCount] = useState(0)
+  // ── Batch 1 ────────────────────────────────────────────────────────────────
+  const [profiles, setProfiles] = useState(INITIAL_PROFILES);
+  const [communities, setCommunities] = useState(INITIAL_COMMUNITIES);
+  const [posts, setPosts] = useState(INITIAL_POSTS);
+  const [comments, setComments] = useState(INITIAL_COMMENTS);
+  const [reactions, setReactions] = useState(INITIAL_REACTIONS);
+
+  // ── Batch 2 ────────────────────────────────────────────────────────────────
+  const [moodJournal, setMoodJournal] = useState(INITIAL_MOOD_JOURNAL);
+  const [resources, setResources] = useState(INITIAL_RESOURCES);
+  const [habits, setHabits] = useState(INITIAL_HABITS);
+  const [habitLogs, setHabitLogs] = useState(INITIAL_HABIT_LOGS);
+
+  // ── Batch 3 ────────────────────────────────────────────────────────────────
+  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
+  const [directMessages, setDirectMessages] = useState(INITIAL_DIRECT_MESSAGES);
+
+  const contextValue = {
+    currentUser: CURRENT_USER,
+    profiles,
+    setProfiles,
+    communities,
+    setCommunities,
+    posts,
+    setPosts,
+    comments,
+    setComments,
+    reactions,
+    setReactions,
+    moodJournal,
+    setMoodJournal,
+    resources,
+    setResources,
+    habits,
+    setHabits,
+    habitLogs,
+    setHabitLogs,
+    notifications,
+    setNotifications,
+    directMessages,
+    setDirectMessages,
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <AppContext.Provider value={contextValue}>
+      <BrowserRouter>
+        <Routes>
+          {/* Redirect root to login */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
 
-      <div className="ticks"></div>
+          {/* Standalone login — no shell */}
+          <Route path="/login" element={<LoginPage />} />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          {/* ✅ All app routes nested inside MobileLayout so shell always renders */}
+          <Route element={<MobileLayout />}>
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/create" element={<CreatePage />} />
+            <Route path="/journal" element={<JournalPage />} />
+            <Route path="/resources" element={<ResourcesPage />} />
+            <Route path="/habits" element={<HabitsPage />} />
+            <Route path="/inbox" element={<InboxPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+            {/* Admin route */}
+            <Route 
+              path="/admin" 
+              element={
+                <AdminRouteGuard>
+                  
+                  <div style={{ padding: "2rem", textAlign: "center" }}>
+                    <h2>Admin Dashboard Placeholder</h2>
+                    <p>UI/UX needs to build this page.</p>
+                  </div>
+                </AdminRouteGuard>
+              } 
+            />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AppContext.Provider>
+  );
 }
 
-export default App
+export default App;
