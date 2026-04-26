@@ -26,23 +26,88 @@ import "./OnboardingPage.css";
 
 // ── NEU Course catalogue ──────────────────────────────────────────────────────
 const COURSES = [
-  { id: "bscs",    code: "BSCS",    name: "BS Computer Science",         dept: "Technology" },
-  { id: "bsit",    code: "BSIT",    name: "BS Information Technology",   dept: "Technology" },
-  { id: "bsed",    code: "BSEd",    name: "BS Education",                dept: "Education" },
-  { id: "beed",    code: "BEEd",    name: "Bachelor of Early Education", dept: "Education" },
-  { id: "bsba",    code: "BSBA",    name: "BS Business Administration",  dept: "Business" },
-  { id: "bsacct",  code: "BSA",     name: "BS Accountancy",              dept: "Business" },
-  { id: "bsn",     code: "BSN",     name: "BS Nursing",                  dept: "Health Sciences" },
-  { id: "bsmt",    code: "BSMT",    name: "BS Medical Technology",       dept: "Health Sciences" },
-  { id: "bspsych", code: "BSPsych", name: "BS Psychology",               dept: "Social Sciences" },
-  { id: "absoc",   code: "AB Soc",  name: "AB Sociology",                dept: "Social Sciences" },
-  { id: "bsarch",  code: "BSArch",  name: "BS Architecture",             dept: "Engineering" },
-  { id: "bsce",    code: "BSCE",    name: "BS Civil Engineering",        dept: "Engineering" },
-  { id: "bsee",    code: "BSEE",    name: "BS Electrical Engineering",   dept: "Engineering" },
-  { id: "bsme",    code: "BSME",    name: "BS Mechanical Engineering",   dept: "Engineering" },
-  { id: "bscrim",  code: "BSCrim",  name: "BS Criminology",              dept: "Law & Justice" },
-  { id: "bshrm",   code: "BSHRM",  name: "BS Hotel & Restaurant Mgmt",  dept: "Hospitality" },
-  { id: "bstm",    code: "BSTM",   name: "BS Tourism Management",       dept: "Hospitality" },
+  { id: "bscs", code: "BSCS", name: "BS Computer Science", dept: "Technology" },
+  {
+    id: "bsit",
+    code: "BSIT",
+    name: "BS Information Technology",
+    dept: "Technology",
+  },
+  { id: "bsed", code: "BSEd", name: "BS Education", dept: "Education" },
+  {
+    id: "beed",
+    code: "BEEd",
+    name: "Bachelor of Early Education",
+    dept: "Education",
+  },
+  {
+    id: "bsba",
+    code: "BSBA",
+    name: "BS Business Administration",
+    dept: "Business",
+  },
+  { id: "bsacct", code: "BSA", name: "BS Accountancy", dept: "Business" },
+  { id: "bsn", code: "BSN", name: "BS Nursing", dept: "Health Sciences" },
+  {
+    id: "bsmt",
+    code: "BSMT",
+    name: "BS Medical Technology",
+    dept: "Health Sciences",
+  },
+  {
+    id: "bspsych",
+    code: "BSPsych",
+    name: "BS Psychology",
+    dept: "Social Sciences",
+  },
+  {
+    id: "absoc",
+    code: "AB Soc",
+    name: "AB Sociology",
+    dept: "Social Sciences",
+  },
+  {
+    id: "bsarch",
+    code: "BSArch",
+    name: "BS Architecture",
+    dept: "Engineering",
+  },
+  {
+    id: "bsce",
+    code: "BSCE",
+    name: "BS Civil Engineering",
+    dept: "Engineering",
+  },
+  {
+    id: "bsee",
+    code: "BSEE",
+    name: "BS Electrical Engineering",
+    dept: "Engineering",
+  },
+  {
+    id: "bsme",
+    code: "BSME",
+    name: "BS Mechanical Engineering",
+    dept: "Engineering",
+  },
+  {
+    id: "bscrim",
+    code: "BSCrim",
+    name: "BS Criminology",
+    dept: "Law & Justice",
+  },
+  {
+    id: "bshrm",
+    code: "BSHRM",
+    name: "BS Hotel & Restaurant Mgmt",
+    dept: "Hospitality",
+  },
+  {
+    id: "bstm",
+    code: "BSTM",
+    name: "BS Tourism Management",
+    dept: "Hospitality",
+  },
 ];
 
 const DEPARTMENTS = ["All", ...new Set(COURSES.map((c) => c.dept))];
@@ -50,30 +115,36 @@ const DEPARTMENTS = ["All", ...new Set(COURSES.map((c) => c.dept))];
 // ── Step bar ──────────────────────────────────────────────────────────────────
 function StepBar({ current }) {
   const steps = [
-    { label: "Terms",   icon: ScrollText },
+    { label: "Terms", icon: ScrollText },
     { label: "Courses", icon: GraduationCap },
-    { label: "Done",    icon: CheckCircle2 },
+    { label: "Done", icon: CheckCircle2 },
   ];
 
   return (
     <div className="ob-stepbar">
-      {steps.map(({ label, icon: Icon }, i) => {
-        const idx    = i + 1;
-        const done   = idx < current;
+      {steps.map((step, i) => {
+        const idx = i + 1;
+        const done = idx < current;
         const active = idx === current;
+        const StepIcon = step.icon;
         return (
-          <React.Fragment key={label}>
-            <div className={`ob-step ${active ? "ob-step--active" : ""} ${done ? "ob-step--done" : ""}`}>
+          <React.Fragment key={step.label}>
+            <div
+              className={`ob-step ${active ? "ob-step--active" : ""} ${done ? "ob-step--done" : ""}`}
+            >
               <div className="ob-step-circle">
-                {done
-                  ? <Check size={14} strokeWidth={3} />
-                  : <Icon size={14} />
-                }
+                {done ? (
+                  <Check size={14} strokeWidth={3} />
+                ) : (
+                  <StepIcon size={14} />
+                )}
               </div>
-              <span className="ob-step-label">{label}</span>
+              <span className="ob-step-label">{step.label}</span>
             </div>
             {i < steps.length - 1 && (
-              <div className={`ob-step-line ${done ? "ob-step-line--done" : ""}`}>
+              <div
+                className={`ob-step-line ${done ? "ob-step-line--done" : ""}`}
+              >
                 <ChevronRight size={12} className="ob-step-chevron" />
               </div>
             )}
@@ -87,7 +158,7 @@ function StepBar({ current }) {
 // ── Step 1: Terms & Conditions ────────────────────────────────────────────────
 function StepTerms({ onAgree, onDisagree, loading }) {
   const [scrolledToEnd, setScrolledToEnd] = useState(false);
-  const [checked, setChecked]             = useState(false);
+  const [checked, setChecked] = useState(false);
 
   function handleScroll(e) {
     const el = e.currentTarget;
@@ -161,10 +232,18 @@ function StepTerms({ onAgree, onDisagree, loading }) {
 
       <div className="ob-tnc-scroll" onScroll={handleScroll}>
         <div className="ob-tnc-top">
-          <img src="/NEULogo1.png" alt="New Era University" className="ob-tnc-logo" />
+          <img
+            src="/NEULogo1.png"
+            alt="New Era University"
+            className="ob-tnc-logo"
+          />
           <div>
-            <h3 className="ob-tnc-heading">MindSpace — Student Wellness Platform</h3>
-            <p className="ob-tnc-updated">Last updated: January 2025 · New Era University</p>
+            <h3 className="ob-tnc-heading">
+              MindSpace — Student Wellness Platform
+            </h3>
+            <p className="ob-tnc-updated">
+              Last updated: January 2025 · New Era University
+            </p>
           </div>
         </div>
 
@@ -189,7 +268,10 @@ function StepTerms({ onAgree, onDisagree, loading }) {
         ))}
 
         <div className="ob-tnc-contact">
-          <p>Questions? Contact the NEU Guidance and Counseling Office or email <strong>mindspace@neu.edu.ph</strong></p>
+          <p>
+            Questions? Contact the NEU Guidance and Counseling Office or email{" "}
+            <strong>mindspace@neu.edu.ph</strong>
+          </p>
         </div>
       </div>
 
@@ -200,8 +282,12 @@ function StepTerms({ onAgree, onDisagree, loading }) {
         </div>
       )}
 
-      <label className={`ob-checkbox-row ${!scrolledToEnd ? "ob-checkbox-row--locked" : ""}`}>
-        <div className={`ob-custom-checkbox ${checked ? "ob-custom-checkbox--checked" : ""}`}>
+      <label
+        className={`ob-checkbox-row ${!scrolledToEnd ? "ob-checkbox-row--locked" : ""}`}
+      >
+        <div
+          className={`ob-custom-checkbox ${checked ? "ob-custom-checkbox--checked" : ""}`}
+        >
           {checked && <Check size={11} strokeWidth={3} />}
         </div>
         <input
@@ -217,7 +303,11 @@ function StepTerms({ onAgree, onDisagree, loading }) {
       </label>
 
       <div className="ob-btn-row">
-        <button className="ob-btn-danger" onClick={onDisagree} disabled={loading}>
+        <button
+          className="ob-btn-danger"
+          onClick={onDisagree}
+          disabled={loading}
+        >
           <X size={15} />
           Disagree
         </button>
@@ -226,8 +316,12 @@ function StepTerms({ onAgree, onDisagree, loading }) {
           onClick={onAgree}
           disabled={!checked || !scrolledToEnd || loading}
         >
-          {loading ? "Please wait…" : (
-            <>Agree &amp; Continue <ChevronRight size={15} /></>
+          {loading ? (
+            "Please wait…"
+          ) : (
+            <>
+              Agree &amp; Continue <ChevronRight size={15} />
+            </>
           )}
         </button>
       </div>
@@ -244,9 +338,10 @@ function StepTerms({ onAgree, onDisagree, loading }) {
 function StepCourses({ selected, onToggle, onBack, onSubmit, loading, error }) {
   const [activeDept, setActiveDept] = useState("All");
 
-  const visible = activeDept === "All"
-    ? COURSES
-    : COURSES.filter((c) => c.dept === activeDept);
+  const visible =
+    activeDept === "All"
+      ? COURSES
+      : COURSES.filter((c) => c.dept === activeDept);
 
   return (
     <div className="ob-section">
@@ -256,7 +351,9 @@ function StepCourses({ selected, onToggle, onBack, onSubmit, loading, error }) {
         </div>
         <div>
           <h2 className="ob-title">What are you studying?</h2>
-          <p className="ob-subtitle">Pick your course(s) — we'll add you to the right communities</p>
+          <p className="ob-subtitle">
+            Pick your course(s) — we'll add you to the right communities
+          </p>
         </div>
       </div>
 
@@ -317,8 +414,12 @@ function StepCourses({ selected, onToggle, onBack, onSubmit, loading, error }) {
           onClick={onSubmit}
           disabled={selected.length === 0 || loading}
         >
-          {loading ? "Setting up…" : (
-            <>Finish setup <ArrowRight size={15} /></>
+          {loading ? (
+            "Setting up…"
+          ) : (
+            <>
+              Finish setup <ArrowRight size={15} />
+            </>
           )}
         </button>
       </div>
@@ -336,7 +437,11 @@ function StepWelcome({ displayName, courseCount, onContinue }) {
   return (
     <div className="ob-welcome">
       <div className="ob-welcome-visual">
-        <img src="/NEULogo1.png" alt="New Era University" className="ob-welcome-logo" />
+        <img
+          src="/NEULogo1.png"
+          alt="New Era University"
+          className="ob-welcome-logo"
+        />
         <div className="ob-welcome-ring ob-welcome-ring--1" />
         <div className="ob-welcome-ring ob-welcome-ring--2" />
       </div>
@@ -348,17 +453,18 @@ function StepWelcome({ displayName, courseCount, onContinue }) {
 
       <h2 className="ob-welcome-title">You're all set, {displayName}!</h2>
       <p className="ob-welcome-body">
-        You've been added to{" "}
-        <strong>{courseCount}</strong>{" "}
-        {courseCount === 1 ? "community" : "communities"} based on your course selection.
-        Start exploring, sharing, and connecting with your peers.
+        You've been added to <strong>{courseCount}</strong>{" "}
+        {courseCount === 1 ? "community" : "communities"} based on your course
+        selection. Start exploring, sharing, and connecting with your peers.
       </p>
 
       <div className="ob-welcome-stats">
         <div className="ob-welcome-stat">
           <GraduationCap size={18} className="ob-welcome-stat-icon" />
           <span className="ob-welcome-stat-value">{courseCount}</span>
-          <span className="ob-welcome-stat-label">{courseCount === 1 ? "Community" : "Communities"}</span>
+          <span className="ob-welcome-stat-label">
+            {courseCount === 1 ? "Community" : "Communities"}
+          </span>
         </div>
         <div className="ob-welcome-stat-divider" />
         <div className="ob-welcome-stat">
@@ -374,7 +480,10 @@ function StepWelcome({ displayName, courseCount, onContinue }) {
         </div>
       </div>
 
-      <button className="ob-btn-primary ob-btn-primary--wide" onClick={onContinue}>
+      <button
+        className="ob-btn-primary ob-btn-primary--wide"
+        onClick={onContinue}
+      >
         Go to MindSpace <ArrowRight size={16} />
       </button>
     </div>
@@ -383,15 +492,14 @@ function StepWelcome({ displayName, courseCount, onContinue }) {
 
 // ── Main OnboardingPage ───────────────────────────────────────────────────────
 export default function OnboardingPage() {
-  const navigate                              = useNavigate();
-  const { currentUser }                       = useContext(AppContext);
-  const [step, setStep]                       = useState(1);
-  const [loading, setLoading]                 = useState(false);
-  const [error, setError]                     = useState("");
+  const navigate = useNavigate();
+  const { currentUser } = useContext(AppContext);
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [selectedCourses, setSelectedCourses] = useState([]);
 
-  const displayName =
-    currentUser?.display_name?.split(" ")[0] ?? "there";
+  const displayName = currentUser?.display_name?.split(" ")[0] ?? "there";
 
   function handleDisagree() {
     navigate("/login", { replace: true });
@@ -403,7 +511,7 @@ export default function OnboardingPage() {
 
   function handleToggle(id) {
     setSelectedCourses((prev) =>
-      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
     );
   }
 
@@ -419,7 +527,11 @@ export default function OnboardingPage() {
     <div className="ob-page">
       {/* ── Brand bar ── */}
       <div className="ob-brand">
-        <img src="/NEULogo1.png" alt="New Era University logo" className="ob-brand-logo" />
+        <img
+          src="/NEULogo1.png"
+          alt="New Era University logo"
+          className="ob-brand-logo"
+        />
         <div className="ob-brand-text">
           <span className="ob-brand-name">MindSpace</span>
           <span className="ob-brand-university">New Era University</span>

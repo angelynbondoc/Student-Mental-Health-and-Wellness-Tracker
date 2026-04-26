@@ -9,11 +9,7 @@
 // All other habits retain the original Mark Done card UI.
 // =============================================================================
 import React, {
-  useContext,
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
+  useState,useContext
 } from "react";
 import AppContext from "../../AppContext";
 import { generateUUID } from "../../Mockdata";

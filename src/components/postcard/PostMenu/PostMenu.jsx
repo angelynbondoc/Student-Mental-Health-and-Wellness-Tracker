@@ -11,7 +11,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './PostMenu.css';
 
-export default function PostMenu({ postId, onHide, onReport }) {
+export default function PostMenu({onHide, onReport }) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
 

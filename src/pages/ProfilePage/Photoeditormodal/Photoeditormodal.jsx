@@ -9,7 +9,7 @@
 //   - Zoom slider to scale the image
 //   - Live circular preview
 // =============================================================================
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback,  } from "react";
 import { X, Upload, ZoomIn, ZoomOut, Check, RefreshCw } from "lucide-react";
 import "./PhotoEditorModal.css";
 
@@ -96,11 +96,17 @@ function CropCircle({ src, offsetX, offsetY, scale, size = 160, isPreset }) {
 
 // ── Main Modal ────────────────────────────────────────────────────────────────
 export default function PhotoEditorModal({ current, onSave, onClose }) {
-  const [tab, setTab] = useState("presets"); // "presets" | "upload"
+  const [tab, setTab] = useState(() =>
+    current && !current.startsWith("https://api.dicebear")
+      ? "upload"
+      : "presets",
+  );
   const [selectedPreset, setSelectedPreset] = useState(null);
 
   // Upload state
-  const [uploadSrc, setUploadSrc] = useState(null);
+  const [uploadSrc, setUploadSrc] = useState(() =>
+    current && !current.startsWith("https://api.dicebear") ? current : null,
+  );
   const [offsetX, setOffsetX] = useState(0);
   const [offsetY, setOffsetY] = useState(0);
   const [scale, setScale] = useState(1);
@@ -111,13 +117,7 @@ export default function PhotoEditorModal({ current, onSave, onClose }) {
   const fileInputRef = useRef(null);
   const cropRef = useRef(null);
 
-  // Load current photo into upload tab if it's not a preset
-  useEffect(() => {
-    if (current && !current.startsWith("https://api.dicebear")) {
-      setUploadSrc(current);
-      setTab("upload");
-    }
-  }, []);
+
 
   // ── File handling ──────────────────────────────────────────────────────────
   const loadFile = (file) => {

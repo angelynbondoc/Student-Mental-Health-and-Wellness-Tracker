@@ -1,9 +1,6 @@
 import React, {
-  useContext,
   useState,
-  useEffect,
-  useRef,
-  useCallback,
+  useEffect,useRef
 } from "react";
 // ── Walk Timer ────────────────────────────────────────────────────────────────
 const WALK_DURATION = 30 * 60; // 30 minutes in seconds
@@ -33,7 +30,7 @@ export function WalkTimer({ habitId, logged, onToggleLog, completionCount }) {
       clearInterval(intervalRef.current);
     }
     return () => clearInterval(intervalRef.current);
-  }, [running]);
+  }, [running]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const reset = () => {
     setRunning(false);

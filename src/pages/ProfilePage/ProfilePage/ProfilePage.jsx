@@ -1,7 +1,7 @@
 // =============================================================================
 // ProfilePage.jsx — refactored to use PhotoEditorModal for profile pictures
 // =============================================================================
-import React, { useContext, useState, useRef } from "react";
+import React, { useContext, useState } from "react";
 import AppContext from "../../../AppContext";
 import {
   Pencil,
@@ -416,15 +416,18 @@ export default function ProfilePage() {
 
       {/* ── Tabs ───────────────────────────────────────────────────────────── */}
       <div className="pp-tabs">
-        {TABS.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            className={`pp-tab${activeTab === id ? " pp-tab--active" : ""}`}
-            onClick={() => setActiveTab(id)}
-          >
-            <Icon size={15} /> {label}
-          </button>
-        ))}
+        {TABS.map((tab) => {
+          const TabIcon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              className={`pp-tab${activeTab === tab.id ? " pp-tab--active" : ""}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              <TabIcon size={15} /> {tab.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* ── Content ────────────────────────────────────────────────────────── */}

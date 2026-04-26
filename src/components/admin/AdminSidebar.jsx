@@ -1,14 +1,20 @@
 import { Flag, ShieldAlert, Users } from "lucide-react";
 
 const NAV_ITEMS = [
-  { key: "reports",     label: "Reported Posts", Icon: Flag },
+  { key: "reports", label: "Reported Posts", Icon: Flag },
   { key: "userreports", label: "Reported Users", Icon: ShieldAlert },
-  { key: "users",       label: "User Management", Icon: Users },
+  { key: "users", label: "User Management", Icon: Users },
 ];
 
 export default function AdminSidebar({
-  tab, setTab, sidebarOpen, closeSidebar,
-  pendingPosts, pendingUsers, resolved, suspended,
+  tab,
+  setTab,
+  sidebarOpen,
+  closeSidebar,
+  pendingPosts,
+  pendingUsers,
+  resolved,
+  suspended,
 }) {
   const badges = {
     reports: pendingPosts,
@@ -26,17 +32,19 @@ export default function AdminSidebar({
 
       <aside className={`admin-sidebar ${sidebarOpen ? "open" : ""}`}>
         <div className="admin-sidebar__label">Navigation</div>
-
-        {NAV_ITEMS.map(({ key, label, Icon }) => (
+        {NAV_ITEMS.map((item) => (
           <button
-            key={key}
-            className={`admin-sidebar__nav-btn ${tab === key ? "active" : ""}`}
-            onClick={() => { setTab(key); closeSidebar(); }}
+            key={item.key}
+            className={`admin-sidebar__nav-btn ${tab === item.key ? "active" : ""}`}
+            onClick={() => {
+              setTab(item.key);
+              closeSidebar();
+            }}
           >
-            <Icon size={16} />
-            {label}
-            {badges[key] > 0 && (
-              <span className="nav-badge">{badges[key]}</span>
+            <item.Icon size={16} />
+            {item.label}
+            {badges[item.key] > 0 && (
+              <span className="nav-badge">{badges[item.key]}</span>
             )}
           </button>
         ))}
@@ -47,8 +55,8 @@ export default function AdminSidebar({
         {[
           ["Post Reports", pendingPosts, "var(--warn)"],
           ["User Reports", pendingUsers, "var(--warn)"],
-          ["Resolved",     resolved,     "var(--primary)"],
-          ["Suspended",    suspended,    "var(--danger)"],
+          ["Resolved", resolved, "var(--primary)"],
+          ["Suspended", suspended, "var(--danger)"],
         ].map(([label, value, color]) => (
           <div key={label} className="admin-sidebar__stat-row">
             <span>{label}</span>
