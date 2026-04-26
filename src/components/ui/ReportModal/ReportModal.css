@@ -1,0 +1,283 @@
+/* =============================================================================
+   ReportModal.css — NEU palette: primary #2E7D32, danger #C62828
+   ============================================================================= */
+
+/* ── backdrop ── */
+.rm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: flex-end;        /* slides up from bottom on mobile */
+  justify-content: center;
+  z-index: 1000;
+  padding: 0;
+  animation: rm-fade-in 0.18s ease;
+}
+
+@media (min-width: 600px) {
+  .rm-backdrop {
+    align-items: center;
+  }
+}
+
+@keyframes rm-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── modal panel ── */
+.rm-modal {
+  background: #ffffff;
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px 20px 32px;
+  animation: rm-slide-up 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (min-width: 600px) {
+  .rm-modal {
+    border-radius: 20px;
+    max-height: 80vh;
+  }
+}
+
+@keyframes rm-slide-up {
+  from { transform: translateY(30px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ── header ── */
+.rm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.rm-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.rm-close-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #9e9e9e;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s;
+}
+
+.rm-close-btn:hover {
+  background: #f2f2f2;
+  color: #1a1a1a;
+}
+
+.rm-subtitle {
+  font-size: 13px;
+  color: #9e9e9e;
+  margin: 0 0 16px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ── reason list ── */
+.rm-reasons {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rm-reason-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fafafa;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #1a1a1a;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.rm-reason-btn:hover {
+  border-color: #2e7d32;
+  background: #f1f8f1;
+}
+
+.rm-reason-btn--selected {
+  border-color: #2e7d32;
+  background: #e8f5e9;
+}
+
+/* ── custom radio dot ── */
+.rm-reason-radio {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #bdbdbd;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s;
+}
+
+.rm-reason-btn--selected .rm-reason-radio {
+  border-color: #2e7d32;
+  background: #2e7d32;
+  box-shadow: inset 0 0 0 3px #ffffff;
+}
+
+/* ── details textarea ── */
+.rm-details-wrap {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.rm-details-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: #616161;
+  margin-bottom: 6px;
+  font-family: 'Inter', sans-serif;
+}
+
+.rm-optional {
+  font-weight: 400;
+  color: #9e9e9e;
+}
+
+.rm-details-input {
+  width: 100%;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #1a1a1a;
+  resize: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+  background: #fafafa;
+}
+
+.rm-details-input:focus {
+  outline: none;
+  border-color: #2e7d32;
+  background: #ffffff;
+}
+
+.rm-char-count {
+  display: block;
+  text-align: right;
+  font-size: 11px;
+  color: #bdbdbd;
+  margin-top: 4px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ── action buttons ── */
+.rm-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.rm-btn-ghost {
+  flex: 1;
+  padding: 12px 0;
+  background: none;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #616161;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.rm-btn-ghost:hover {
+  background: #f2f2f2;
+}
+
+.rm-btn-primary {
+  flex: 2;
+  padding: 12px 0;
+  background: #c62828;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.rm-btn-primary:hover:not(:disabled) {
+  background: #b71c1c;
+}
+
+.rm-btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── success state ── */
+.rm-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 12px 0 8px;
+  gap: 10px;
+}
+
+.rm-success-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #e8f5e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #2e7d32;
+  font-weight: 700;
+}
+
+.rm-success-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.rm-success-body {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #616161;
+  margin: 0;
+  max-width: 300px;
+  line-height: 1.55;
+}

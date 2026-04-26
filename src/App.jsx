@@ -15,9 +15,10 @@ import ResourcesPage from "./pages/ResourcesPage/ResourcesPage";
 import HabitsPage from "./pages/HabitsPage/HabitsPage";
 import InboxPage from "./pages/InboxPage/InboxPage";
 import LoginPage from "./pages/LoginPage/LoginPage";
-import ProfilePage from "./pages/ProfilePage/ProfilePage";
+import ProfilePage from "./pages/ProfilePage/ProfilePage/ProfilePage";
 import AdminRouteGuard from "./components/AdminRouteGuard";
 import AdminDashboard from "./pages/AdminPage/AdminDashboard";
+import UserProfilePage from "./pages/ProfilePage/UserProfilePage/UserProfilePage";
 import {
   INITIAL_PROFILES,
   INITIAL_COMMUNITIES,
@@ -93,13 +94,13 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
 
           <Route
-              path="/admin"
-              element={
-                <AdminRouteGuard>
-                  <AdminDashboard />
-                </AdminRouteGuard>
-              }
-            />
+            path="/admin"
+            element={
+              <AdminRouteGuard>
+                <AdminDashboard />
+              </AdminRouteGuard>
+            }
+          />
 
           {/* ✅ All app routes nested inside MobileLayout so shell always renders */}
           <Route element={<MobileLayout />}>
@@ -110,9 +111,9 @@ function App() {
             <Route path="/habits" element={<HabitsPage />} />
             <Route path="/inbox" element={<InboxPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/:userId" element={<UserProfilePage />} />
 
             {/* Admin route */}
-            
           </Route>
         </Routes>
       </BrowserRouter>
