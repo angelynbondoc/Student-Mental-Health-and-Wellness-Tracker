@@ -17,8 +17,13 @@ import {
 } from "lucide-react";
 import PhotoEditorModal from "../Photoeditormodal/Photoeditormodal";
 import "./ProfilePage.css";
+import { supabase } from "../../../supabase"; // adjust path if needed
 
 // ── Confirmation Modal ────────────────────────────────────────────────────────
+const handleLogout = async () => {
+  await supabase.auth.signOut();
+  window.location.href = "/login";
+};
 function ConfirmModal({
   title,
   message,
@@ -388,12 +393,21 @@ export default function ProfilePage() {
                     </div>
                   ))}
                 </div>
-                <button
-                  className="pp-btn pp-btn--outline pp-edit-btn"
-                  onClick={() => setEditing(true)}
-                >
-                  <Pencil size={14} /> Edit Profile
-                </button>
+                <div className="pp-profile-actions">
+                  <button
+                    className="pp-btn pp-btn--outline pp-edit-btn"
+                    onClick={() => setEditing(true)}
+                  >
+                    <Pencil size={14} /> Edit Profile
+                  </button>
+
+                  <button
+                    className="pp-btn pp-btn--ghost pp-logout-btn"
+                    onClick={handleLogout}
+                  >
+                    <LogOut size={14} /> Log out
+                  </button>
+                </div>
               </>
             )}
           </div>
