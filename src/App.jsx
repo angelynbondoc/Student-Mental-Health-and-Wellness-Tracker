@@ -19,6 +19,7 @@ import ProfilePage from "./pages/ProfilePage/ProfilePage/ProfilePage";
 import AdminRouteGuard from "./components/AdminRouteGuard";
 import AdminDashboard from "./pages/AdminPage/AdminDashboard";
 import UserProfilePage from "./pages/ProfilePage/UserProfilePage/UserProfilePage";
+import OnboardingPage from "./pages/OnboardingPage/OnboardingPage";
 import {
   INITIAL_PROFILES,
   INITIAL_COMMUNITIES,
@@ -92,6 +93,7 @@ function App() {
 
           {/* Standalone login — no shell */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/onboarding" element={<OnboardingPage />} />
 
           <Route
             path="/admin"
