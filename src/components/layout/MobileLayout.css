@@ -310,3 +310,152 @@
   .neu-topbar         { padding: 0 14px; }
   .neu-topbar-appname { font-size: 15px; }
 }
+
+.neu-profile-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white);
+  transition: background 0.15s ease;
+}
+.neu-profile-btn:hover { background: rgba(255, 255, 255, 0.25); }
+
+/* ── Search bar ────────────────────────────────────────────────────────────── */
+.neu-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 100px;
+  padding: 0 14px;
+  height: 36px;
+  width: 100%;
+  max-width: 320px;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.neu-search-wrap--focused {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 3px rgba(245, 196, 0, 0.25);
+}
+
+.neu-search-icon {
+  color: rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+}
+
+.neu-search-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-white);
+  min-width: 0;
+}
+
+.neu-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.neu-search-clear {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-white);
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.neu-search-clear:hover { background: rgba(255, 255, 255, 0.35); }
+
+/* Hide search on very small screens */
+@media (max-width: 480px) {
+  .neu-search-wrap { display: none; }
+}
+
+/* ── Mobile search trigger button ──────────────────────────────────────────── */
+.neu-mobile-search-btn {
+  display: none; /* hidden on desktop */
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-white);
+  transition: background 0.15s;
+}
+.neu-mobile-search-btn:hover { background: rgba(255, 255, 255, 0.25); }
+
+/* ── Mobile search overlay bar ─────────────────────────────────────────────── */
+.neu-mobile-search-bar {
+  display: none; /* shown via media query below */
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--topbar-height);
+  background: var(--color-primary);
+  padding: 0 16px;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+  animation: neu-search-slide 0.18s ease;
+}
+
+@keyframes neu-search-slide {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.neu-mobile-search-close {
+  background: none;
+  border: none;
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+  white-space: nowrap;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+.neu-mobile-search-close:hover { opacity: 1; }
+
+/* ── Responsive toggles ────────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  /* Show mobile search icon */
+  .neu-mobile-search-btn { display: flex; }
+
+  /* Hide desktop inline search */
+  .neu-search-wrap { display: none; }
+
+  /* Show overlay bar when rendered */
+  .neu-mobile-search-bar { display: flex; }
+}
+
+@media (min-width: 1024px) {
+  /* Hide mobile-only elements on desktop */
+  .neu-mobile-search-btn { display: none; }
+  .neu-mobile-search-bar { display: none !important; }
+}

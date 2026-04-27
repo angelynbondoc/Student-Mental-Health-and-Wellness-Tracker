@@ -288,3 +288,114 @@ export const INITIAL_DIRECT_MESSAGES = [
     created_at: new Date('2024-06-11T09:00:00').toISOString(),
   },
 ];
+
+export const MOCK_REPORTS = [
+  {
+    id: 1, status: "pending", reason: "Harmful content",
+    description: "This post contains advice that could be dangerous to students struggling with mental health.",
+    reportedAt: "2025-04-26T09:14:00",
+    reporter: { name: "Ana Reyes", program: "BS Psychology", avatar: "AR" },
+    post: {
+      id: "p1",
+      content: "If you feel like no one cares, maybe they're right. Just stop trying to reach out, it never works anyway.",
+      author: { name: "Unknown User", program: "BS Computer Science", avatar: "UU" },
+      postedAt: "2025-04-26T08:00:00", likes: 2, comments: 5,
+    },
+  },
+  {
+    id: 2, status: "pending", reason: "Misinformation",
+    description: "Post spreads false information about medication and mental health treatment.",
+    reportedAt: "2025-04-25T14:30:00",
+    reporter: { name: "Carlo Mendoza", program: "BS Nursing", avatar: "CM" },
+    post: {
+      id: "p2",
+      content: "Antidepressants are just a scam by big pharma. Just exercise and you'll be 100% cured from depression. Doctors won't tell you this.",
+      author: { name: "Jeric Santos", program: "BS Physical Education", avatar: "JS" },
+      postedAt: "2025-04-25T11:00:00", likes: 14, comments: 21,
+    },
+  },
+  {
+    id: 3, status: "pending", reason: "Bullying / Harassment",
+    description: "The post is mocking students who seek professional help.",
+    reportedAt: "2025-04-24T18:45:00",
+    reporter: { name: "Maria Cruz", program: "BS Education", avatar: "MC" },
+    post: {
+      id: "p3",
+      content: "lol imagine going to therapy because you can't handle college. some people are just too soft for university life ngl 💀",
+      author: { name: "Kevin Lim", program: "BS Business Administration", avatar: "KL" },
+      postedAt: "2025-04-24T17:20:00", likes: 7, comments: 3,
+    },
+  },
+  {
+    id: 4, status: "resolved", resolution: "removed", reason: "Spam",
+    description: "Repetitive promotional content unrelated to mental health.",
+    reportedAt: "2025-04-23T10:00:00",
+    reporter: { name: "Rina Bautista", program: "BS Psychology", avatar: "RB" },
+    post: {
+      id: "p4",
+      content: "Check out this amazing supplement that cures anxiety! DM me for prices. Limited stocks only!!!",
+      author: { name: "Spam Account", program: "—", avatar: "SA" },
+      postedAt: "2025-04-23T09:00:00", likes: 0, comments: 0,
+    },
+  },
+  {
+    id: 5, status: "resolved", resolution: "dismissed", reason: "Inappropriate language",
+    description: "Contains strong language but reviewer found it within acceptable bounds.",
+    reportedAt: "2025-04-22T16:00:00",
+    reporter: { name: "Paolo Garcia", program: "BS Accountancy", avatar: "PG" },
+    post: {
+      id: "p5",
+      content: "Honestly this semester has been absolute hell. I'm burnt out and exhausted and I just need a break.",
+      author: { name: "Tricia Villanueva", program: "BS Accountancy", avatar: "TV" },
+      postedAt: "2025-04-22T15:00:00", likes: 44, comments: 12,
+    },
+  },
+];
+
+export const MOCK_USER_REPORTS = [
+  {
+    id: "ur1", status: "pending", reason: "Harassment",
+    description: "This user has been sending threatening messages to other students in the community.",
+    reportedAt: "2025-04-26T10:00:00",
+    reporter: { name: "Ana Reyes", program: "BS Psychology", avatar: "AR" },
+    reportedUser: { id: "u2", name: "Kevin Lim", program: "BS Business Administration", avatar: "KL", postCount: 21, joinedAt: "2024-08-01" },
+  },
+  {
+    id: "ur2", status: "pending", reason: "Spam / Bot behavior",
+    description: "Account posts repetitive promotional content multiple times a day.",
+    reportedAt: "2025-04-25T08:30:00",
+    reporter: { name: "Carlo Mendoza", program: "BS Nursing", avatar: "CM" },
+    reportedUser: { id: "u3", name: "Spam Account", program: "—", avatar: "SA", postCount: 5, joinedAt: "2025-04-20" },
+  },
+  {
+    id: "ur3", status: "pending", reason: "Impersonation",
+    description: "This user is pretending to be a licensed school counselor and giving mental health advice.",
+    reportedAt: "2025-04-24T15:00:00",
+    reporter: { name: "Maria Cruz", program: "BS Education", avatar: "MC" },
+    reportedUser: { id: "u1", name: "Jeric Santos", program: "BS Physical Education", avatar: "JS", postCount: 38, joinedAt: "2024-08-01" },
+  },
+  {
+    id: "ur4", status: "resolved", resolution: "suspended", reason: "Repeated violations",
+    description: "User has accumulated multiple post removals and continues to violate community guidelines.",
+    reportedAt: "2025-04-22T12:00:00",
+    reporter: { name: "Rina Bautista", program: "BS Psychology", avatar: "RB" },
+    reportedUser: { id: "u3", name: "Spam Account", program: "—", avatar: "SA", postCount: 5, joinedAt: "2025-04-20" },
+    adminNote: "User suspended after review of violation history.",
+  },
+  {
+    id: "ur5", status: "resolved", resolution: "dismissed", reason: "Inappropriate username",
+    description: "Reporter found the username offensive but it does not violate our guidelines.",
+    reportedAt: "2025-04-21T09:00:00",
+    reporter: { name: "Paolo Garcia", program: "BS Accountancy", avatar: "PG" },
+    reportedUser: { id: "u4", name: "Ana Reyes", program: "BS Psychology", avatar: "AR", postCount: 57, joinedAt: "2024-08-01" },
+    adminNote: "Username reviewed — does not violate community standards.",
+  },
+];
+
+export const MOCK_USERS = [
+  { id: "u1", name: "Jeric Santos", program: "BS Physical Education", avatar: "JS", status: "active", reportCount: 2, joinedAt: "2024-08-01", postCount: 38 },
+  { id: "u2", name: "Kevin Lim", program: "BS Business Administration", avatar: "KL", status: "active", reportCount: 1, joinedAt: "2024-08-01", postCount: 21 },
+  { id: "u3", name: "Spam Account", program: "—", avatar: "SA", status: "suspended", reportCount: 4, joinedAt: "2025-04-20", postCount: 5 },
+  { id: "u4", name: "Ana Reyes", program: "BS Psychology", avatar: "AR", status: "active", reportCount: 0, joinedAt: "2024-08-01", postCount: 57 },
+  { id: "u5", name: "Tricia Villanueva", program: "BS Accountancy", avatar: "TV", status: "active", reportCount: 0, joinedAt: "2024-08-01", postCount: 29 },
+];

@@ -5,11 +5,11 @@
 // Usage:
 //   import { PostCard } from '../components/postcard';
 // =============================================================================
-export { default as PostCard }       from './PostCard';
-export { default as PostHeader }     from './PostHeader';
-export { default as PostAvatar }     from './PostAvatar';
-export { default as ActionBar }      from './ActionBar';
-export { default as ShareConfirm }   from './ShareConfirm';
-export { default as CommentSection } from './CommentSection';
-export { default as CommentItem }    from './CommentItem';
-export { default as usePostCard }    from './usePostCard';
+export { default as PostCard } from "./PostCard/PostCard";
+export { default as PostHeader } from "./PostHeader/PostHeader";
+export { default as PostAvatar } from "./PostAvatar";
+export { default as ActionBar } from "./ActionBar";
+export { default as ShareConfirm } from "./ShareConfirm";
+export { default as CommentSection } from "./CommentSection";
+export { default as CommentItem } from "./CommentItem";
+export { default as usePostCard } from "./usePostCard";

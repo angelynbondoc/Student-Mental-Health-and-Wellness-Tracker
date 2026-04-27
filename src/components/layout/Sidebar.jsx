@@ -6,17 +6,17 @@ export default function Sidebar() {
   return (
     <aside className="neu-sidebar">
       <p className="neu-sidebar-label">Navigation</p>
-      {NAV_LINKS.map(({ to, label,icon:Icon}) => (
+      {NAV_LINKS.map((item) => (
         <NavLink
-          key={to}
-          to={to}
-          end={to === '/'}
+          key={item.to}
+          to={item.to}
+          end={item.to === '/'}
           className={({ isActive }) =>
             `neu-sidebar-link${isActive ? ' active' : ''}`
           }
         >
-          <Icon size={16} className="neu-sidebar-icon" />
-          {label}
+          <item.icon size={16} className="neu-sidebar-icon" />
+          {item.label}
         </NavLink>
       ))}
     </aside>

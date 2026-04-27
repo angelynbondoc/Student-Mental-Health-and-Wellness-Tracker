@@ -28,3 +28,8 @@ dist/
 .env
 .env.local
 >>>>>>> 372ee6cbcec5a3b56edbe9dcebc534756591533a
+
+
+# Supabase CLI temp files
+supabase/.temp/
+supabase/.branches/
