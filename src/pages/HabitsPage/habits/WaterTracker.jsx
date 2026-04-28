@@ -18,7 +18,9 @@ export function WaterTracker({ habitId, logged, onToggleLog }) {
     setFilled(next);
     try {
       localStorage.setItem(storageKey, String(next));
-    } catch {}
+    } catch {
+      // localStorage unavailable, continue without persisting
+    }
     if (next >= TOTAL_GLASSES && !logged) onToggleLog(habitId);
     if (next < TOTAL_GLASSES && logged) onToggleLog(habitId);
   };

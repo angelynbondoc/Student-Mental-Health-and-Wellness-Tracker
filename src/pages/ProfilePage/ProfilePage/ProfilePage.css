@@ -134,9 +134,7 @@
 
 /* ── Edit Button ──────────────────────────────────────────────────────────── */
 .pp-edit-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  margin-top: 12px;
 }
 
 /* ── Tabs ─────────────────────────────────────────────────────────────────── */
@@ -749,4 +747,34 @@
 }
 .pp-change-photo-btn:hover {
   background: var(--color-primary-light);
+}
+.pp-logout-btn {
+  margin-top: 12px;
+  margin-left: 8px;
+  color: #c62828;
+  border: 1px solid #c62828;
+  border-radius: 8px;
+}
+
+.pp-logout-btn:hover {
+  background: #fdecea;
+  border-color: #c62828;
+}
+
+.pp-logout-btn {
+  margin-top: 8px;
+  color: #c62828;
+  border: 1px solid #c62828;  /* ← adds the border */
+}
+
+.pp-logout-btn:hover {
+  background: #fdecea;
+  border-color: #c62828;
+}
+.pp-profile-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
 }

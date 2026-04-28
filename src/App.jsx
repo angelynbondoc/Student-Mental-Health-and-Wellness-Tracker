@@ -15,10 +15,11 @@ import ResourcesPage from "./pages/ResourcesPage/ResourcesPage";
 import HabitsPage from "./pages/HabitsPage/HabitsPage";
 import InboxPage from "./pages/InboxPage/InboxPage";
 import LoginPage from "./pages/LoginPage/LoginPage";
-import ProfilePage from "./pages/ProfilePage/ProfilePage";
-
+import ProfilePage from "./pages/ProfilePage/ProfilePage/ProfilePage";
 import AdminRouteGuard from "./components/AdminRouteGuard";
-
+import AdminDashboard from "./pages/AdminPage/AdminDashboard";
+import UserProfilePage from "./pages/ProfilePage/UserProfilePage/UserProfilePage";
+import OnboardingPage from "./pages/OnboardingPage/OnboardingPage";
 import {
   INITIAL_PROFILES,
   INITIAL_COMMUNITIES,
@@ -92,6 +93,16 @@ function App() {
 
           {/* Standalone login — no shell */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/onboarding" element={<OnboardingPage />} />
+
+          <Route
+            path="/admin"
+            element={
+              <AdminRouteGuard>
+                <AdminDashboard />
+              </AdminRouteGuard>
+            }
+          />
 
           {/* ✅ All app routes nested inside MobileLayout so shell always renders */}
           <Route element={<MobileLayout />}>
@@ -102,20 +113,9 @@ function App() {
             <Route path="/habits" element={<HabitsPage />} />
             <Route path="/inbox" element={<InboxPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/:userId" element={<UserProfilePage />} />
 
             {/* Admin route */}
-            <Route 
-              path="/admin" 
-              element={
-                <AdminRouteGuard>
-                  
-                  <div style={{ padding: "2rem", textAlign: "center" }}>
-                    <h2>Admin Dashboard Placeholder</h2>
-                    <p>UI/UX needs to build this page.</p>
-                  </div>
-                </AdminRouteGuard>
-              } 
-            />
           </Route>
         </Routes>
       </BrowserRouter>
