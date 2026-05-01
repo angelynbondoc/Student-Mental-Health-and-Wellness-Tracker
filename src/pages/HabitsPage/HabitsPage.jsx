@@ -8,11 +8,9 @@
 //
 // All other habits retain the original Mark Done card UI.
 // =============================================================================
-import React, {
-  useState,useContext
-} from "react";
+import React, { useState, useEffect, useContext } from "react";
 import AppContext from "../../AppContext";
-import { generateUUID } from "../../Mockdata";
+import { supabase } from "../../supabase";
 import { PageShell, EmptyState } from "../../components/ui";
 import "./HabitsPage.css";
 import { WalkTimer } from "./habits/WalkTimer";
@@ -63,63 +61,74 @@ function DefaultHabitCard({ habit, logged, onToggleLog, completionCount }) {
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function HabitsPage() {
-  const { currentUser, habits, setHabits, habitLogs, setHabitLogs } =
-    useContext(AppContext);
-  const [newHabitName, setNewHabitName] = useState("");
+  const { currentUser } = useContext(AppContext);
+  const [myHabits, setMyHabits] = useState([]);
+  const [habitLogs, setHabitLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const todayStr = new Date().toISOString().split("T")[0];
-  const myHabits = habits.filter((h) => h.user_id === currentUser.id);
+
+  useEffect(() => {
+    if (!currentUser?.id) return;
+    let cancelled = false;
+    async function fetchData() {
+      setLoading(true);
+      const [habitsRes, logsRes] = await Promise.all([
+        supabase.from("habits").select("*"),
+        supabase.from("habit_logs").select("*").eq("user_id", currentUser.id),
+      ]);
+      console.log("HABITS:", habitsRes.data, habitsRes.error);
+      console.log("LOGS:", logsRes.data, logsRes.error);
+      if (cancelled) return;
+      if (habitsRes.data) setMyHabits(habitsRes.data);
+      if (logsRes.data) setHabitLogs(logsRes.data);
+      setLoading(false);
+    }
+    fetchData();
+    return () => { cancelled = true; };
+  }, [currentUser?.id]);
 
   const isLoggedToday = (habitId) =>
     habitLogs.some(
       (log) => log.habit_id === habitId && log.completed_date === todayStr,
     );
 
-  const handleToggleLog = (habitId) => {
+  const handleToggleLog = async (habitId) => {
     if (isLoggedToday(habitId)) {
+      await supabase
+        .from("habit_logs")
+        .delete()
+        .eq("habit_id", habitId)
+        .eq("user_id", currentUser.id)
+        .eq("completed_date", todayStr);
       setHabitLogs((prev) =>
         prev.filter(
-          (log) =>
-            !(log.habit_id === habitId && log.completed_date === todayStr),
+          (log) => !(log.habit_id === habitId && log.completed_date === todayStr),
         ),
       );
     } else {
-      setHabitLogs((prev) => [
-        ...prev,
-        {
-          id: generateUUID(),
-          habit_id: habitId,
-          user_id: currentUser.id,
-          completed_date: todayStr,
-          created_at: new Date().toISOString(),
-        },
-      ]);
+      const { data } = await supabase
+        .from("habit_logs")
+        .insert({ habit_id: habitId, user_id: currentUser.id, completed_date: todayStr })
+        .select()
+        .single();
+      if (data) setHabitLogs((prev) => [...prev, data]);
     }
   };
 
   const completionCount = (habitId) =>
     habitLogs.filter((log) => log.habit_id === habitId).length;
 
-  const handleAddHabit = () => {
-    const trimmed = newHabitName.trim();
-    if (!trimmed) return;
-    setHabits((prev) => [
-      ...prev,
-      {
-        id: generateUUID(),
-        user_id: currentUser.id,
-        habit_name: trimmed,
-        created_at: new Date().toISOString(),
-      },
-    ]);
-    setNewHabitName("");
-  };
+  
+
 
   return (
     <PageShell heading="My Habits" sub="Track your daily wellness rituals ✨">
       <div className="hp-list">
-        {myHabits.length === 0 ? (
-          <EmptyState message="No habits yet. Ask an admin to add some!" />
+        {loading ? (
+          <p style={{ textAlign: "center", padding: "24px", color: "var(--text)" }}>Loading…</p>
+        ) : myHabits.length === 0 ? (
+          <EmptyState message="No habits yet. Add one below!" />
         ) : (
           myHabits.map((habit) => {
             const type = habitType(habit.habit_name);
@@ -168,24 +177,7 @@ export default function HabitsPage() {
         )}
       </div>
 
-      {currentUser.role === "admin" && (
-        <div className="hp-admin-box">
-          <p className="hp-admin-label">🛡️ Admin — Add New Habit</p>
-          <div className="hp-admin-row">
-            <input
-              className="field-input"
-              type="text"
-              placeholder="e.g. Journal before bed"
-              value={newHabitName}
-              onChange={(e) => setNewHabitName(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleAddHabit()}
-            />
-            <button className="hp-admin-btn" onClick={handleAddHabit}>
-              + Add
-            </button>
-          </div>
-        </div>
-      )}
-    </PageShell>
+    
+      </PageShell>
   );
 }

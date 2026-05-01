@@ -3,24 +3,13 @@ import React, { useState } from "react";
 const TOTAL_GLASSES = 8;
 
 export function WaterTracker({ habitId, logged, onToggleLog }) {
-  const storageKey = `water_${habitId}_${new Date().toISOString().split("T")[0]}`;
-  const [filled, setFilled] = useState(() => {
-    try {
-      return parseInt(localStorage.getItem(storageKey) || "0", 10);
-    } catch {
-      return 0;
-    }
-  });
+  const [filled, setFilled] = useState(0);
+
   const [showPanel, setShowPanel] = useState(false);
 
   const fill = (n) => {
     const next = filled === n ? n - 1 : n;
     setFilled(next);
-    try {
-      localStorage.setItem(storageKey, String(next));
-    } catch {
-      // localStorage unavailable, continue without persisting
-    }
     if (next >= TOTAL_GLASSES && !logged) onToggleLog(habitId);
     if (next < TOTAL_GLASSES && logged) onToggleLog(habitId);
   };
