@@ -1,12 +1,7 @@
-// =============================================================================
-// App.jsx — Single source of truth. Holds ALL global state.
-// Batch 3 adds: notifications, directMessages + InboxPage route
-// FIX: Restored missing /create route and CreatePage import
-// =============================================================================
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import AppContext from "./AppContext"; // ✅ same folder
+import AppContext from "./AppContext";
 import { MobileLayout } from "./components/layout";
 import HomePage from "./pages/HomePage/HomePage";
 import CreatePage from "./pages/CreatePage";
@@ -20,10 +15,10 @@ import AdminRouteGuard from "./components/AdminRouteGuard";
 import AdminDashboard from "./pages/AdminPage/AdminDashboard";
 import UserProfilePage from "./pages/ProfilePage/UserProfilePage/UserProfilePage";
 import OnboardingPage from "./pages/OnboardingPage/OnboardingPage";
+import { supabase } from "./supabase";
 import {
   INITIAL_PROFILES,
   INITIAL_COMMUNITIES,
-  INITIAL_POSTS,
   INITIAL_COMMENTS,
   INITIAL_REACTIONS,
   INITIAL_MOOD_JOURNAL,
@@ -32,21 +27,48 @@ import {
   INITIAL_HABIT_LOGS,
   INITIAL_NOTIFICATIONS,
   INITIAL_DIRECT_MESSAGES,
-} from "./mockData"; // ✅ same folder
-
-const CURRENT_USER = {
-  id: "user-1",
-  display_name: "username_<role>",
-  role: "student", // change to 'admin' to reveal admin UI
-};
+} from "./mockData";
 
 function App() {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [authReady, setAuthReady] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setCurrentUser(session?.user
+        ? { id: session.user.id, display_name: session.user.email, role: "student" }
+        : null
+      );
+      setAuthReady(true);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setCurrentUser(session?.user
+        ? { id: session.user.id, display_name: session.user.email, role: "student" }
+        : null
+      );
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   // ── Batch 1 ────────────────────────────────────────────────────────────────
   const [profiles, setProfiles] = useState(INITIAL_PROFILES);
   const [communities, setCommunities] = useState(INITIAL_COMMUNITIES);
-  const [posts, setPosts] = useState(INITIAL_POSTS);
+  const [posts, setPosts] = useState([]);
   const [comments, setComments] = useState(INITIAL_COMMENTS);
   const [reactions, setReactions] = useState(INITIAL_REACTIONS);
+
+  useEffect(() => {
+    async function fetchPosts() {
+      const { data } = await supabase
+        .from("posts")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (data) setPosts(data);
+    }
+    fetchPosts();
+  }, []);
 
   // ── Batch 2 ────────────────────────────────────────────────────────────────
   const [moodJournal, setMoodJournal] = useState(INITIAL_MOOD_JOURNAL);
@@ -59,7 +81,7 @@ function App() {
   const [directMessages, setDirectMessages] = useState(INITIAL_DIRECT_MESSAGES);
 
   const contextValue = {
-    currentUser: CURRENT_USER,
+    currentUser,
     profiles,
     setProfiles,
     communities,
@@ -84,17 +106,14 @@ function App() {
     setDirectMessages,
   };
 
+
   return (
     <AppContext.Provider value={contextValue}>
       <BrowserRouter>
         <Routes>
-          {/* Redirect root to login */}
           <Route path="/" element={<Navigate to="/login" replace />} />
-
-          {/* Standalone login — no shell */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
-
           <Route
             path="/admin"
             element={
@@ -103,9 +122,9 @@ function App() {
               </AdminRouteGuard>
             }
           />
-
-          {/* ✅ All app routes nested inside MobileLayout so shell always renders */}
-          <Route element={<MobileLayout />}>
+          <Route element={
+            !authReady ? null : currentUser ? <MobileLayout /> : <Navigate to="/login" replace />
+          }>
             <Route path="/home" element={<HomePage />} />
             <Route path="/create" element={<CreatePage />} />
             <Route path="/journal" element={<JournalPage />} />
@@ -114,8 +133,6 @@ function App() {
             <Route path="/inbox" element={<InboxPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/:userId" element={<UserProfilePage />} />
-
-            {/* Admin route */}
           </Route>
         </Routes>
       </BrowserRouter>

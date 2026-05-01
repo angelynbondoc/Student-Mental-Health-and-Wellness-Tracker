@@ -21,8 +21,9 @@ export default function MobileLayout() {
   const [showNotifPanel, setShowNotifPanel] = useState(false);
 
   const unreadCount = notifications.filter(
-    (n) => n.user_id === currentUser.id && !n.is_read
+    (n) => currentUser && n.user_id === currentUser.id && !n.is_read
   ).length;
+
 
   return (
     <div className="neu-shell">
