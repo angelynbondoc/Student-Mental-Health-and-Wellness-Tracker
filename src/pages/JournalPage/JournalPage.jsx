@@ -12,7 +12,7 @@
 // =============================================================================
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import AppContext from '../../AppContext';
-import { generateUUID } from '../../mockData';
+import { supabase } from '../../supabase';
 import { PageShell, EmptyState } from '../../components/ui';
 import './JournalPage.css';
 
@@ -192,7 +192,21 @@ function StepIndicator({ current }) {
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function JournalPage() {
-  const { moodJournal, setMoodJournal, currentUser } = useContext(AppContext);
+  const { currentUser } = useContext(AppContext);
+  const [myEntries, setMyEntries] = useState([]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    async function fetchEntries() {
+      const { data } = await supabase
+        .from('mood_journal')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+      if (data) setMyEntries(data);
+    }
+    fetchEntries();
+  }, [currentUser?.id]);
 
   const [step,           setStep]           = useState(0);
   const [moodRating,     setMoodRating]     = useState(3);
@@ -213,37 +227,40 @@ export default function JournalPage() {
     if (step === 2) textareaRef.current?.focus();
   }, [step]);
 
-  const handleSubmit = () => {
-    if (!entryText.trim()) return;
-    const newEntry = {
-      id:              generateUUID(),
-      user_id:         currentUser.id,
-      mood_rating:     moodRating,
-      trigger_note:    triggerNote.trim(),
-      gratitude_note:  gratitudeNote.trim(),
-      reflection_note: reflectionNote.trim(),
-      entry_text:      entryText.trim(),
-      created_at:      new Date().toISOString(),
-    };
-    setMoodJournal(prev => [newEntry, ...prev]);
-    // Reset
-    setStep(0);
-    setMoodRating(3);
-    setTriggerNote('');
-    setGratitudeNote('');
-    setReflectionNote('');
-    setEntryText('');
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
+  const handleSubmit = async () => {
+    if (!entryText.trim() || !currentUser) return;
+    const { data, error } = await supabase
+      .from('mood_journal')
+      .insert({
+        user_id:         currentUser.id,
+        mood_rating:     moodRating,
+        trigger_note:    triggerNote.trim(),
+        gratitude_note:  gratitudeNote.trim(),
+        reflection_note: reflectionNote.trim(),
+        entry_text:      entryText.trim(),
+      })
+      .select()
+      .single();
+    if (!error && data) {
+      setMyEntries(prev => [data, ...prev]);
+      setStep(0);
+      setMoodRating(3);
+      setTriggerNote('');
+      setGratitudeNote('');
+      setReflectionNote('');
+      setEntryText('');
+      setSubmitted(true);
+      setTimeout(() => setSubmitted(false), 3000);
+    }
   };
 
-  const handleDelete = (id) => {
-    setMoodJournal(prev => prev.filter(e => e.id !== id));
+  const handleDelete = async (id) => {
+    const { error } = await supabase
+      .from('mood_journal')
+      .delete()
+      .eq('id', id);
+    if (!error) setMyEntries(prev => prev.filter(e => e.id !== id));
   };
-
-  const myEntries = moodJournal
-    .filter(e => e.user_id === currentUser.id)
-    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   const shufflePrompt = () =>
     setPromptIdx(i => (i + 1) % WRITING_PROMPTS.length);
