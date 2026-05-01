@@ -183,7 +183,7 @@ export default function InboxPage() {
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
           />
           <button className="ip-send-btn" onClick={handleSend}>
-            Send ➤
+            Send 
           </button>
         </div>
       </div>
@@ -201,13 +201,13 @@ export default function InboxPage() {
             setOpenThreadId(null);
           }}
         >
-          💬 Messages
+          Messages
         </button>
         <button
           className={`ip-tab${activeTab === "alerts" ? " ip-tab--active" : ""}`}
           onClick={() => setActiveTab("alerts")}
         >
-          🔔 Alerts
+          Alerts
           {unreadAlerts > 0 && (
             <span className="ip-tab__badge">{unreadAlerts}</span>
           )}

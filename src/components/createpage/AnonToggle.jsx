@@ -18,7 +18,7 @@ export default function AnonToggle({ checked, onChange }) {
 
       {checked && (
         <p className="notice--gold">
-          🔒 Your name will be hidden. Only "Anonymous" will be shown.
+          Your name will be hidden. Only "Anonymous" will be shown.
         </p>
       )}
     </>

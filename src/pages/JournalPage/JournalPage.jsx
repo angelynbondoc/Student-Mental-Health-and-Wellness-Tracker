@@ -328,7 +328,7 @@ export default function JournalPage() {
 
             <div className="jp-context-fields">
               <div className="jp-context-field">
-                <label className="jp-field-label">⚡ What triggered this mood?</label>
+                <label className="jp-field-label">What triggered this mood?</label>
                 <input
                   className="jp-input"
                   value={triggerNote}
@@ -337,7 +337,7 @@ export default function JournalPage() {
                 />
               </div>
               <div className="jp-context-field">
-                <label className="jp-field-label">🙏 What are you grateful for?</label>
+                <label className="jp-field-label">What are you grateful for?</label>
                 <input
                   className="jp-input"
                   value={gratitudeNote}
@@ -346,7 +346,7 @@ export default function JournalPage() {
                 />
               </div>
               <div className="jp-context-field">
-                <label className="jp-field-label">💡 One thing you'd do differently?</label>
+                <label className="jp-field-label">One thing you'd do differently?</label>
                 <input
                   className="jp-input"
                   value={reflectionNote}
@@ -373,7 +373,6 @@ export default function JournalPage() {
 
             {/* Prompt suggestion */}
             <div className="jp-prompt-chip" onClick={shufflePrompt} title="Click for a new prompt">
-              <span className="jp-prompt-icon">💬</span>
               <span className="jp-prompt-text">{WRITING_PROMPTS[promptIdx]}</span>
               <span className="jp-prompt-shuffle">↻</span>
             </div>
@@ -412,7 +411,7 @@ export default function JournalPage() {
                 disabled={!entryText.trim()}
                 style={{ background: entryText.trim() ? moodColors.text : undefined }}
               >
-                Save Entry ✓
+                Save Entry 
               </button>
             </div>
           </div>
