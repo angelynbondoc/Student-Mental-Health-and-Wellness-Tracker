@@ -16,22 +16,10 @@ import AdminDashboard from "./pages/AdminPage/AdminDashboard";
 import UserProfilePage from "./pages/ProfilePage/UserProfilePage/UserProfilePage";
 import OnboardingPage from "./pages/OnboardingPage/OnboardingPage";
 import { supabase } from "./supabase";
-import {
-  INITIAL_PROFILES,
-  INITIAL_COMMENTS,
-  INITIAL_REACTIONS,
-  INITIAL_MOOD_JOURNAL,
-  INITIAL_RESOURCES,
-  INITIAL_HABITS,
-  INITIAL_HABIT_LOGS,
-  INITIAL_NOTIFICATIONS,
-  INITIAL_DIRECT_MESSAGES,
-} from "./mockData";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [authReady, setAuthReady] = useState(false);
-  
 
   useEffect(() => {
     async function resolveUser(session) {
@@ -47,7 +35,6 @@ function App() {
         .eq('id', session.user.id)
         .single();
 
-      // profile missing = new user, default to student
       return {
         id: session.user.id,
         display_name: profile?.display_name ?? email ?? 'User',
@@ -78,7 +65,7 @@ function App() {
   }, []);
 
   // ── Batch 1 ────────────────────────────────────────────────────────────────
-  const [profiles, setProfiles] = useState(INITIAL_PROFILES);
+  const [profiles, setProfiles] = useState([]);
   const [communities, setCommunities] = useState([]);
 
   useEffect(() => {
@@ -88,9 +75,10 @@ function App() {
     }
     fetchCommunities();
   }, []);
+
   const [posts, setPosts] = useState([]);
-  const [comments, setComments] = useState(INITIAL_COMMENTS);
-  const [reactions, setReactions] = useState(INITIAL_REACTIONS);
+  const [comments, setComments] = useState([]);
+  const [reactions, setReactions] = useState([]);
 
   useEffect(() => {
     async function fetchPosts() {
@@ -104,14 +92,11 @@ function App() {
   }, []);
 
   // ── Batch 2 ────────────────────────────────────────────────────────────────
-  const [moodJournal, setMoodJournal] = useState(INITIAL_MOOD_JOURNAL);
-  const [resources, setResources] = useState(INITIAL_RESOURCES);
-  const [habits, setHabits] = useState(INITIAL_HABITS);
-  const [habitLogs, setHabitLogs] = useState(INITIAL_HABIT_LOGS);
+  const [moodJournal, setMoodJournal] = useState([]);
 
   // ── Batch 3 ────────────────────────────────────────────────────────────────
-  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
-  const [directMessages, setDirectMessages] = useState(INITIAL_DIRECT_MESSAGES);
+  const [notifications, setNotifications] = useState([]);
+  const [directMessages, setDirectMessages] = useState([]);
 
   const contextValue = {
     currentUser,
@@ -127,18 +112,11 @@ function App() {
     setReactions,
     moodJournal,
     setMoodJournal,
-    resources,
-    setResources,
-    habits,
-    setHabits,
-    habitLogs,
-    setHabitLogs,
     notifications,
     setNotifications,
     directMessages,
     setDirectMessages,
   };
-
 
   return (
     <AppContext.Provider value={contextValue}>
