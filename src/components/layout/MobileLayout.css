@@ -1,0 +1,461 @@
+/* =============================================================================
+   MobileLayout.css
+   NEU MindSpace — Shell layout styles
+   Extracted from MobileLayout.jsx for clean separation of concerns.
+
+   Layout strategy:
+     Desktop (≥1024px): top bar + left sidebar + full-width main
+     Mobile  (<1024px):  top bar + full-width main + fixed bottom tab bar
+============================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=DM+Sans:wght@400;500&display=swap');
+
+/* ── CSS Variables ─────────────────────────────────────────────────────────── */
+:root {
+  --color-primary:       #2E7D32;
+  --color-primary-light: #E8F5E9;
+  --color-primary-hover: #C8E6C9;
+  --color-accent:        #F5C400;
+  --color-danger:        #C62828;
+  --color-bg:            #FAFAFA;
+  --color-surface:       #F2F2F2;
+  --color-white:         #FFFFFF;
+  --color-border:        #E8E8E8;
+  --color-text:          #1A1A1A;
+  --color-text-secondary:#616161;
+  --color-text-muted:    #9E9E9E;
+
+  --font-display: 'Poppins', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+
+  --topbar-height:    56px;
+  --sidebar-width:    220px;
+  --bottom-nav-height:64px;
+}
+
+/* ── Shell: full viewport ──────────────────────────────────────────────────── */
+.neu-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  min-height: 100vh;
+  background: var(--color-bg);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ── Top bar ───────────────────────────────────────────────────────────────── */
+.neu-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: var(--topbar-height);
+  padding: 0 24px;
+  background: var(--color-primary);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+}
+
+.neu-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Gold vertical bar — NEU sun motif accent */
+.neu-topbar-gold-bar {
+  width: 3px;
+  height: 22px;
+  background: var(--color-accent);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.neu-topbar-appname {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-white);
+  letter-spacing: -0.2px;
+}
+
+.neu-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.neu-user-chip {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-white);
+  background: rgba(255, 255, 255, 0.15);
+  padding: 5px 14px;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.neu-admin-badge {
+  background: var(--color-accent);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 100px;
+  padding: 1px 7px;
+}
+
+/* Bell button */
+.neu-bell-btn {
+  position: relative;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white);
+  transition: background 0.15s ease;
+}
+.neu-bell-btn:hover { background: rgba(255, 255, 255, 0.25); }
+
+/* Muted Red badge — alerts only per design rationale */
+.neu-bell-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  background: var(--color-danger);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 100px;
+  padding: 1px 5px;
+  border: 1.5px solid var(--color-primary);
+  min-width: 16px;
+  text-align: center;
+}
+
+/* ── Notifications dropdown ────────────────────────────────────────────────── */
+.neu-notif-dropdown {
+  position: fixed;
+  top: 60px;
+  right: 16px;
+  width: 340px;
+  max-width: calc(100vw - 32px);
+  background: var(--color-white);
+  border-radius: 16px;
+  z-index: 300;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+  padding: 16px;
+  max-height: 60vh;
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+}
+
+.neu-view-all-btn {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background: var(--color-primary-light);
+  border: none;
+  border-radius: 10px;
+  color: var(--color-primary);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.neu-view-all-btn:hover { background: var(--color-primary-hover); }
+
+/* ── Body row: sidebar + main ──────────────────────────────────────────────── */
+.neu-body {
+  display: flex;
+  flex: 1;
+  width: 100%;
+}
+
+/* ── Sidebar — desktop only ────────────────────────────────────────────────── */
+.neu-sidebar {
+  display: none;
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  background: var(--color-white);
+  border-right: 1px solid var(--color-border);
+  padding: 24px 0;
+  position: sticky;
+  top: var(--topbar-height);
+  height: calc(100vh - var(--topbar-height));
+  overflow-y: auto;
+}
+
+.neu-sidebar-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0 20px;
+  margin-bottom: 8px;
+}
+
+.neu-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.neu-sidebar-link:hover {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+.neu-sidebar-link.active {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-left-color: var(--color-primary);
+  font-weight: 600;
+}
+
+.neu-sidebar-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Main content area ─────────────────────────────────────────────────────── */
+.neu-main {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  background: var(--color-bg);
+}
+
+/* ── Bottom tab bar — mobile only ──────────────────────────────────────────── */
+.neu-bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--bottom-nav-height);
+  background: var(--color-white);
+  border-top: 1px solid var(--color-border);
+  z-index: 200;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.neu-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  text-decoration: none;
+  color: var(--color-text-muted);
+  padding: 4px 8px;
+  border-radius: 10px;
+  flex: 1;
+  transition: color 0.15s ease;
+}
+.neu-nav-item.active { color: var(--color-primary); }
+
+.neu-nav-icon {
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.neu-nav-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* ── Desktop breakpoint ────────────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .neu-sidebar    { display: flex; flex-direction: column; }
+  .neu-bottom-nav { display: none; }
+  .neu-main       { padding-bottom: 0; }
+  .neu-topbar     { padding: 0 32px; }
+}
+
+/* ── Mobile breakpoint ─────────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .neu-main      { padding-bottom: 70px; }
+  .neu-user-chip { display: none; }
+}
+
+@media (max-width: 380px) {
+  .neu-topbar         { padding: 0 14px; }
+  .neu-topbar-appname { font-size: 15px; }
+}
+
+.neu-profile-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white);
+  transition: background 0.15s ease;
+}
+.neu-profile-btn:hover { background: rgba(255, 255, 255, 0.25); }
+
+/* ── Search bar ────────────────────────────────────────────────────────────── */
+.neu-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 100px;
+  padding: 0 14px;
+  height: 36px;
+  width: 100%;
+  max-width: 320px;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.neu-search-wrap--focused {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 3px rgba(245, 196, 0, 0.25);
+}
+
+.neu-search-icon {
+  color: rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+}
+
+.neu-search-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-white);
+  min-width: 0;
+}
+
+.neu-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.neu-search-clear {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-white);
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.neu-search-clear:hover { background: rgba(255, 255, 255, 0.35); }
+
+/* Hide search on very small screens */
+@media (max-width: 480px) {
+  .neu-search-wrap { display: none; }
+}
+
+/* ── Mobile search trigger button ──────────────────────────────────────────── */
+.neu-mobile-search-btn {
+  display: none; /* hidden on desktop */
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-white);
+  transition: background 0.15s;
+}
+.neu-mobile-search-btn:hover { background: rgba(255, 255, 255, 0.25); }
+
+/* ── Mobile search overlay bar ─────────────────────────────────────────────── */
+.neu-mobile-search-bar {
+  display: none; /* shown via media query below */
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--topbar-height);
+  background: var(--color-primary);
+  padding: 0 16px;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+  animation: neu-search-slide 0.18s ease;
+}
+
+@keyframes neu-search-slide {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.neu-mobile-search-close {
+  background: none;
+  border: none;
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+  white-space: nowrap;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+.neu-mobile-search-close:hover { opacity: 1; }
+
+/* ── Responsive toggles ────────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  /* Show mobile search icon */
+  .neu-mobile-search-btn { display: flex; }
+
+  /* Hide desktop inline search */
+  .neu-search-wrap { display: none; }
+
+  /* Show overlay bar when rendered */
+  .neu-mobile-search-bar { display: flex; }
+}
+
+@media (min-width: 1024px) {
+  /* Hide mobile-only elements on desktop */
+  .neu-mobile-search-btn { display: none; }
+  .neu-mobile-search-bar { display: none !important; }
+}

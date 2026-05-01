@@ -1,0 +1,780 @@
+/* =============================================================================
+   ProfilePage.css — NEU MindSpace
+   Matches MobileLayout design tokens: Poppins + DM Sans, green/gold palette.
+============================================================================= */
+
+/* ── Shell ────────────────────────────────────────────────────────────────── */
+.pp-shell {
+  width: 100%;
+  min-height: 100%;
+  background: var(--color-bg);
+  font-family: var(--font-body);
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+.pp-header {
+  background: var(--color-white);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Green gradient banner */
+.pp-header-bg {
+  height: 120px;
+  background: linear-gradient(135deg, #1B5E20 0%, var(--color-primary) 60%, #388E3C 100%);
+  position: relative;
+}
+
+/* Gold shimmer stripe at bottom of banner */
+.pp-header-bg::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+}
+
+.pp-header-content {
+  display: flex;
+  flex-direction: column;
+  padding: 0 32px 24px;
+}
+
+/* ── Avatar ───────────────────────────────────────────────────────────────── */
+.pp-avatar {
+  position: relative;
+  flex-shrink: 0;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), #1B5E20);
+  border: 4px solid var(--color-white);
+  box-shadow: 0 4px 16px rgba(46, 125, 50, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -44px;
+  margin-bottom: 14px;
+}
+
+.pp-avatar-letter {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--color-white);
+  line-height: 1;
+}
+
+.pp-avatar-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background: var(--color-accent);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 100px;
+  padding: 2px 7px;
+  border: 2px solid var(--color-white);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Header Info ──────────────────────────────────────────────────────────── */
+.pp-header-info {
+  width: 100%;
+}
+
+.pp-name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 6px;
+  line-height: 1.2;
+}
+
+.pp-bio {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0 0 16px;
+  max-width: 480px;
+}
+
+/* ── Stats row ────────────────────────────────────────────────────────────── */
+.pp-stats {
+  display: flex;
+  gap: 28px;
+  margin-bottom: 16px;
+}
+
+.pp-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.pp-stat-value {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.pp-stat-label {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Edit Button ──────────────────────────────────────────────────────────── */
+.pp-edit-btn {
+  margin-top: 12px;
+}
+
+/* ── Tabs ─────────────────────────────────────────────────────────────────── */
+.pp-tabs {
+  display: flex;
+  background: var(--color-white);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0 24px;
+  gap: 4px;
+  position: sticky;
+  top: var(--topbar-height, 56px);
+  z-index: 10;
+}
+
+.pp-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 16px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.pp-tab:hover {
+  color: var(--color-text);
+}
+
+.pp-tab--active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* ── Content area ─────────────────────────────────────────────────────────── */
+.pp-content {
+  padding: 24px;
+  max-width: 720px;
+}
+
+.pp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Post Card ────────────────────────────────────────────────────────────── */
+.pp-post-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 16px 20px;
+  transition: box-shadow 0.15s;
+}
+
+.pp-post-card:hover {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.pp-post-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.pp-post-community {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+
+.pp-post-dot {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.pp-post-date {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.pp-shared-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+
+.pp-post-body {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text);
+  margin-bottom: 12px;
+}
+
+.pp-post-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ── Community Row ────────────────────────────────────────────────────────── */
+.pp-community-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 14px 18px;
+  transition: box-shadow 0.15s;
+}
+
+.pp-community-row:hover {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.pp-community-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--color-primary-light), var(--color-primary-hover));
+  color: var(--color-primary);
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pp-community-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pp-community-name {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.pp-community-desc {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+.pp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+}
+
+.pp-btn--primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+.pp-btn--primary:hover { background: #256427; }
+
+.pp-btn--outline {
+  background: transparent;
+  color: var(--color-primary);
+  border: 1.5px solid var(--color-primary);
+}
+.pp-btn--outline:hover {
+  background: var(--color-primary-light);
+}
+
+.pp-btn--ghost {
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+}
+.pp-btn--ghost:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+.pp-btn--danger {
+  background: var(--color-danger);
+  color: var(--color-white);
+}
+.pp-btn--danger:hover { background: #a31e1e; }
+
+/* Icon button (inline, smaller) */
+.pp-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+}
+
+.pp-icon-btn--danger {
+  background: #FFEBEE;
+  color: var(--color-danger);
+}
+.pp-icon-btn--danger:hover {
+  background: var(--color-danger);
+  color: var(--color-white);
+}
+
+/* ── Edit Form ────────────────────────────────────────────────────────────── */
+.pp-edit-form {
+  width: 100%;
+  max-width: 420px;
+  background: var(--color-surface);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  position: relative;
+}
+
+.pp-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.pp-input,
+.pp-textarea {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text);
+  background: var(--color-white);
+  border: 1.5px solid var(--color-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  transition: border-color 0.15s;
+  resize: none;
+  outline: none;
+}
+
+.pp-input:focus,
+.pp-textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.pp-char-count {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  text-align: right;
+  margin-top: -2px;
+}
+
+.pp-edit-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* ── Confirm Modal ────────────────────────────────────────────────────────── */
+.pp-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: pp-fade-in 0.15s ease;
+}
+
+@keyframes pp-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.pp-modal {
+  background: var(--color-white);
+  border-radius: 20px;
+  padding: 28px;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+  animation: pp-slide-up 0.2s ease;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+@keyframes pp-slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.pp-modal-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pp-modal-icon--danger {
+  background: #FFEBEE;
+  color: var(--color-danger);
+}
+
+.pp-modal-icon--warn {
+  background: #FFF8E1;
+  color: #F57F17;
+}
+
+.pp-modal-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.pp-modal-msg {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.pp-modal-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.pp-modal-actions .pp-btn {
+  flex: 1;
+  justify-content: center;
+}
+
+/* ── Empty State ──────────────────────────────────────────────────────────── */
+.pp-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 48px 24px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.pp-empty-icon {
+  color: var(--color-border);
+  margin-bottom: 4px;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .pp-header-content {
+    padding: 56px 20px 24px;
+    gap: 16px;
+  }
+
+  .pp-content {
+    padding: 16px;
+  }
+
+  .pp-tabs {
+    padding: 0 12px;
+    overflow-x: auto;
+  }
+
+  .pp-tab {
+    padding: 12px 12px;
+    font-size: 12px;
+  }
+
+  .pp-stats {
+    gap: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pp-avatar {
+    width: 68px;
+    height: 68px;
+  }
+
+  .pp-avatar-letter {
+    font-size: 26px;
+  }
+
+  .pp-name {
+    font-size: 18px;
+  }
+
+  .pp-header-content {
+    flex-wrap: wrap;
+  }
+}
+
+/* ── Avatar wrap (positions badge relative to circle) ─────────────────────── */
+.pp-avatar-wrap {
+  position: relative;
+  width: fit-content;
+  margin-top: -44px;
+  margin-bottom: 14px;
+}
+
+/* ── Avatar image fill ────────────────────────────────────────────────────── */
+.pp-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* ── Clickable avatar hover overlay ──────────────────────────────────────── */
+.pp-avatar--clickable {
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.pp-avatar-edit-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.38);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.pp-avatar--clickable:hover .pp-avatar-edit-overlay {
+  opacity: 1;
+}
+
+/* ── Photo drop zone ──────────────────────────────────────────────────────── */
+.pp-photo-drop {
+  border: 2px dashed var(--color-border);
+  border-radius: 12px;
+  background: var(--color-white);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  overflow: hidden;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pp-photo-drop:hover,
+.pp-photo-drop--over {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+/* Empty state inside drop zone */
+.pp-photo-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 20px;
+  text-align: center;
+}
+
+.pp-photo-icon-ring {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.pp-photo-hint-main {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.pp-photo-hint-sub {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+/* Preview inside drop zone */
+.pp-photo-preview-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.pp-photo-preview {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.pp-photo-change-hint {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.42);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.pp-photo-drop:hover .pp-photo-change-hint {
+  opacity: 1;
+}
+
+/* Hidden file input */
+.pp-file-hidden {
+  display: none;
+}
+
+/* Remove photo link */
+.pp-remove-photo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-danger);
+  padding: 2px 0;
+  margin-top: 2px;
+  transition: opacity 0.15s;
+}
+.pp-remove-photo:hover { opacity: 0.75; }
+
+/* ── Change photo button (inside edit form) ───────────────────────────────── */
+.pp-change-photo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--color-white);
+  border: 1.5px solid var(--color-primary);
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: background 0.15s;
+  width: fit-content;
+}
+.pp-change-photo-btn:hover {
+  background: var(--color-primary-light);
+}
+.pp-logout-btn {
+  margin-top: 12px;
+  margin-left: 8px;
+  color: #c62828;
+  border: 1px solid #c62828;
+  border-radius: 8px;
+}
+
+.pp-logout-btn:hover {
+  background: #fdecea;
+  border-color: #c62828;
+}
+
+.pp-logout-btn {
+  margin-top: 8px;
+  color: #c62828;
+  border: 1px solid #c62828;  /* ← adds the border */
+}
+
+.pp-logout-btn:hover {
+  background: #fdecea;
+  border-color: #c62828;
+}
+.pp-profile-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}

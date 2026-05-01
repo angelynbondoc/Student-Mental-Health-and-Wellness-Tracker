@@ -1,0 +1,129 @@
+/* =============================================================================
+   NotificationsPanel.css
+   Styles for the notifications panel — used in both InboxPage and the
+   MobileLayout bell dropdown.
+============================================================================= */
+
+/* ── Panel wrapper ─────────────────────────────────────────────────────────── */
+.neu-notif-panel { padding: 4px 0; }
+
+/* ── Header ────────────────────────────────────────────────────────────────── */
+.neu-notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.neu-notif-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.neu-notif-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* Muted Red badge — used ONLY for alert counts per design rationale */
+.neu-notif-badge {
+  background: var(--color-danger);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 100px;
+  padding: 2px 7px;
+}
+
+.neu-mark-all-btn {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 4px 0;
+}
+.neu-mark-all-btn:hover { text-decoration: underline; }
+
+/* ── Empty state ───────────────────────────────────────────────────────────── */
+.neu-notif-empty {
+  font-family: var(--font-body);
+  color: var(--color-text-muted);
+  font-size: 14px;
+  text-align: center;
+  padding: 24px 0;
+}
+
+/* ── Notification list ─────────────────────────────────────────────────────── */
+.neu-notif-list { display: flex; flex-direction: column; gap: 8px; }
+
+.neu-notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+}
+
+/* Unread: green tint + green left border */
+.neu-notif-item--unread {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary-hover);
+  border-left: 3px solid var(--color-primary);
+}
+
+/* Read: muted gray */
+.neu-notif-item--read {
+  background: var(--color-surface);
+  border-left: 3px solid #E0E0E0;
+}
+
+/* ── Item internals ────────────────────────────────────────────────────────── */
+.neu-notif-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+}
+.neu-notif-body  { flex: 1; }
+.neu-notif-text {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-text);
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.neu-notif-time {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin: 3px 0 0;
+}
+
+/* ── Mark-read button ──────────────────────────────────────────────────────── */
+.neu-read-btn {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-primary);
+  background: var(--color-white);
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.neu-read-btn:hover {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
