@@ -18,7 +18,6 @@ import OnboardingPage from "./pages/OnboardingPage/OnboardingPage";
 import { supabase } from "./supabase";
 import {
   INITIAL_PROFILES,
-  INITIAL_COMMUNITIES,
   INITIAL_COMMENTS,
   INITIAL_REACTIONS,
   INITIAL_MOOD_JOURNAL,
@@ -32,21 +31,47 @@ import {
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [authReady, setAuthReady] = useState(false);
+  
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setCurrentUser(session?.user
-        ? { id: session.user.id, display_name: session.user.email, role: "student" }
-        : null
-      );
-      setAuthReady(true);
-    });
+    async function resolveUser(session) {
+      if (!session?.user) return null;
+      const email = session.user.email ?? '';
+      if (!email.endsWith('@neu.edu.ph')) {
+        await supabase.auth.signOut();
+        return null;
+      }
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role, display_name')
+        .eq('id', session.user.id)
+        .single();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setCurrentUser(session?.user
-        ? { id: session.user.id, display_name: session.user.email, role: "student" }
-        : null
-      );
+      // profile missing = new user, default to student
+      return {
+        id: session.user.id,
+        display_name: profile?.display_name ?? email ?? 'User',
+        role: profile?.role ?? 'student',
+      };
+    }
+
+    async function init() {
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = await resolveUser(session);
+      setCurrentUser(user);
+      setAuthReady(true);
+    }
+    init();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_OUT') {
+        setCurrentUser(null);
+        setAuthReady(true);
+        return;
+      }
+      const user = await resolveUser(session);
+      setCurrentUser(user);
+      setAuthReady(true);
     });
 
     return () => subscription.unsubscribe();
@@ -54,7 +79,15 @@ function App() {
 
   // ── Batch 1 ────────────────────────────────────────────────────────────────
   const [profiles, setProfiles] = useState(INITIAL_PROFILES);
-  const [communities, setCommunities] = useState(INITIAL_COMMUNITIES);
+  const [communities, setCommunities] = useState([]);
+
+  useEffect(() => {
+    async function fetchCommunities() {
+      const { data } = await supabase.from('communities').select('*');
+      if (data) setCommunities(data);
+    }
+    fetchCommunities();
+  }, []);
   const [posts, setPosts] = useState([]);
   const [comments, setComments] = useState(INITIAL_COMMENTS);
   const [reactions, setReactions] = useState(INITIAL_REACTIONS);

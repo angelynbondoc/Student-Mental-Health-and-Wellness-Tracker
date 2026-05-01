@@ -18,6 +18,16 @@ function Particle({ style }) {
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    // If redirected back after a rejected non-NEU login
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user && !session.user.email?.endsWith('@neu.edu.ph')) {
+        supabase.auth.signOut();
+        setError("Access denied. Please use your @neu.edu.ph account.");
+      }
+    });
+  }, []);
   const [particles, setParticles] = useState([]);
 
   // Generate decorative floating particles once on mount
