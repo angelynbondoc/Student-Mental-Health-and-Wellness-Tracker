@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import AppContext from "../../AppContext";
 import "./OnboardingPage.css";
+import { supabase } from "../../supabase";
 
 // ── NEU Course catalogue ──────────────────────────────────────────────────────
 const COURSES = [
@@ -493,7 +494,7 @@ function StepWelcome({ displayName, courseCount, onContinue }) {
 // ── Main OnboardingPage ───────────────────────────────────────────────────────
 export default function OnboardingPage() {
   const navigate = useNavigate();
-  const { currentUser } = useContext(AppContext);
+  const { currentUser, setCurrentUser } = useContext(AppContext);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -516,11 +517,36 @@ export default function OnboardingPage() {
   }
 
   async function handleSubmit() {
+    if (!currentUser) return;
     setError("");
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setLoading(false);
-    setStep(3);
+
+    try {
+      // Mark privacy as acknowledged
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ privacy_acknowledged: true })
+        .eq('id', currentUser.id);
+
+      if (profileError) throw profileError;
+
+      // Join selected course communities
+      if (selectedCourses.length > 0) {
+        const memberships = selectedCourses.map(courseId => ({
+          user_id: currentUser.id,
+          community_id: courseId,
+        }));
+        await supabase.from('community_members').upsert(memberships);
+      }
+
+      setCurrentUser(prev => ({ ...prev, privacy_acknowledged: true }));
+      setStep(3);
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
