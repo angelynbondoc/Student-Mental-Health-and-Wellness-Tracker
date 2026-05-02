@@ -64,21 +64,27 @@ export default function usePostCard(post) {
     fetchCount();
   }, [post.id]);
 
-  const handleAddComment = async (content) => {
+  const handleAddComment = async (content, isAnonymous = false) => {
     if (!currentUser) return;
     const { error } = await supabase
       .from("comments")
-      .insert({ post_id: post.id, author_id: currentUser.id, content });
+      .insert({ post_id: post.id, author_id: currentUser.id, content, is_anonymous: isAnonymous });
     if (!error) setCommentCount((n) => n + 1);
   };
 
   // ── Share ──────────────────────────────────────────────────────────────────
   const handleShare = async () => {
     if (!currentUser) return;
+    
+    // Strip the prefix so re-shares don't chain
+    const originalContent = post.content.startsWith('[Shared Post]: ')
+      ? post.content.slice('[Shared Post]: '.length)
+      : post.content;
+
     const { error } = await supabase.from("posts").insert({
       author_id: currentUser.id,
       community_id: post.community_id,
-      content: `[Shared Post]: ${post.content}`,
+      content: `[Shared Post]: ${originalContent}`,
       is_anonymous: false,
       is_flagged: false,
     });

@@ -8,6 +8,7 @@ import ReportedUsersTab from "../../components/admin/ReportedUserTab"
 import UserManagementTab from "../../components/admin/UserManagementTab"
 import PostReportModal from "../../components/admin/PostReportModal";
 import UserReportModal from "../../components/admin/UserReportModal";
+import CommunityReviewTab from "../../components/admin/CommunityReviewTab";
 
 export default function AdminDashboard() {
   const {
@@ -25,7 +26,11 @@ export default function AdminDashboard() {
     search, setSearch,
     pendingPosts, pendingUsers, resolved, suspended,
     resolvePost, resolveUserReport, toggleUser,
-  } = useAdminDashboard();
+    pendingCommunities,
+    approveCommunity,
+    rejectCommunity,
+    pendingCommunityCount,
+} = useAdminDashboard();
 
   return (
     <div className="admin-root">
@@ -47,6 +52,7 @@ export default function AdminDashboard() {
           pendingUsers={pendingUsers}
           resolved={resolved}
           suspended={suspended}
+          pendingCommunityCount={pendingCommunityCount}
         />
 
         <main className="admin-main">
@@ -55,6 +61,7 @@ export default function AdminDashboard() {
           <div className="admin-stats-grid">
             <StatCard label="Pending Post Reports" value={pendingPosts} sub="Awaiting review" accent="var(--warn)" />
             <StatCard label="Pending User Reports" value={pendingUsers} sub="Awaiting review" accent="#E65100" />
+            <StatCard label="Pending Communities" value={pendingCommunityCount} sub="Awaiting approval" accent="var(--primary)" />
             <StatCard label="Resolved Reports"     value={resolved}     sub="All time"        accent="var(--primary)" />
             <StatCard label="Suspended Users"      value={suspended}    sub="Currently restricted" accent="var(--danger)" />
           </div>
@@ -76,6 +83,14 @@ export default function AdminDashboard() {
               setUrFilter={setUrFilter}
               setSelUserReport={setSelUserReport}
               setUserModal={setUserModal}
+            />
+          )}
+
+          {tab === "communities" && (
+            <CommunityReviewTab
+              communities={pendingCommunities}
+              onApprove={approveCommunity}
+              onReject={rejectCommunity}
             />
           )}
 

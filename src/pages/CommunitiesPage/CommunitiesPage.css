@@ -1,0 +1,143 @@
+/* =============================================================================
+   CommunitiesPage.css
+   Shared: page-shell, page-inner, page-heading, page-sub, empty-state
+   ============================================================================= */
+
+.cp-loading {
+  text-align: center;
+  padding: 24px;
+  color: var(--color-text-faint);
+  font-size: 14px;
+}
+
+/* ── Section label ─────────────────────────────────────────────────────────── */
+.cp-section { margin-bottom: 32px; }
+
+.cp-section-label {
+  font-family: var(--font-heading);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  padding-left: 12px;
+  border-left: 3px solid var(--color-accent);
+}
+
+/* ── Grid ──────────────────────────────────────────────────────────────────── */
+.cp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+/* ── Card ──────────────────────────────────────────────────────────────────── */
+.cp-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.cp-card:hover {
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+}
+
+.cp-card--joined {
+  border-color: var(--color-primary-light);
+  background: color-mix(in srgb, var(--color-primary-light) 30%, var(--color-surface));
+}
+
+.cp-card-emoji {
+  font-size: 28px;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.cp-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.cp-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.cp-card-name {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.cp-joined-badge {
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: 100px;
+  padding: 2px 8px;
+  flex-shrink: 0;
+}
+
+.cp-card-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-text-faint);
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Action button ─────────────────────────────────────────────────────────── */
+.cp-action-btn {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background 0.15s ease;
+  align-self: center;
+}
+
+.cp-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cp-action-btn--join {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.cp-action-btn--join:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.cp-action-btn--leave {
+  background: var(--color-input-bg);
+  color: var(--color-text-faint);
+  border: 1px solid var(--color-border);
+}
+
+.cp-action-btn--leave:hover:not(:disabled) {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+}
