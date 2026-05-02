@@ -7,11 +7,12 @@ import '../components/createpage/CreatePage.css';
 
 export default function CreatePage() {
   const { currentUser, setCommunities } = useContext(AppContext);
-
+  const [communityEmoji, setCommunityEmoji] = useState('🌐');
   const [communityName, setCommunityName] = useState('');
   const [communityCategory, setCommunityCategory] = useState('shared_interest');
   const [communityError, setCommunityError] = useState('');
   const [communitySuccess, setCommunitySuccess] = useState('');
+  const EMOJI_OPTIONS = ['🌐','💬','📚','🎯','🎮','🏃','🎵','🍳','💡','🔬','✈️','💻','🎨','📰','⚙️'];
 
   const handleCreateCommunity = async (e) => {
     e.preventDefault();
@@ -25,6 +26,7 @@ export default function CreatePage() {
       .insert({
         name: communityName.trim(),
         category: communityCategory,
+        emoji: communityEmoji,
         created_by: currentUser.id,
       })
       .select()
@@ -36,10 +38,9 @@ export default function CreatePage() {
       .from('community_members')
       .insert({ community_id: newCommunity.id, user_id: currentUser.id });
 
-    setCommunities(prev => [...prev, newCommunity]);
     setCommunityName('');
     setCommunityCategory('shared_interest');
-    setCommunitySuccess(`Community "${newCommunity.name}" created!`);
+    setCommunitySuccess(`"${newCommunity.name}" submitted for review! A moderator will approve it shortly.`);
   };
 
   const {
@@ -56,7 +57,6 @@ export default function CreatePage() {
 
   return (
     <PageShell heading="Share Something" sub="What's on your mind today?" narrow>
-
       <form className="form-card" onSubmit={handleSubmit}>
         <CommunitySelect
           communities={communities}
@@ -79,6 +79,30 @@ export default function CreatePage() {
 
       <div style={{ marginTop: '2rem' }}>
         <PageShell heading="Create a Community" sub="Visible to all users after creation." narrow>
+                <div style={{ marginBottom: '1rem' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' }}>
+                  Community Emoji
+                </label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {EMOJI_OPTIONS.map(e => (
+                    <button
+                      key={e}
+                      type="button"
+                      onClick={() => setCommunityEmoji(e)}
+                      style={{
+                        fontSize: '20px',
+                        padding: '6px',
+                        borderRadius: '8px',
+                        border: communityEmoji === e ? '2px solid var(--color-primary)' : '2px solid transparent',
+                        background: communityEmoji === e ? 'var(--color-primary-light)' : 'var(--color-input-bg)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {e}
+                    </button>
+                  ))}
+                </div>
+              </div>
           <form className="form-card" onSubmit={handleCreateCommunity}>
             <FormField
               label="Community Name"

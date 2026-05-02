@@ -10,12 +10,13 @@ export default function CommentSection({ postId, profiles, onAddComment }) {
   const [comments, setComments]   = useState([]);
   const [input,    setInput]      = useState('');
   const [loading,  setLoading]    = useState(true);
+  const [isAnonymous, setIsAnonymous] = useState(false);
 
   useEffect(() => {
     async function fetchComments() {
       const { data } = await supabase
         .from('comments')
-        .select('id, post_id, author_id, content, created_at')
+        .select('id, post_id, author_id, content, created_at, is_anonymous')
         .eq('post_id', postId)
         .order('created_at', { ascending: true });
       setComments(data ?? []);
@@ -28,14 +29,21 @@ export default function CommentSection({ postId, profiles, onAddComment }) {
     const trimmed = input.trim();
     if (!trimmed) return;
     setInput('');
-    await onAddComment(trimmed); // insert, fully awaited
-    // re-fetch after confirmed insert — no race condition since insert is done
+    await onAddComment(trimmed, isAnonymous);
     const { data } = await supabase
       .from('comments')
-      .select('id, post_id, author_id, content, created_at')
+      .select('id, post_id, author_id, content, created_at, is_anonymous')
       .eq('post_id', postId)
       .order('created_at', { ascending: true });
     setComments(data ?? []);
+  };
+
+  const handleDelete = async (commentId) => {
+    const { error } = await supabase
+      .from('comments')
+      .delete()
+      .eq('id', commentId);
+    if (!error) setComments(prev => prev.filter(c => c.id !== commentId));
   };
 
   return (
@@ -51,10 +59,19 @@ export default function CommentSection({ postId, profiles, onAddComment }) {
           key={c.id}
           comment={c}
           profiles={profiles}
+          onDelete={handleDelete}
         />
       ))}
 
       <div className="pc-comments__input-row">
+        <label className="pc-comments__anon">
+          <input
+            type="checkbox"
+            checked={isAnonymous}
+            onChange={e => setIsAnonymous(e.target.checked)}
+          />
+          Anonymous
+        </label>
         <input
           className="pc-comments__input"
           type="text"
