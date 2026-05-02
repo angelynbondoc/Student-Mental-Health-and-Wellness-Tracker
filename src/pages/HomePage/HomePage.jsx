@@ -12,16 +12,23 @@ import { PostCard } from "../../components/postcard";
 import "./HomePage.css";
 
 export default function HomePage() {
-  const { posts, communities } = useContext(AppContext);
+  const { posts, communities, searchQuery } = useContext(AppContext);
 
   // Local UI state — other pages don't need this, so it stays local
   const [selectedCommunityId, setSelectedCommunityId] = useState(null);
 
   // Derived: SELECT * FROM posts WHERE community_id=? ORDER BY created_at DESC
+  const matchingCommunityIds = communities
+    .filter(c => c.name?.toLowerCase().includes(searchQuery.toLowerCase()))
+    .map(c => c.id);
+
   const filteredPosts = posts
-    .filter(
-      (post) =>
-        !selectedCommunityId || post.community_id === selectedCommunityId,
+    .filter(post =>
+      (!selectedCommunityId || post.community_id === selectedCommunityId) &&
+      (!searchQuery || 
+        post.content?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        matchingCommunityIds.includes(post.community_id)
+      )
     )
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 

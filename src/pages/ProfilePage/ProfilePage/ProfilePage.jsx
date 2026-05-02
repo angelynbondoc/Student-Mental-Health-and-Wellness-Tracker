@@ -271,6 +271,7 @@ const TABS = [
 export default function ProfilePage() {
   const {
     currentUser,
+    setCurrentUser,
     profiles,
     setProfiles,
     posts,
@@ -286,50 +287,86 @@ export default function ProfilePage() {
   const profile = profiles.find((p) => p.id === currentUser.id) ?? {
     id: currentUser.id,
     display_name: currentUser.display_name,
-    bio: "",
-    photo_url: null,
+    bio: currentUser.bio ?? "",
+    avatar_url: currentUser.avatar_url ?? null,
   };
 
   const myPosts = posts.filter(
-    (p) => p.user_id === currentUser.id && !p.is_shared,
+    (p) => p.author_id === currentUser.id && !p.content?.startsWith("[Shared Post]:"),
   );
   const sharedPosts = posts.filter(
-    (p) => p.user_id === currentUser.id && p.is_shared,
+    (p) => p.author_id === currentUser.id && p.content?.startsWith("[Shared Post]:"),
   );
   const myCommunities = communities.filter(
     (c) => c.member_ids?.includes(currentUser.id) ?? true,
   );
 
   // Save text fields only
-  const handleSaveProfile = ({ display_name, bio }) => {
-    setProfiles((prev) =>
-      prev.map((p) =>
-        p.id === currentUser.id ? { ...p, display_name, bio } : p,
-      ),
+  const handleSaveProfile = async ({ display_name, bio }) => {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ display_name, bio })
+      .eq('id', currentUser.id);
+
+    if (error) {
+      console.error('save failed:', error);
+      return;
+    }
+
+    setProfiles(prev =>
+      prev.map(p => p.id === currentUser.id ? { ...p, display_name, bio } : p)
     );
+    setCurrentUser(prev => ({ ...prev, display_name, bio }));
     setEditing(false);
   };
 
   // Save photo from modal
-  const handleSavePhoto = ({
-    photo_url,
-    offsetX = 0,
-    offsetY = 0,
-    scale = 1,
-    is_preset = false,
-  }) => {
-    setProfiles((prev) =>
-      prev.map((p) =>
+  const handleSavePhoto = async ({ photo_url, offsetX = 0, offsetY = 0, scale = 1, is_preset = false }) => {
+    let finalUrl = photo_url;
+
+    // Only upload to storage if it's a real file (base64), not a preset URL
+    if (!is_preset) {
+      // Convert base64 to a file blob
+      const res = await fetch(photo_url);
+      const blob = await res.blob();
+      const ext = blob.type.split('/')[1] || 'jpg';
+      const filePath = `${currentUser.id}/avatar.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, blob, { upsert: true, contentType: blob.type });
+
+      if (uploadError) {
+        console.error('upload failed:', uploadError);
+        return;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      finalUrl = publicUrl;
+    }
+
+    // Now save the URL (short string) to the DB
+    const { error } = await supabase
+      .from('profiles')
+      .update({ photo_url: finalUrl })
+      .eq('id', currentUser.id);
+
+    if (error) {
+      console.error('photo save failed:', error);
+      return;
+    }
+
+    setProfiles(prev =>
+      prev.map(p =>
         p.id === currentUser.id
-          ? {
-              ...p,
-              photo_url,
-              is_preset,
-              photo_offset: { x: offsetX, y: offsetY, scale },
-            }
-          : p,
-      ),
+          ? { ...p, photo_url: finalUrl, is_preset, photo_offset: { x: offsetX, y: offsetY, scale } }
+          : p
+      )
     );
+    setCurrentUser(prev => ({ ...prev, photo_url: finalUrl }));
     setPhotoModal(false);
   };
 

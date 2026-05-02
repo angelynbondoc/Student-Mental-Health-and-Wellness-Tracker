@@ -49,7 +49,7 @@ export default function LoginPage() {
         provider: "google",
         options: {
           hd: "neu.edu.ph", // restrict to NEU accounts
-          redirectTo: `${window.location.origin}/home`,
+          redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: { prompt: "select_account" },
         },
       });

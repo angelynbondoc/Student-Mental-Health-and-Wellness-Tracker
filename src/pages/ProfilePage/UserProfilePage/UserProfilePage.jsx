@@ -141,10 +141,10 @@ export default function UserProfilePage() {
 
         <div className="up-header-card">
           <div className="up-avatar" aria-hidden="true">
-            {profile.avatar_url ? (
-              <img src={profile.avatar_url} alt={profile.display_name} />
+            {profile.photo_url ? (
+              <img src={profile.photo_url} alt={profile.display_name} />
             ) : (
-              <span>{getInitials(profile.display_name)}</span>
+              <span>{getInitials(profile.display_name ?? "")}</span>
             )}
           </div>
 
