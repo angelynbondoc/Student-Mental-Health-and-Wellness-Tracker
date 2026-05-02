@@ -8,7 +8,6 @@ import CreatePage from "./pages/CreatePage";
 import JournalPage from "./pages/JournalPage/JournalPage";
 import ResourcesPage from "./pages/ResourcesPage/ResourcesPage";
 import HabitsPage from "./pages/HabitsPage/HabitsPage";
-import InboxPage from "./pages/InboxPage/InboxPage";
 import CommunitiesPage from "./pages/CommunitiesPage/CommunitiesPage";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import ProfilePage from "./pages/ProfilePage/ProfilePage/ProfilePage";
@@ -239,7 +238,6 @@ function App() {
             <Route path="/journal" element={<JournalPage />} />
             <Route path="/resources" element={<ResourcesPage />} />
             <Route path="/habits" element={<HabitsPage />} />
-            <Route path="/inbox" element={<InboxPage />} />
             <Route path="/communities" element={<CommunitiesPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/:userId" element={<UserProfilePage />} />

@@ -43,17 +43,6 @@ const handleSearch = (query) => {
         searchQuery={searchQuery}
       />
 
-      {showNotifPanel && (
-        <div className="neu-notif-dropdown">
-          <NotificationsPanel />
-          <button
-            className="neu-view-all-btn"
-            onClick={() => { setShowNotifPanel(false); navigate('/inbox'); }}
-          >
-            View all in Inbox →
-          </button>
-        </div>
-      )}
 
       <div className="neu-body">
         <Sidebar />
