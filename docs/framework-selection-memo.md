@@ -1,22 +1,30 @@
 # Framework Selection Memo
-
 ## Project: Student Mental Health & Wellness Tracker
 ## Role: KM Analyst
-## Date: April, 2026
+## Phase: Discovery
 
-## Selected Framework
-Knowledge Management (KM) using the SECI Model (Socialization, Externalization, Combination, Internalization)
+## Selected Framework: SECI Model
+The SECI Model (Socialization, Externalization, Combination, 
+Internalization) by Nonaka & Takeuchi is selected as the 
+KM framework for this application.
 
 ## Rationale
-The SECI model was selected because:
-- It supports conversion of tacit to explicit knowledge
-- It fits the anonymous, peer-driven nature of the wellness platform
-- It allows structured knowledge capture through documentation and reflection
+- Mental health awareness is deeply personal and experiential 
+  (tacit-heavy)
+- Users need tools to express and articulate emotions 
+  (externalization)
+- Knowledge must be organized and connected (combination)
+- Growth happens when users apply insights in real life 
+  (internalization)
 
-## Tools Used
-- GitHub for version control and documentation
-- Markdown files for knowledge artifacts
-- Supabase for data storage
+## Why Not Other Frameworks?
+- Communities of Practice: focuses more on group learning, 
+  less on individual reflection
+- Knowledge Mapping: focuses on structure but not transformation
+- SECI provides a complete cycle of knowledge creation and 
+  personal growth
 
 ## Conclusion
-The SECI-based KM framework best supports the goals of the Student Mental Health & Wellness Tracker project.
+SECI is ideal because mental awareness involves both tacit 
+knowledge (feelings, emotions) and explicit knowledge 
+(advice, coping strategies).
