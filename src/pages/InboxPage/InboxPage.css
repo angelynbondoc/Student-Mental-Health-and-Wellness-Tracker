@@ -1,85 +1,282 @@
 /* =============================================================================
-   InboxPage.css — page-specific styles only.
-   Shared: page-shell, page-inner, page-heading, field-input, btn-pill (shared.css)
+   InboxPage.css — Notification feed styles
+   Design system: Poppins headings, Inter body, NEU green #2E7D32, gold #F5C400
    ============================================================================= */
 
-/* ── Tabs ─────────────────────────────────────────────────────────────────── */
-.ip-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+/* ── Page shell ──────────────────────────────────────────────────────────────── */
+.ip-notif-page {
+  padding: 8px 0 40px;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────────── */
+.ip-notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.ip-notif-heading {
+  font-family: var(--font-heading, 'Poppins', sans-serif);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-text, #1A1A1A);
+  margin: 0;
+}
+
+.ip-mark-all-btn {
+  background: none;
+  border: none;
+  font-family: var(--font-heading, 'Poppins', sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary, #2E7D32);
+  cursor: pointer;
+  padding: 4px 0;
+  transition: color 0.15s ease;
+  white-space: nowrap;
+}
+
+.ip-mark-all-btn:hover {
+  color: var(--color-primary-dark, #1B5E20);
+  text-decoration: underline;
+}
+
+/* ── Filter tabs ─────────────────────────────────────────────────────────────── */
+.ip-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
 .ip-tab {
-  flex: 1; padding: 10px 8px; border-radius: 10px;
-  border: 1px solid var(--color-border); background: var(--color-surface);
-  cursor: pointer; font-family: var(--font-heading); font-weight: 500;
-  font-size: 14px; color: var(--color-text-muted);
-  display: flex; align-items: center; justify-content: center;
-  gap: 6px; transition: all 0.15s ease;
+  padding: 7px 16px;
+  border-radius: 100px;
+  border: 1px solid var(--color-border, #E0E0E0);
+  background: var(--color-surface, #F2F2F2);
+  cursor: pointer;
+  font-family: var(--font-heading, 'Poppins', sans-serif);
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--color-text-muted, #616161);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
 }
-.ip-tab:hover { border-color: var(--color-primary); color: var(--color-primary); background: var(--color-primary-light); }
-.ip-tab--active { background: var(--color-primary); color: #FFFFFF; border-color: var(--color-primary); box-shadow: 0 2px 8px rgba(46,125,50,0.22); }
-.ip-tab--active:hover { background: var(--color-primary-dark); border-color: var(--color-primary-dark); color: #FFFFFF; }
+
+.ip-tab:hover {
+  border-color: var(--color-primary, #2E7D32);
+  color: var(--color-primary, #2E7D32);
+  background: var(--color-primary-light, #E8F5E9);
+}
+
+.ip-tab--active {
+  background: var(--color-primary, #2E7D32);
+  color: #ffffff;
+  border-color: var(--color-primary, #2E7D32);
+  box-shadow: 0 2px 8px rgba(46, 125, 50, 0.22);
+}
+
+.ip-tab--active:hover {
+  background: var(--color-primary-dark, #1B5E20);
+  border-color: var(--color-primary-dark, #1B5E20);
+  color: #ffffff;
+}
+
 .ip-tab__badge {
-  background: var(--color-danger); color: #fff;
-  font-family: var(--font-body); font-size: 10px; font-weight: 700;
-  border-radius: 100px; padding: 1px 6px;
+  background: var(--color-danger, #C62828);
+  color: #ffffff;
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 100px;
+  padding: 1px 6px;
+  line-height: 1.4;
 }
 
-/* ── Thread list ──────────────────────────────────────────────────────────── */
-.ip-thread-list { display: flex; flex-direction: column; gap: 6px; }
-.ip-thread {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 18px; border-radius: 12px;
-  cursor: pointer; background: var(--color-surface);
-  border: 1px solid var(--color-border);
+/* ── Notification list ───────────────────────────────────────────────────────── */
+.ip-notif-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Notification card ───────────────────────────────────────────────────────── */
+.ip-notif-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border, #E0E0E0);
+  background: var(--color-surface, #ffffff);
+  cursor: pointer;
   transition: box-shadow 0.15s ease, border-color 0.15s ease;
-}
-.ip-thread:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.07); border-color: var(--color-primary); }
-.ip-thread--unread { background: var(--color-primary-light); border-left: 3px solid var(--color-primary); }
-
-.ip-avatar {
-  width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
-  background: linear-gradient(135deg, #2E7D32, #66BB6A);
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-family: var(--font-heading); font-weight: 700; font-size: 16px;
-}
-.ip-thread-preview { flex: 1; min-width: 0; }
-.ip-thread-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.ip-thread-name { font-family: var(--font-heading); font-size: 14px; font-weight: 600; color: var(--color-text); }
-.ip-thread-time { font-family: var(--font-body); font-size: 11px; color: var(--color-text-faint); flex-shrink: 0; }
-.ip-thread-snippet {
-  font-family: var(--font-body); font-size: 12px; color: var(--color-text-faint);
-  margin: 3px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.ip-unread-badge {
-  background: var(--color-primary); color: #fff;
-  font-family: var(--font-body); font-size: 11px; font-weight: 700;
-  border-radius: 100px; padding: 2px 8px; flex-shrink: 0;
+  outline: none;
 }
 
-/* ── Chat thread ──────────────────────────────────────────────────────────── */
-.ip-chat { display: flex; flex-direction: column; height: calc(100vh - 200px); min-height: 400px; }
-.ip-back-btn {
-  background: none; border: none; color: var(--color-primary);
-  font-family: var(--font-heading); font-weight: 600; font-size: 14px;
-  cursor: pointer; padding: 0 0 10px; text-align: left; transition: color 0.15s ease;
+.ip-notif-card:hover {
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+  border-color: var(--color-primary, #2E7D32);
 }
-.ip-back-btn:hover { color: var(--color-primary-dark); }
-.ip-chat-header { font-family: var(--font-body); font-size: 14px; color: var(--color-text-faint); margin-bottom: 16px; }
-.ip-chat-header strong { font-family: var(--font-heading); color: var(--color-text); }
 
-.ip-bubble-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 12px; }
-.ip-bubble-row  { display: flex; }
-.ip-bubble      { max-width: 72%; padding: 10px 14px; border-radius: 16px; }
-.ip-bubble--mine   { background: var(--color-primary); color: #FFFFFF; border-bottom-right-radius: 4px; }
-.ip-bubble--theirs { background: var(--color-input-bg); color: var(--color-text); border-bottom-left-radius: 4px; }
-.ip-bubble__text { font-family: var(--font-body); font-size: 14px; margin: 0; line-height: 1.5; }
-.ip-bubble__time { font-family: var(--font-body); font-size: 10px; opacity: 0.65; margin: 4px 0 0; text-align: right; }
-
-.ip-compose { display: flex; gap: 8px; padding-top: 10px; }
-.ip-send-btn {
-  padding: 11px 22px; border-radius: 100px; border: none;
-  background: var(--color-primary); color: #FFFFFF;
-  font-family: var(--font-heading); font-weight: 600; font-size: 14px;
-  cursor: pointer; white-space: nowrap; transition: background 0.15s ease;
+.ip-notif-card:focus-visible {
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.25);
+  border-color: var(--color-primary, #2E7D32);
 }
-.ip-send-btn:hover { background: var(--color-primary-dark); }
 
-@media (max-width: 480px) { .ip-bubble { max-width: 88%; } }
+.ip-notif-card--unread {
+  background: #f6fbf6;
+  border-left: 3px solid var(--color-primary, #2E7D32);
+}
+
+/* ── Avatar ──────────────────────────────────────────────────────────────────── */
+.ip-notif-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading, 'Poppins', sans-serif);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* ── Card body ───────────────────────────────────────────────────────────────── */
+.ip-notif-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.ip-notif-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.ip-notif-name {
+  font-family: var(--font-heading, 'Poppins', sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text, #1A1A1A);
+}
+
+.ip-notif-time {
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 11px;
+  color: var(--color-text-faint, #9E9E9E);
+  flex-shrink: 0;
+}
+
+.ip-notif-text {
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 13px;
+  color: var(--color-text-muted, #616161);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.ip-notif-text strong {
+  color: var(--color-text, #1A1A1A);
+  font-weight: 500;
+}
+
+/* ── Category tags ───────────────────────────────────────────────────────────── */
+.ip-notif-tag {
+  display: inline-block;
+  margin-top: 8px;
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 100px;
+}
+
+.ip-tag--like {
+  background: #eaf3de;
+  color: #3B6D11;
+}
+
+.ip-tag--comment {
+  background: #e6f1fb;
+  color: #185FA5;
+}
+
+.ip-tag--community {
+  background: #E1F5EE;
+  color: #0F6E56;
+}
+
+.ip-tag--report {
+  background: #FCEBEB;
+  color: #A32D2D;
+}
+
+.ip-tag--mood {
+  background: #FAEEDA;
+  color: #854F0B;
+}
+
+/* ── Unread dot ──────────────────────────────────────────────────────────────── */
+.ip-notif-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-primary, #2E7D32);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────────────── */
+.ip-notif-empty {
+  text-align: center;
+  padding: 48px 16px;
+  color: var(--color-text-muted, #616161);
+}
+
+.ip-notif-empty__icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.ip-notif-empty p {
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 14px;
+  color: var(--color-text-muted, #616161);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .ip-notif-heading {
+    font-size: 20px;
+  }
+
+  .ip-tabs {
+    gap: 6px;
+  }
+
+  .ip-tab {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  .ip-notif-card {
+    padding: 12px 12px;
+    gap: 10px;
+  }
+
+  .ip-notif-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+  }
+}

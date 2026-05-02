@@ -16,7 +16,7 @@ export default function NotificationsPanel() {
 
       <div className="neu-notif-header">
         <div className="neu-notif-title-row">
-          <span className="neu-notif-title">Alerts</span>
+          
           {unreadCount > 0 && (
             <span className="neu-notif-badge">{unreadCount}</span>
           )}
@@ -28,9 +28,7 @@ export default function NotificationsPanel() {
         )}
       </div>
 
-      {myNotifs.length === 0 && (
-        <p className="neu-notif-empty">You're all caught up! 🎉</p>
-      )}
+    
 
       <div className="neu-notif-list">
         {myNotifs.map((notif) => (

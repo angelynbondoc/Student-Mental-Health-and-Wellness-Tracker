@@ -20,7 +20,7 @@ const NAV_LINKS = [
   { to: "/habits", label: "Habits", icon: CheckSquare },  
   { to: "/communities", label: "Communities", icon: Users },
   { to: "/resources", label: "Resources", icon: BookMarked },
-  { to: "/inbox", label: "Inbox", icon: Inbox },
+  { to: "/inbox", label: "Notification", icon: Inbox },
 ];
 
 export default NAV_LINKS;
