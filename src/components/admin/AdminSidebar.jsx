@@ -1,9 +1,10 @@
-import { Flag, ShieldAlert, Users } from "lucide-react";
+import { Flag, ShieldAlert, Users, LayoutGrid } from "lucide-react";
 
 const NAV_ITEMS = [
   { key: "reports", label: "Reported Posts", Icon: Flag },
   { key: "userreports", label: "Reported Users", Icon: ShieldAlert },
   { key: "users", label: "User Management", Icon: Users },
+  { key: "communities", label: "Community Review",  Icon: LayoutGrid  },
 ];
 
 export default function AdminSidebar({
@@ -15,11 +16,13 @@ export default function AdminSidebar({
   pendingUsers,
   resolved,
   suspended,
+  pendingCommunityCount,
 }) {
   const badges = {
     reports: pendingPosts,
     userreports: pendingUsers,
     users: 0,
+    communities: pendingCommunityCount,
   };
 
   return (
@@ -55,6 +58,7 @@ export default function AdminSidebar({
         {[
           ["Post Reports", pendingPosts, "var(--warn)"],
           ["User Reports", pendingUsers, "var(--warn)"],
+          ["Pending Communities",pendingCommunityCount, "var(--primary)"],
           ["Resolved", resolved, "var(--primary)"],
           ["Suspended", suspended, "var(--danger)"],
         ].map(([label, value, color]) => (

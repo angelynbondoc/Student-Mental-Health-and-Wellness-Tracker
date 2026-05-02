@@ -9,6 +9,7 @@ import JournalPage from "./pages/JournalPage/JournalPage";
 import ResourcesPage from "./pages/ResourcesPage/ResourcesPage";
 import HabitsPage from "./pages/HabitsPage/HabitsPage";
 import InboxPage from "./pages/InboxPage/InboxPage";
+import CommunitiesPage from "./pages/CommunitiesPage/CommunitiesPage";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import ProfilePage from "./pages/ProfilePage/ProfilePage/ProfilePage";
 import AdminRouteGuard from "./components/AdminRouteGuard";
@@ -84,18 +85,28 @@ function App() {
   useEffect(() => {
     if (!currentUser) return  // wait for auth
     async function fetchCommunities() {
-      const { data } = await supabase.from('communities').select('*');
-      if (data) setCommunities(data);
+      const { data } = await supabase
+        .from('community_members')
+        .select('community_id, communities(*)')
+        .eq('user_id', currentUser.id);
+
+      if (data) setCommunities(data.map(row => row.communities));
     }
     fetchCommunities();
   }, [currentUser]); // re-run when user is available
 
   useEffect(() => {
-    if (!currentUser) return
+    if (!currentUser?.id) return 
     async function fetchProfiles() {
       const { data } = await supabase
         .from('profiles')
-        .select('id, display_name, bio, photo_url, role')
+        .select(`
+          id, display_name, bio, photo_url, role, created_at,
+          program:program_id (
+            name,
+            college:college_id ( name )
+          )
+        `)
       if (data) setProfiles(data)
     }
     fetchProfiles()
@@ -110,7 +121,13 @@ function App() {
     async function fetchProfile() {
       const { data: profile, error } = await supabase
         .from('profiles')
-        .select('role, display_name, privacy_acknowledged, photo_url, bio')
+        .select(`
+          role, display_name, privacy_acknowledged, photo_url, bio,
+          program:program_id (
+            name,
+            college:college_id ( name )
+          )
+        `)
         .eq('id', currentUser.id)
         .single()
 
@@ -127,6 +144,7 @@ function App() {
         privacy_acknowledged: profile?.privacy_acknowledged ?? false,
         photo_url: profile?.photo_url ?? null,  
         bio: profile?.bio ?? '',    
+        program: profile?.program ?? null,
       }))
       setProfileReady(true) // ← unblock the route guard
     }
@@ -168,22 +186,7 @@ function App() {
     fetchNotifications();
   }, [currentUser?.id]);
 
-  const [directMessages, setDirectMessages] = useState([]);
-
-  useEffect(() => {
-    if (!currentUser) return;
-    async function fetchDirectMessages() {
-      const { data } = await supabase
-        .from('direct_messages')
-        .select('*')
-        .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`)
-        .order('created_at', { ascending: true });
-      if (data) setDirectMessages(data);
-    }
-    fetchDirectMessages();
-  }, [currentUser?.id]);
   const [searchQuery, setSearchQuery] = useState('');
-
   const contextValue = {
     currentUser,
     setCurrentUser,
@@ -203,8 +206,6 @@ function App() {
     setMoodJournal,
     notifications,
     setNotifications,
-    directMessages,
-    setDirectMessages,
   };
 
   return (
@@ -239,6 +240,7 @@ function App() {
             <Route path="/resources" element={<ResourcesPage />} />
             <Route path="/habits" element={<HabitsPage />} />
             <Route path="/inbox" element={<InboxPage />} />
+            <Route path="/communities" element={<CommunitiesPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/:userId" element={<UserProfilePage />} />
           </Route>

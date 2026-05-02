@@ -297,9 +297,7 @@ export default function ProfilePage() {
   const sharedPosts = posts.filter(
     (p) => p.author_id === currentUser.id && p.content?.startsWith("[Shared Post]:"),
   );
-  const myCommunities = communities.filter(
-    (c) => c.member_ids?.includes(currentUser.id) ?? true,
-  );
+  const myCommunities = communities;
 
   // Save text fields only
   const handleSaveProfile = async ({ display_name, bio }) => {
@@ -373,19 +371,17 @@ export default function ProfilePage() {
   const handleDeletePost = (id) =>
     setPosts((prev) => prev.filter((p) => p.id !== id));
 
-  const handleLeave = (communityId) =>
-    setCommunities((prev) =>
-      prev.map((c) =>
-        c.id === communityId
-          ? {
-              ...c,
-              member_ids: (c.member_ids ?? []).filter(
-                (id) => id !== currentUser.id,
-              ),
-            }
-          : c,
-      ),
-    );
+  const handleLeave = async (communityId) => {
+    const { error } = await supabase
+      .from('community_members')
+      .delete()
+      .eq('community_id', communityId)
+      .eq('user_id', currentUser.id);
+
+    if (error) { console.error('leave error:', error); return; }
+
+    setCommunities(prev => prev.filter(c => c.id !== communityId));
+  };
 
   const stats = [
     { label: "Posts", value: myPosts.length },
@@ -421,6 +417,12 @@ export default function ProfilePage() {
             ) : (
               <>
                 <h1 className="pp-name">{profile.display_name}</h1>
+                {profile.program && (
+                  <>
+                    <p className="up-program">{profile.program.name}</p>
+                    <p className="up-college">{profile.program.college?.name}</p>
+                  </>
+                )}
                 <p className="pp-bio">{profile.bio || "No bio yet."}</p>
                 <div className="pp-stats">
                   {stats.map((s) => (

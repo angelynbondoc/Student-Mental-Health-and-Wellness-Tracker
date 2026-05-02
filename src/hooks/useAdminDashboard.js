@@ -13,6 +13,7 @@ export function useAdminDashboard() {
   const [note, setNote] = useState("");
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState("");
+  const [pendingCommunities, setPendingCommunities] = useState([]);
 
   const showToast = (msg, type = "success") => {
     setToast({ msg, type });
@@ -83,6 +84,48 @@ export function useAdminDashboard() {
 
     fetchReports()
   }, [])
+
+  useEffect(() => {
+    async function fetchPendingCommunities() {
+      const { data, error } = await supabase
+        .from('communities')
+        .select(`
+          id, name, category, emoji, status, created_at,
+          creator:profiles!communities_created_by_fkey (
+            id, display_name, moderation_strikes
+          )
+        `)
+        .eq('status', 'pending')
+        .order('created_at', { ascending: true });
+
+      if (error) { console.error('fetch pending communities error:', error); return; }
+      setPendingCommunities(data ?? []);
+    }
+    fetchPendingCommunities();
+  }, []);
+
+  // Add these two functions
+  const approveCommunity = async (id) => {
+    const { error } = await supabase
+      .from('communities')
+      .update({ status: 'approved', reviewed_at: new Date().toISOString() })
+      .eq('id', id);
+
+    if (error) { console.error(error); return; }
+    setPendingCommunities(prev => prev.filter(c => c.id !== id));
+    showToast('Community approved!');
+  };
+
+  const rejectCommunity = async (id, reason) => {
+    const { error } = await supabase
+      .from('communities')
+      .update({ status: 'rejected', rejection_reason: reason, reviewed_at: new Date().toISOString() })
+      .eq('id', id);
+
+    if (error) { console.error(error); return; }
+    setPendingCommunities(prev => prev.filter(c => c.id !== id));
+    showToast('Community rejected.', 'danger');
+  };
 
   // Fetch all users (profiles)
   useEffect(() => {
@@ -248,5 +291,9 @@ export function useAdminDashboard() {
     resolvePost,
     resolveUserReport: () => {},
     toggleUser,
+    pendingCommunities,
+    approveCommunity,
+    rejectCommunity,
+    pendingCommunityCount: pendingCommunities.length,
   }
 }
