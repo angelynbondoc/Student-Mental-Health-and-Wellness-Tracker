@@ -1,9 +1,11 @@
 // =============================================================================
 // ReportModal.jsx — uses createPortal to escape overflow:hidden parents
 // =============================================================================
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import AppContext from '../../../AppContext';
 import { createPortal } from 'react-dom';
 import './ReportModal.css';
+import { supabase } from '../../../supabase';
 
 const POST_REASONS = [
   { id: 'harmful',        label: 'Harmful or dangerous content' },
@@ -25,8 +27,9 @@ const PROFILE_REASONS = [
 ];
 
 export default function ReportModal({ type = 'post', targetId, onClose, onSubmit }) {
+  const { currentUser } = useContext(AppContext);
   const [selectedReason, setSelectedReason] = useState('');
-  const [details, setDetails]               = useState('');
+  const [details, setDetails] = useState('');
   const [submitted, setSubmitted]           = useState(false);
   const [submitting, setSubmitting]         = useState(false);
 
@@ -36,6 +39,19 @@ export default function ReportModal({ type = 'post', targetId, onClose, onSubmit
   async function handleSubmit() {
     if (!selectedReason) return;
     setSubmitting(true);
+
+    const insertData = type === 'profile'
+      ? { type: 'profile', target_user_id: targetId, reason: selectedReason, details, reporter_id: currentUser.id }
+      : { type: 'post',    post_id: targetId,         reason: selectedReason, details, reporter_id: currentUser.id };
+
+    const { error } = await supabase.from('reports').insert(insertData);
+
+    if (error) {
+      console.error('report submit error:', error);
+      setSubmitting(false);
+      return;
+    }
+
     await onSubmit?.(selectedReason, details, targetId, type);
     setSubmitting(false);
     setSubmitted(true);

@@ -1,10 +1,16 @@
 import { Navigate } from "react-router-dom";
+import { useContext } from "react";
+import AppContext from "../AppContext";
 
 const AdminRouteGuard = ({ children }) => {
-  const isAdmin = true; // replace with your actual auth check later
+  const { currentUser } = useContext(AppContext)
 
-  if (!isAdmin) {
-    return <Navigate to="/home" replace />;
+  if (!currentUser) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (currentUser.role !== 'admin' && currentUser.role !== 'superadmin') {
+    return <Navigate to="/home" replace />
   }
 
   return children;
