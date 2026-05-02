@@ -1,30 +1,30 @@
-# Framework Selection Memo
+# KM Architecture Document
 ## Project: Student Mental Health & Wellness Tracker
 ## Role: KM Analyst
-## Phase: Discovery
 
-## Selected Framework: SECI Model
-The SECI Model (Socialization, Externalization, Combination, 
-Internalization) by Nonaka & Takeuchi is selected as the 
-KM framework for this application.
+## Taxonomy & Tagging Schema
+Knowledge in this app is categorized by:
+- Emotion type (anxiety, stress, fatigue)
+- Knowledge type (tacit, explicit)
+- SECI phase (Socialization, Externalization, 
+  Combination, Internalization)
 
-## Rationale
-- Mental health awareness is deeply personal and experiential 
-  (tacit-heavy)
-- Users need tools to express and articulate emotions 
-  (externalization)
-- Knowledge must be organized and connected (combination)
-- Growth happens when users apply insights in real life 
-  (internalization)
+## SECI-to-Feature Mapping
 
-## Why Not Other Frameworks?
-- Communities of Practice: focuses more on group learning, 
-  less on individual reflection
-- Knowledge Mapping: focuses on structure but not transformation
-- SECI provides a complete cycle of knowledge creation and 
-  personal growth
+| SECI Component | KM Meaning | App Feature |
+|---|---|---|
+| Socialization | Sharing tacit knowledge | Anonymous sharing, peer stories |
+| Externalization | Converting feelings to explicit form | Mood journal, reflection prompts |
+| Combination | Organizing knowledge | Resource library, coping strategies |
+| Internalization | Applying knowledge | Habit tracker, daily exercises |
 
-## Conclusion
-SECI is ideal because mental awareness involves both tacit 
-knowledge (feelings, emotions) and explicit knowledge 
-(advice, coping strategies).
+## Retrieval Requirements
+- Users can search resources by emotion tag
+- Resources are categorized by SECI phase
+- Personal reflections are private by default
+- Community posts are anonymous and searchable
+
+## Knowledge Flow
+Thoughts → Structured Reflections
+Experiences → Shareable Insights  
+Information → Actionable Personal Knowledge
