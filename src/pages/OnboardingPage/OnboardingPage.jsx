@@ -448,7 +448,6 @@ function StepWelcome({ displayName, courseCount, onContinue }) {
       </div>
 
       <div className="ob-welcome-badge">
-        <PartyPopper size={18} />
         Welcome to MindSpace
       </div>
 
