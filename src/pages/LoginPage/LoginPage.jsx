@@ -1,13 +1,9 @@
 import { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../../supabase"; // Note: Adjust the path depending on where supabase.js is located!
 import "./LoginPage.css";
 
 // ─── Supabase client ───────────────────────────────────────────────────────────
 // Replace with your actual project values or set in .env
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY,
-);
 
 // ─── Floating particle ────────────────────────────────────────────────────────
 function Particle({ style }) {
@@ -18,6 +14,16 @@ function Particle({ style }) {
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    // If redirected back after a rejected non-NEU login
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user && !session.user.email?.endsWith('@neu.edu.ph')) {
+        supabase.auth.signOut();
+        setError("Access denied. Please use your @neu.edu.ph account.");
+      }
+    });
+  }, []);
   const [particles, setParticles] = useState([]);
 
   // Generate decorative floating particles once on mount

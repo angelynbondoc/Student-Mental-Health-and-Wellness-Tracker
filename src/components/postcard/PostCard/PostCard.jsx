@@ -13,7 +13,7 @@ import ReportModal from "../../ui/ReportModal/ReportModal";
 import "./PostCard.css";
 
 export default function PostCard({ post }) {
-  const { profiles, communities, comments } = useContext(AppContext);
+  const { profiles, communities } = useContext(AppContext);
 
   const [hidden, setHidden] = useState(false);
   const [showReport, setShowReport] = useState(false);
@@ -91,7 +91,6 @@ export default function PostCard({ post }) {
         {showComments && (
           <CommentSection
             postId={post.id}
-            comments={comments}
             profiles={profiles}
             onAddComment={handleAddComment}
           />

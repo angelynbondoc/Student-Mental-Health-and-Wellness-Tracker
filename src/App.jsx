@@ -1,12 +1,7 @@
-// =============================================================================
-// App.jsx — Single source of truth. Holds ALL global state.
-// Batch 3 adds: notifications, directMessages + InboxPage route
-// FIX: Restored missing /create route and CreatePage import
-// =============================================================================
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import AppContext from "./AppContext"; // ✅ same folder
+import AppContext from "./AppContext";
 import { MobileLayout } from "./components/layout";
 import HomePage from "./pages/HomePage/HomePage";
 import CreatePage from "./pages/CreatePage";
@@ -155,10 +150,7 @@ function App() {
   }, []);
 
   // ── Batch 2 ────────────────────────────────────────────────────────────────
-  const [moodJournal, setMoodJournal] = useState(INITIAL_MOOD_JOURNAL);
-  const [resources, setResources] = useState(INITIAL_RESOURCES);
-  const [habits, setHabits] = useState(INITIAL_HABITS);
-  const [habitLogs, setHabitLogs] = useState(INITIAL_HABIT_LOGS);
+  const [moodJournal, setMoodJournal] = useState([]);
 
   // ── Batch 3 ────────────────────────────────────────────────────────────────
   const [notifications, setNotifications] = useState([]);
@@ -209,12 +201,6 @@ function App() {
     setSearchQuery,
     moodJournal,
     setMoodJournal,
-    resources,
-    setResources,
-    habits,
-    setHabits,
-    habitLogs,
-    setHabitLogs,
     notifications,
     setNotifications,
     directMessages,
@@ -225,10 +211,7 @@ function App() {
     <AppContext.Provider value={contextValue}>
       <BrowserRouter>
         <Routes>
-          {/* Redirect root to login */}
           <Route path="/" element={<Navigate to="/login" replace />} />
-
-          {/* Standalone login — no shell */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
 
@@ -258,8 +241,6 @@ function App() {
             <Route path="/inbox" element={<InboxPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/:userId" element={<UserProfilePage />} />
-
-            {/* Admin route */}
           </Route>
         </Routes>
       </BrowserRouter>
