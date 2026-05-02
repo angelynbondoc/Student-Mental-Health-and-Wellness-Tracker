@@ -55,7 +55,7 @@ export default function PostCard({ post }) {
         <div className="pc-header-row">
           <PostHeader
             authorId={post.is_anonymous ? null : post.author_id}
-            avatarUrl={post.is_anonymous ? null : author?.avatar_url}
+            avatarUrl={post.is_anonymous ? null : author?.photo_url}
             displayName={displayName}
             communityName={community?.name ?? "Community"}
             createdAt={post.created_at}

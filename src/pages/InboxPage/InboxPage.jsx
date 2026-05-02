@@ -11,8 +11,8 @@
 // =============================================================================
 import React, { useContext, useState } from "react";
 import AppContext from "../../AppContext";
+import { supabase } from "../../supabase";
 import { NotificationsPanel } from "../../components/notifications";
-import { generateUUID } from "../../Mockdata";
 import { PageShell, EmptyState } from "../../components/ui";
 import "./InboxPage.css";
 
@@ -63,20 +63,29 @@ export default function InboxPage() {
   const getProfile = (id) => profiles.find((p) => p.id === id);
 
   // INSERT INTO direct_messages (id, sender_id, receiver_id, message_text, is_read, created_at)
-  const handleSend = () => {
+  const handleSend = async () => {
     const trimmed = messageInput.trim();
     if (!trimmed || !openThreadId) return;
-    setDirectMessages((prev) => [
-      ...prev,
-      {
-        id: generateUUID(),
-        sender_id: currentUser.id,
-        receiver_id: openThreadId,
-        message_text: trimmed,
-        is_read: false,
-        created_at: new Date().toISOString(),
-      },
-    ]);
+
+    const newMsg = {
+      sender_id: currentUser.id,
+      receiver_id: openThreadId,
+      message_text: trimmed,
+      is_read: false,
+    };
+
+    const { data, error } = await supabase
+      .from("direct_messages")
+      .insert(newMsg)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("send error:", error);
+      return;
+    }
+
+    setDirectMessages((prev) => [...prev, data]);
     setMessageInput("");
   };
 

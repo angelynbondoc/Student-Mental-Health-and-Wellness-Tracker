@@ -16,13 +16,20 @@ import BottomNav from './BottomNav';
 import './MobileLayout.css';
 
 export default function MobileLayout() {
-  const { currentUser, notifications } = useContext(AppContext);
+  const { currentUser, notifications, setSearchQuery } = useContext(AppContext);
   const navigate = useNavigate();
   const [showNotifPanel, setShowNotifPanel] = useState(false);
 
   const unreadCount = notifications.filter(
     (n) => n.user_id === currentUser.id && !n.is_read
   ).length;
+
+const [searchQuery] = useState('');
+
+const handleSearch = (query) => {
+  setSearchQuery(query);
+  if (query) navigate('/home');
+};
 
   return (
     <div className="neu-shell">
@@ -32,6 +39,8 @@ export default function MobileLayout() {
         isAdmin={currentUser.role === 'admin'}
         unreadCount={unreadCount}
         onBellClick={() => setShowNotifPanel((v) => !v)}
+        onSearch={handleSearch}
+        searchQuery={searchQuery}
       />
 
       {showNotifPanel && (

@@ -20,33 +20,139 @@ import AdminRouteGuard from "./components/AdminRouteGuard";
 import AdminDashboard from "./pages/AdminPage/AdminDashboard";
 import UserProfilePage from "./pages/ProfilePage/UserProfilePage/UserProfilePage";
 import OnboardingPage from "./pages/OnboardingPage/OnboardingPage";
-import {
-  INITIAL_PROFILES,
-  INITIAL_COMMUNITIES,
-  INITIAL_POSTS,
-  INITIAL_COMMENTS,
-  INITIAL_REACTIONS,
-  INITIAL_MOOD_JOURNAL,
-  INITIAL_RESOURCES,
-  INITIAL_HABITS,
-  INITIAL_HABIT_LOGS,
-  INITIAL_NOTIFICATIONS,
-  INITIAL_DIRECT_MESSAGES,
-} from "./mockData"; // ✅ same folder
-
-const CURRENT_USER = {
-  id: "user-1",
-  display_name: "username_<role>",
-  role: "student", // change to 'admin' to reveal admin UI
-};
+import AuthCallback from './pages/AuthCallback';
+import { supabase } from "./supabase";
 
 function App() {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [authReady, setAuthReady] = useState(false);
+  const [profileReady, setProfileReady] = useState(false);
+
+    useEffect(() => {
+    async function resolveUser(session) {
+      if (!session?.user) return null;
+      const email = session.user.email ?? '';
+      if (!email.endsWith('@neu.edu.ph')) {
+        await supabase.auth.signOut();
+        return null;
+      }
+      return {
+        id: session.user.id,
+        display_name: email,
+        role: 'student',
+      };
+    }
+
+    async function init() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = await resolveUser(session);
+        setCurrentUser(user);
+      } catch(err) {
+        console.error('init error:', err);
+        setCurrentUser(null);
+      } finally {
+        setAuthReady(true);
+      }
+    }
+    init();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('auth event:', event)
+       console.log('auth session:', session)
+      if (event === 'SIGNED_OUT') {
+        setCurrentUser(null);
+        setProfileReady(false);
+        setAuthReady(true);
+        return;
+      }
+
+      const user = await resolveUser(session);
+      console.log('resolved user:', user)
+
+      setCurrentUser(prev => {
+        if (prev?.id === user?.id) return prev; // same user, preserve profile data
+        return user; // different user, let profile fetch re-run
+      });
+
+      setAuthReady(true);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+
   // ── Batch 1 ────────────────────────────────────────────────────────────────
-  const [profiles, setProfiles] = useState(INITIAL_PROFILES);
-  const [communities, setCommunities] = useState(INITIAL_COMMUNITIES);
-  const [posts, setPosts] = useState(INITIAL_POSTS);
-  const [comments, setComments] = useState(INITIAL_COMMENTS);
-  const [reactions, setReactions] = useState(INITIAL_REACTIONS);
+  const [profiles, setProfiles] = useState([]);
+  const [communities, setCommunities] = useState([]);
+
+  useEffect(() => {
+    if (!currentUser) return  // wait for auth
+    async function fetchCommunities() {
+      const { data } = await supabase.from('communities').select('*');
+      if (data) setCommunities(data);
+    }
+    fetchCommunities();
+  }, [currentUser]); // re-run when user is available
+
+  useEffect(() => {
+    if (!currentUser) return
+    async function fetchProfiles() {
+      const { data } = await supabase
+        .from('profiles')
+        .select('id, display_name, bio, photo_url, role')
+      if (data) setProfiles(data)
+    }
+    fetchProfiles()
+  }, [currentUser?.id])
+
+
+  const [userProfile, setUserProfile] = useState(null)
+
+  useEffect(() => {
+  if (!currentUser) return
+
+    async function fetchProfile() {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('role, display_name, privacy_acknowledged, photo_url, bio')
+        .eq('id', currentUser.id)
+        .single()
+
+      if (error) {
+        console.error('profile fetch error:', error)
+        setProfileReady(true) // still unblock even on error
+        return
+      }
+
+      setCurrentUser(prev => ({
+        ...prev,
+        role: profile?.role ?? 'student',
+        display_name: profile?.display_name ?? prev.display_name,
+        privacy_acknowledged: profile?.privacy_acknowledged ?? false,
+        photo_url: profile?.photo_url ?? null,  
+        bio: profile?.bio ?? '',    
+      }))
+      setProfileReady(true) // ← unblock the route guard
+    }
+
+    fetchProfile()
+  }, [currentUser?.id])
+
+  const [posts, setPosts] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [reactions, setReactions] = useState([]);
+
+  useEffect(() => {
+    async function fetchPosts() {
+      const { data } = await supabase
+        .from("posts_view")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (data) setPosts(data);
+    }
+    fetchPosts();
+  }, []);
 
   // ── Batch 2 ────────────────────────────────────────────────────────────────
   const [moodJournal, setMoodJournal] = useState(INITIAL_MOOD_JOURNAL);
@@ -55,11 +161,40 @@ function App() {
   const [habitLogs, setHabitLogs] = useState(INITIAL_HABIT_LOGS);
 
   // ── Batch 3 ────────────────────────────────────────────────────────────────
-  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
-  const [directMessages, setDirectMessages] = useState(INITIAL_DIRECT_MESSAGES);
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    async function fetchNotifications() {
+      const { data } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+      if (data) setNotifications(data);
+    }
+    fetchNotifications();
+  }, [currentUser?.id]);
+
+  const [directMessages, setDirectMessages] = useState([]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    async function fetchDirectMessages() {
+      const { data } = await supabase
+        .from('direct_messages')
+        .select('*')
+        .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`)
+        .order('created_at', { ascending: true });
+      if (data) setDirectMessages(data);
+    }
+    fetchDirectMessages();
+  }, [currentUser?.id]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const contextValue = {
-    currentUser: CURRENT_USER,
+    currentUser,
+    setCurrentUser,
     profiles,
     setProfiles,
     communities,
@@ -70,6 +205,8 @@ function App() {
     setComments,
     reactions,
     setReactions,
+    searchQuery,
+    setSearchQuery,
     moodJournal,
     setMoodJournal,
     resources,
@@ -95,6 +232,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
 
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route
             path="/admin"
             element={
@@ -103,9 +241,15 @@ function App() {
               </AdminRouteGuard>
             }
           />
-
-          {/* ✅ All app routes nested inside MobileLayout so shell always renders */}
-          <Route element={<MobileLayout />}>
+          <Route element={
+            !authReady ? <div>Loading...</div> :
+            !currentUser ? <Navigate to="/login" replace /> :
+            !profileReady ? <div>Loading...</div> :
+            (currentUser.role === 'admin' || currentUser.role === 'superadmin') 
+              ? <Navigate to="/admin" replace /> :
+            !currentUser.privacy_acknowledged ? <Navigate to="/onboarding" replace /> :
+            <MobileLayout />
+          }>
             <Route path="/home" element={<HomePage />} />
             <Route path="/create" element={<CreatePage />} />
             <Route path="/journal" element={<JournalPage />} />

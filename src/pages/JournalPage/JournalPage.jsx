@@ -58,7 +58,8 @@ function getEncouragement(count) {
 }
 
 function formatDate(iso) {
-  return new Date(iso).toLocaleDateString('en-US', {
+  const utcString = iso.endsWith('Z') ? iso : iso + 'Z';
+  return new Date(utcString).toLocaleDateString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
   });
