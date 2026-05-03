@@ -15,15 +15,19 @@ export default function HomePage() {
     .filter(c => c?.name?.toLowerCase().includes(searchQuery.toLowerCase()))
     .map(c => c.id);
 
+  const GENERAL_ID = 'a1829718-2700-46fe-a10c-4a42f22607b6';
+  const joinedIds = new Set(communities.map(c => c.id));
+
   const filteredPosts = posts
     .filter(post =>
+      (post.community_id === GENERAL_ID || joinedIds.has(post.community_id)) &&
       (!selectedCommunityId || post.community_id === selectedCommunityId) &&
-      (!searchQuery ||
+      (!searchQuery || 
         post.content?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         matchingCommunityIds.includes(post.community_id)
       )
     )
-    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   const activeCommunityName = communities.find(
     (c) => c.id === selectedCommunityId,
