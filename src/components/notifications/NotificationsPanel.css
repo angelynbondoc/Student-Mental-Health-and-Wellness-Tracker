@@ -127,3 +127,35 @@
   background: var(--color-primary);
   color: var(--color-white);
 }
+
+.neu-notif-announcement-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary, #2e7d32);
+  opacity: 0.75;
+}
+
+/* Make sure the row doesn't let text overflow into the button */
+.neu-notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.neu-notif-body {
+  flex: 1;
+  min-width: 0; /* ← key: allows text to shrink */
+}
+
+.neu-notif-text,
+.neu-notif-time {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Keep the check button from shrinking away */
+.neu-read-btn {
+  flex-shrink: 0;
+}

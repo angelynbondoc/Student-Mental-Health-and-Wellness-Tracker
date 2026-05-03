@@ -1,4 +1,4 @@
-import { Flag, ShieldAlert, Users, LayoutGrid, LogOut } from "lucide-react";
+import { Flag, ShieldAlert, Users, LayoutGrid, Megaphone, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabase";
@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { key: "userreports",  label: "Reported Users",   Icon: ShieldAlert },
   { key: "users",        label: "User Management",  Icon: Users },
   { key: "communities",  label: "Community Review", Icon: LayoutGrid },
+  { key: "broadcast",    label: "Broadcast",        Icon: Megaphone }, 
 ];
 
 export default function AdminSidebar({
@@ -24,7 +25,6 @@ export default function AdminSidebar({
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
 
-  // Get the raw NEU email directly from the Supabase session
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setEmail(session?.user?.email ?? '');
@@ -36,6 +36,7 @@ export default function AdminSidebar({
     userreports:  pendingUsers,
     users:        0,
     communities:  pendingCommunityCount,
+    broadcast:    0, 
   };
 
   async function handleSignOut() {

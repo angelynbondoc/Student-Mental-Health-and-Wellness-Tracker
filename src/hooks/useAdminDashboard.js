@@ -20,38 +20,26 @@ export function useAdminDashboard() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // Fetch reports with post and reporter info
+  // ---------------------------------------------------------------------------
+  // Fetch reports
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     async function fetchReports() {
       const { data, error } = await supabase
         .from('reports')
         .select(`
-          id,
-          reason,
-          created_at,
-          post_id,
-          reporter_id,
+          id, reason, created_at, post_id, reporter_id,
           posts_view (
-            id,
-            content,
-            author_id,
-            is_flagged,
-            created_at
+            id, content, author_id, is_flagged, created_at
           ),
           reporter:profiles!reports_reporter_id_fkey (
-            id,
-            display_name,
-            email
+            id, display_name, email
           )
         `)
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('fetch reports error:', error)
-        return
-      }
+      if (error) { console.error('fetch reports error:', error); return; }
 
-      // Normalize to shape the UI expects
       const normalized = data.map(r => ({
         id: r.id,
         reason: r.reason,
@@ -76,15 +64,17 @@ export function useAdminDashboard() {
           name: r.reporter?.display_name ?? r.reporter?.email ?? 'Unknown',
           avatar: (r.reporter?.display_name?.[0] ?? 'U').toUpperCase(),
           program: '',
-        }
-      }))
+        },
+      }));
 
-      setReports(normalized)
+      setReports(normalized);
     }
+    fetchReports();
+  }, []);
 
-    fetchReports()
-  }, [])
-
+  // ---------------------------------------------------------------------------
+  // Fetch pending communities
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     async function fetchPendingCommunities() {
       const { data, error } = await supabase
@@ -104,13 +94,11 @@ export function useAdminDashboard() {
     fetchPendingCommunities();
   }, []);
 
-  // Add these two functions
   const approveCommunity = async (id) => {
     const { error } = await supabase
       .from('communities')
       .update({ status: 'approved', reviewed_at: new Date().toISOString() })
       .eq('id', id);
-
     if (error) { console.error(error); return; }
     setPendingCommunities(prev => prev.filter(c => c.id !== id));
     showToast('Community approved!');
@@ -121,24 +109,22 @@ export function useAdminDashboard() {
       .from('communities')
       .update({ status: 'rejected', rejection_reason: reason, reviewed_at: new Date().toISOString() })
       .eq('id', id);
-
     if (error) { console.error(error); return; }
     setPendingCommunities(prev => prev.filter(c => c.id !== id));
     showToast('Community rejected.', 'danger');
   };
 
-  // Fetch all users (profiles)
+  // ---------------------------------------------------------------------------
+  // Fetch users
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     async function fetchUsers() {
       const { data, error } = await supabase
         .from('profiles')
         .select('id, display_name, email, role, created_at')
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('fetch users error:', error)
-        return
-      }
+      if (error) { console.error('fetch users error:', error); return; }
 
       const normalized = data.map(u => ({
         id: u.id,
@@ -150,70 +136,16 @@ export function useAdminDashboard() {
         joinedAt: u.created_at,
         status: u.role === 'suspended' ? 'suspended' : 'active',
         role: u.role,
-      }))
+      }));
 
-      setUsers(normalized)
+      setUsers(normalized);
     }
+    fetchUsers();
+  }, []);
 
-    fetchUsers()
-  }, [])
-
-  // Resolve a post report — dismiss or remove post
-  const resolvePost = async (id, res) => {
-    const report = reports.find(r => r.id === id)
-
-    if (res === 'removed' && report?.post?.id) {
-      // Delete the post from DB
-      await supabase
-        .from('posts')
-        .delete()
-        .eq('id', report.post.id)
-    } else {
-      // Just unflag the post
-      await supabase
-        .from('posts')
-        .update({ is_flagged: false })
-        .eq('id', report?.post?.id)
-    }
-
-    setReports(prev =>
-      prev.map(r => r.id === id
-        ? { ...r, status: 'resolved', resolution: res, adminNote: note }
-        : r
-      )
-    )
-    setPostModal(null)
-    setSelReport(null)
-    setNote("")
-    showToast(
-      res === 'removed' ? 'Post removed.' : 'Report dismissed.',
-      res === 'removed' ? 'danger' : 'success'
-    )
-  }
-
-  // Toggle user suspend/reactivate
-  const toggleUser = async (uid, status) => {
-    const newRole = status === 'suspended' ? 'suspended' : 'student'
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({ role: newRole })
-      .eq('id', uid)
-
-    if (error) {
-      console.error('toggle user error:', error)
-      return
-    }
-
-    setUsers(prev =>
-      prev.map(u => u.id === uid ? { ...u, status } : u)
-    )
-    showToast(
-      status === 'suspended' ? 'User suspended.' : 'User reactivated.',
-      status === 'suspended' ? 'danger' : 'success'
-    )
-  }
-
+  // ---------------------------------------------------------------------------
+  // Fetch user reports
+  // ---------------------------------------------------------------------------
   const [userReports, setUserReports] = useState([]);
 
   useEffect(() => {
@@ -221,12 +153,7 @@ export function useAdminDashboard() {
       const { data, error } = await supabase
         .from('reports')
         .select(`
-          id,
-          reason,
-          details,
-          created_at,
-          reporter_id,
-          target_user_id,
+          id, reason, details, created_at, reporter_id, target_user_id,
           reporter:profiles!reports_reporter_id_fkey (
             id, display_name
           ),
@@ -258,15 +185,128 @@ export function useAdminDashboard() {
 
       setUserReports(normalized);
     }
-
     fetchUserReports();
   }, []);
 
-  const closeSidebar = () => setSidebarOpen(false)
+  // ---------------------------------------------------------------------------
+  // Resolve post report
+  // ---------------------------------------------------------------------------
+  const resolvePost = async (id, res) => {
+    const report = reports.find(r => r.id === id);
 
-  const pendingPosts = reports.filter(r => r.status === 'pending').length
-  const resolved = reports.filter(r => r.status === 'resolved').length
-  const suspended = users.filter(u => u.status === 'suspended').length
+    if (res === 'removed' && report?.post?.id) {
+      await supabase.from('posts').delete().eq('id', report.post.id);
+    } else {
+      await supabase.from('posts').update({ is_flagged: false }).eq('id', report?.post?.id);
+    }
+
+    setReports(prev =>
+      prev.map(r => r.id === id
+        ? { ...r, status: 'resolved', resolution: res, adminNote: note }
+        : r
+      )
+    );
+    setPostModal(null);
+    setSelReport(null);
+    setNote("");
+    showToast(
+      res === 'removed' ? 'Post removed.' : 'Report dismissed.',
+      res === 'removed' ? 'danger' : 'success'
+    );
+  };
+
+  // ---------------------------------------------------------------------------
+  // Toggle user suspend/reactivate
+  // ---------------------------------------------------------------------------
+  const toggleUser = async (uid, status) => {
+    const newRole = status === 'suspended' ? 'suspended' : 'student';
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ role: newRole })
+      .eq('id', uid);
+
+    if (error) { console.error('toggle user error:', error); return; }
+
+    setUsers(prev =>
+      prev.map(u => u.id === uid ? { ...u, status } : u)
+    );
+    showToast(
+      status === 'suspended' ? 'User suspended.' : 'User reactivated.',
+      status === 'suspended' ? 'danger' : 'success'
+    );
+  };
+
+  // ---------------------------------------------------------------------------
+  // NEW: Broadcast announcement to all or selected users
+  // ---------------------------------------------------------------------------
+  //
+  // Inserts one row per recipient into the `notifications` table:
+  //   { user_id, type: 'announcement', message, title, is_read: false }
+  //
+  // targetType: 'all' | 'selected'
+  // selectedUserIds: string[] (only used when targetType === 'selected')
+  // ---------------------------------------------------------------------------
+  const broadcastNotification = async ({ title, message, targetType, selectedUserIds }) => {
+    if (!message.trim()) {
+      showToast('Message cannot be empty.', 'danger');
+      return false;
+    }
+
+    // Resolve recipient IDs
+    let recipientIds = [];
+
+    if (targetType === 'all') {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .neq('role', 'suspended');  // skip suspended users — adjust as needed
+
+      if (error) {
+        console.error('broadcast fetch users error:', error);
+        showToast('Failed to fetch users.', 'danger');
+        return false;
+      }
+      recipientIds = data.map(u => u.id);
+    } else {
+      recipientIds = selectedUserIds ?? [];
+    }
+
+    if (recipientIds.length === 0) {
+      showToast('No recipients selected.', 'danger');
+      return false;
+    }
+
+    // Build the notification rows
+    const rows = recipientIds.map(uid => ({
+      user_id: uid,
+      type: 'announcement',
+      title: title.trim() || 'Admin Announcement',
+      message: message.trim(),
+      is_read: false,
+    }));
+
+    // Supabase supports batch inserts natively
+    const { error } = await supabase.from('notifications').insert(rows);
+
+    if (error) {
+      console.error('broadcast insert error:', error);
+      showToast('Broadcast failed. Check console.', 'danger');
+      return false;
+    }
+
+    showToast(`Announcement sent to ${recipientIds.length} user(s)!`);
+    return true;  // signals success so the form can reset
+  };
+
+  // ---------------------------------------------------------------------------
+  // Misc helpers & derived values
+  // ---------------------------------------------------------------------------
+  const closeSidebar = () => setSidebarOpen(false);
+
+  const pendingPosts = reports.filter(r => r.status === 'pending').length;
+  const resolved     = reports.filter(r => r.status === 'resolved').length;
+  const suspended    = users.filter(u => u.status === 'suspended').length;
   const pendingUsers = userReports.filter(r => r.status === 'pending').length;
 
   return {
@@ -275,7 +315,7 @@ export function useAdminDashboard() {
     filter, setFilter,
     urFilter, setUrFilter,
     reports,
-    userReports, // user reports coming from reports table filtered by type
+    userReports,
     users,
     selReport, setSelReport,
     selUserReport: null, setSelUserReport: () => {},
@@ -295,5 +335,6 @@ export function useAdminDashboard() {
     approveCommunity,
     rejectCommunity,
     pendingCommunityCount: pendingCommunities.length,
-  }
+    broadcastNotification,
+  };
 }

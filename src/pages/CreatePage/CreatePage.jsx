@@ -133,6 +133,18 @@ export default function CreatePage() {
       setCommunityError('Please enter a community name.');
       return;
     }
+
+    const { data: existing } = await supabase
+      .from('communities')
+      .select('id')
+      .ilike('name', communityName.trim())
+      .single();
+
+    if (existing) {
+      setCommunityError('A community with this name already exists.');
+      return;
+    }
+    
     setCommunityLoading(true);
     const { data: newCommunity, error: insertError } = await supabase
       .from('communities')
