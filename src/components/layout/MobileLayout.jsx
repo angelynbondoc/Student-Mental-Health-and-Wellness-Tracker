@@ -13,6 +13,7 @@ import { NotificationsPanel } from "../notifications";
 import TopBar from "./TopBar";
 import Sidebar from "./Sidebar";
 import BottomNav from "./BottomNav";
+import useNotifications from '../../hooks/useNotifications';
 import "./MobileLayout.css";
 
 export default function MobileLayout() {
@@ -20,9 +21,7 @@ export default function MobileLayout() {
   const navigate = useNavigate();
   const [showNotifPanel, setShowNotifPanel] = useState(false);
 
-  const unreadCount = notifications.filter(
-    (n) => currentUser && n.user_id === currentUser.id && !n.is_read,
-  ).length;
+  const { unreadCount } = useNotifications();
 
   const [searchQuery] = useState("");
 
@@ -47,12 +46,9 @@ export default function MobileLayout() {
           <NotificationsPanel />
           <button
             className="neu-view-all-btn"
-            onClick={() => {
-              setShowNotifPanel(false);
-              
-            }}
+            onClick={() => { setShowNotifPanel(false); navigate('/notifications'); }}
           >
-            View all notifications
+            View all notifications →
           </button>
         </div>
       )}

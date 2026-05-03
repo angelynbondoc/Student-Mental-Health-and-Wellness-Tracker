@@ -9,6 +9,7 @@ import JournalPage from "./pages/JournalPage/JournalPage";
 import ResourcesPage from "./pages/ResourcesPage/ResourcesPage";
 import HabitsPage from "./pages/HabitsPage/HabitsPage";
 import CommunitiesPage from "./pages/CommunitiesPage/CommunitiesPage";
+import NotificationsPage from './pages/NotificationsPage/NotificationsPage'
 import LoginPage from "./pages/LoginPage/LoginPage";
 import ProfilePage from "./pages/ProfilePage/ProfilePage/ProfilePage";
 import AdminRouteGuard from "./components/AdminRouteGuard";
@@ -90,9 +91,10 @@ function App() {
       const { data } = await supabase
         .from("community_members")
         .select("community_id, communities(*)")
-        .eq("user_id", currentUser.id);
+        .eq("user_id", currentUser.id)
+        .eq("communities.status", "approved");
 
-      if (data) setCommunities(data.map((row) => row.communities));
+      if (data) setCommunities(data.map((row) => row.communities).filter(Boolean));
     }
     fetchCommunities();
   }, [currentUser]); // re-run when user is available
@@ -244,6 +246,7 @@ function App() {
               )
             }
           >
+            <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/home" element={<HomePage />} />
             <Route path="/create" element={<CreatePage />} />
             <Route path="/journal" element={<JournalPage />} />

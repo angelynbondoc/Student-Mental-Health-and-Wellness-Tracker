@@ -1,31 +1,24 @@
-// =============================================================================
-// HomePage.jsx — refactored
-// Shared: PageShell, shared.css (page-shell, chip classes)
-// Own:    HomePage.css (filter bar, feed header, chips)
-//
-// KEY LOGIC: selectedCommunity is LOCAL state — UI preference only, not DB data.
-// filteredPosts is derived (not stored) — equivalent to SELECT ... WHERE community_id=?
-// =============================================================================
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import AppContext from "../../AppContext";
 import { PostCard } from "../../components/postcard";
 import "./HomePage.css";
 
 export default function HomePage() {
   const { posts, communities, searchQuery } = useContext(AppContext);
-
-  // Local UI state — other pages don't need this, so it stays local
+  const location = useLocation();
   const [selectedCommunityId, setSelectedCommunityId] = useState(null);
+  const [highlightedPostId, setHighlightedPostId] = useState(null);
+  const didScrollRef = useRef(false);
 
-  // Derived: SELECT * FROM posts WHERE community_id=? ORDER BY created_at DESC
   const matchingCommunityIds = communities
-    .filter(c => c.name?.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter(c => c?.name?.toLowerCase().includes(searchQuery.toLowerCase()))
     .map(c => c.id);
 
   const filteredPosts = posts
     .filter(post =>
       (!selectedCommunityId || post.community_id === selectedCommunityId) &&
-      (!searchQuery || 
+      (!searchQuery ||
         post.content?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         matchingCommunityIds.includes(post.community_id)
       )
@@ -35,6 +28,31 @@ export default function HomePage() {
   const activeCommunityName = communities.find(
     (c) => c.id === selectedCommunityId,
   )?.name;
+
+  // ── Scroll-to-post from notification click ──────────────────────────────
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const postId = params.get('post');
+    if (!postId || didScrollRef.current) return;
+
+    // Wait for posts to be in the list
+    const postExists = posts.some(p => p.id === postId);
+    if (!postExists) return;
+
+    setHighlightedPostId(postId);
+    didScrollRef.current = true;
+
+    // Small delay to let the DOM render
+    setTimeout(() => {
+      const el = document.getElementById(`post-${postId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 150);
+
+    // Remove highlight after 3 seconds
+    setTimeout(() => setHighlightedPostId(null), 3000);
+  }, [location.search, posts]);
 
   return (
     <div className="page-shell">
@@ -94,7 +112,13 @@ export default function HomePage() {
         ) : (
           <div className="hfeed-list">
             {filteredPosts.map((post) => (
-              <PostCard key={post.id} post={post} />
+              <div
+                key={post.id}
+                id={`post-${post.id}`}
+                className={`hfeed-post-wrapper${highlightedPostId === post.id ? ' hfeed-post-wrapper--highlight' : ''}`}
+              >
+                <PostCard post={post} />
+              </div>
             ))}
           </div>
         )}

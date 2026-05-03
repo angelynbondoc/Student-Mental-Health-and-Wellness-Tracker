@@ -1,7 +1,7 @@
 // =============================================================================
 // NotificationsPanel.jsx
 // Renders filtered notifications for currentUser.
-// Used inside InboxPage (Alerts tab) AND the MobileLayout bell dropdown.
+// Used inside Notifications (Alerts tab) AND the MobileLayout bell dropdown.
 // =============================================================================
 import React from 'react';
 import useNotifications from '../../hooks/useNotifications';

@@ -40,7 +40,7 @@ export default function CommunitiesPage() {
     if (!currentUser) return;
     async function fetchAll() {
       const [{ data: all, error: allErr }, { data: memberships, error: memErr }] = await Promise.all([
-        supabase.from("communities").select("id, name, category, emoji").order("name"),
+        supabase.from("communities").select("id, name, category, emoji").eq("status", "approved").order("name"),
         supabase.from("community_members").select("community_id").eq("user_id", currentUser.id),
         ]);
         console.log("all communities:", all, allErr);

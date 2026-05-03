@@ -1,0 +1,93 @@
+/* ── Filter chips ─────────────────────────────────────────────────────────── */
+.np-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.np-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-radius: 100px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.np-chip:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.np-chip--active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.np-chip-badge {
+  background: #fff;
+  color: var(--color-primary);
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 100px;
+  padding: 1px 6px;
+}
+.np-chip--active .np-chip-badge {
+  background: rgba(255,255,255,0.3);
+  color: #fff;
+}
+
+/* ── Actions row ──────────────────────────────────────────────────────────── */
+.np-actions-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+.np-mark-all-btn {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 4px 0;
+}
+.np-mark-all-btn:hover { text-decoration: underline; }
+
+/* ── List ─────────────────────────────────────────────────────────────────── */
+.np-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Empty state ──────────────────────────────────────────────────────────── */
+.np-empty {
+  text-align: center;
+  padding: 48px 24px;
+}
+.np-empty-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+.np-empty-msg {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.neu-notif-item--clickable {
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.neu-notif-item--clickable:hover {
+  background: var(--surface-alt, #f0f0f0);
+}

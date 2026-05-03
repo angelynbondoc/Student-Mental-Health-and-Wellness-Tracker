@@ -33,6 +33,20 @@ export default function ResourcesPage() {
   const toggleExpand = (id) =>
     setExpandedId((prev) => (prev === id ? null : id));
 
+  function getCategoryEmoji(category) {
+  const map = {
+    'Breathing': '🌬️',
+    'Meditation': '🧘',
+    'Exercise': '🏃',
+    'Journaling': '📓',
+    'Sleep': '😴',
+    'Nutrition': '🥗',
+    'Social': '🤝',
+    'Crisis': '🆘',
+  }
+  return map[category] ?? '📌'
+}
+
   return (
     <PageShell
       heading="💚 Resource Library"

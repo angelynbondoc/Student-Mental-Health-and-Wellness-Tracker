@@ -1,0 +1,374 @@
+/* =============================================================================
+   BroadcastTab.css
+   ============================================================================= */
+
+.bc-root {
+  padding: 1.5rem 2rem;
+}
+
+.bc-header {
+  margin-bottom: 1.75rem;
+}
+
+.bc-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0 0 0.35rem;
+  color: var(--text, #111);
+}
+
+.bc-sub {
+  font-size: 0.875rem;
+  color: var(--muted, #666);
+  margin: 0;
+}
+
+/* ── Layout ──────────────────────────────────────────────────────────────── */
+
+.bc-body {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.bc-compose {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* ── Form elements ───────────────────────────────────────────────────────── */
+
+.bc-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted, #666);
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bc-counter {
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: var(--muted, #999);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.bc-counter--warn {
+  color: #e65100;
+}
+
+.bc-input,
+.bc-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1.5px solid var(--border, #ddd);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--text, #111);
+  background: var(--surface, #fff);
+  transition: border-color 0.15s;
+  resize: none;
+}
+
+.bc-input:focus,
+.bc-textarea:focus {
+  outline: none;
+  border-color: var(--primary, #4f46e5);
+}
+
+/* ── Audience buttons ────────────────────────────────────────────────────── */
+
+.bc-audience-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.bc-audience-btn {
+  flex: 1;
+  padding: 0.6rem 0.75rem;
+  border: 1.5px solid var(--border, #ddd);
+  border-radius: 8px;
+  background: var(--surface, #fff);
+  font-size: 0.875rem;
+  font-family: inherit;
+  cursor: pointer;
+  color: var(--text, #333);
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.bc-audience-btn:hover {
+  border-color: var(--primary, #4f46e5);
+}
+
+.bc-audience-btn--active {
+  background: var(--primary, #4f46e5);
+  border-color: var(--primary, #4f46e5);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ── Preview card ────────────────────────────────────────────────────────── */
+
+.bc-preview {
+  margin-top: 0.75rem;
+  border: 1.5px dashed var(--border, #ddd);
+  border-radius: 10px;
+  padding: 1rem;
+  background: var(--surface-alt, #fafafa);
+}
+
+.bc-preview-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted, #aaa);
+  margin-bottom: 0.65rem;
+}
+
+.bc-preview-notif {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.bc-preview-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+  margin-top: 0.1rem;
+}
+
+.bc-preview-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.bc-preview-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text, #111);
+}
+
+.bc-preview-msg {
+  font-size: 0.85rem;
+  color: var(--muted, #555);
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── Send row ────────────────────────────────────────────────────────────── */
+
+.bc-send-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.bc-recipient-label {
+  font-size: 0.82rem;
+  color: var(--muted, #666);
+}
+
+.bc-send-btn {
+  padding: 0.65rem 1.25rem;
+  background: var(--primary, #4f46e5);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.bc-send-btn:hover:not(:disabled) {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.bc-send-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── User picker panel ───────────────────────────────────────────────────── */
+
+.bc-picker {
+  width: 280px;
+  flex-shrink: 0;
+  border: 1.5px solid var(--border, #ddd);
+  border-radius: 10px;
+  background: var(--surface, #fff);
+  display: flex;
+  flex-direction: column;
+  max-height: 520px;
+  overflow: hidden;
+}
+
+.bc-picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border, #eee);
+}
+
+.bc-picker-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted, #666);
+}
+
+.bc-select-all {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--primary, #4f46e5);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.bc-picker-search {
+  margin: 0.65rem 1rem;
+  padding: 0.45rem 0.75rem;
+  border: 1.5px solid var(--border, #ddd);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  color: var(--text, #111);
+  background: var(--surface, #fff);
+  width: calc(100% - 2rem);
+  box-sizing: border-box;
+}
+
+.bc-picker-search:focus {
+  outline: none;
+  border-color: var(--primary, #4f46e5);
+}
+
+.bc-user-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.bc-user-empty {
+  padding: 1rem;
+  font-size: 0.85rem;
+  color: var(--muted, #999);
+  text-align: center;
+}
+
+.bc-user-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: background 0.1s;
+  border-bottom: 1px solid var(--border, #f0f0f0);
+}
+
+.bc-user-row:hover {
+  background: var(--surface-alt, #f7f7f7);
+}
+
+.bc-user-row--selected {
+  background: color-mix(in srgb, var(--primary, #4f46e5) 8%, transparent);
+}
+
+.bc-user-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--primary, #4f46e5);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.bc-user-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.bc-user-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text, #111);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bc-user-role {
+  font-size: 0.72rem;
+  color: var(--muted, #999);
+  text-transform: capitalize;
+}
+
+.bc-user-check {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border, #ccc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.bc-user-check--on {
+  background: var(--primary, #4f46e5);
+  border-color: var(--primary, #4f46e5);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 700px) {
+  .bc-root {
+    padding: 1rem;
+  }
+
+  .bc-body {
+    flex-direction: column;
+  }
+
+  .bc-picker {
+    width: 100%;
+    max-height: 340px;
+  }
+}
