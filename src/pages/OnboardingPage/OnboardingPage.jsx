@@ -393,7 +393,7 @@ function StepCommunities({ program, onBack, onSubmit, loading, error }) {
   useEffect(() => {
     async function fetch() {
       const [{ data: communities }, { data: mappings }] = await Promise.all([
-        supabase.from('communities').select('id, name, emoji').eq('status', 'approved').order('name'),
+        supabase.from('communities').select('id, name, emoji').eq('status', 'approved').eq('is_general', false).order('name'),
         supabase
           .from("program_community_map")
           .select("community_id")

@@ -1,45 +1,120 @@
-/* =============================================================================
-   ResourcesPage.css — page-specific styles only.
-   Shared: page-shell, page-inner, page-heading, page-sub, empty-state (shared.css)
-   ============================================================================= */
-
-/* ── Category block ───────────────────────────────────────────────────────── */
-.rp-category-block { margin-bottom: 32px; }
-.rp-category-heading {
-  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
-  padding-left: 12px; border-left: 3px solid var(--color-accent);
-}
-.rp-category-title {
-  font-family: var(--font-heading); font-size: 14px; font-weight: 600;
-  color: var(--color-text); margin: 0; flex: 1;
-}
-.rp-category-count {
-  font-family: var(--font-body); font-size: 11px; font-weight: 600;
-  background: var(--color-primary-light); color: var(--color-primary);
-  border-radius: 100px; padding: 2px 10px;
+.ra-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 32px;
 }
 
-/* ── Resource accordion card ──────────────────────────────────────────────── */
-.rp-card {
-  background: var(--color-surface); border-radius: 10px;
-  margin-bottom: 8px; border: 1px solid var(--color-border);
-  overflow: hidden; transition: box-shadow 0.15s ease;
+.ra-card {
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface, #fff);
+  transition: box-shadow 0.2s ease;
 }
-.rp-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.07); }
-.rp-card__btn {
-  width: 100%; display: flex; justify-content: space-between; align-items: center;
-  padding: 14px 18px; background: none; border: none; cursor: pointer;
-  font-family: var(--font-heading); font-size: 13px; font-weight: 500;
-  color: var(--color-text); text-align: left; transition: background 0.15s ease;
+
+.ra-card--open {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
 }
-.rp-card__btn:hover { background: var(--color-input-bg); }
-.rp-chevron {
-  font-size: 15px; color: var(--color-text-faint);
-  transition: transform 0.2s ease; flex-shrink: 0; margin-left: 8px;
+
+.ra-card__header {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
 }
-.rp-chevron--open { transform: rotate(180deg); color: var(--color-primary); }
-.rp-card__content {
-  font-family: var(--font-body); font-size: 13px; color: var(--color-text-body);
-  line-height: 1.7; padding: 0 18px 16px;
-  border-top: 1px solid var(--color-input-bg); margin: 0;
+
+.ra-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.ra-card__year {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary, #16a34a);
+}
+
+.ra-card__key-idea {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text, #111);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.ra-card__title {
+  font-size: 12px;
+  color: var(--color-text-secondary, #6b7280);
+  font-style: italic;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.ra-chevron {
+  font-size: 16px;
+  color: var(--color-text-secondary, #6b7280);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.ra-chevron--open {
+  transform: rotate(180deg);
+}
+
+.ra-card__body {
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid var(--border, #e5e7eb);
+  padding-top: 14px;
+}
+
+.ra-card__findings {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--color-text, #374151);
+  margin: 0;
+}
+
+.ra-card__citation {
+  font-size: 11px;
+  color: var(--color-text-secondary, #9ca3af);
+  font-style: italic;
+  line-height: 1.5;
+  margin: 0;
+  padding: 8px 10px;
+  background: var(--surface-alt, #f9fafb);
+  border-radius: 6px;
+  border-left: 3px solid var(--color-primary, #16a34a);
+}
+
+.ra-read-btn {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary, #16a34a);
+  text-decoration: none;
+  padding: 6px 14px;
+  border: 1.5px solid var(--color-primary, #16a34a);
+  border-radius: 20px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.ra-read-btn:hover {
+  background: var(--color-primary, #16a34a);
+  color: #fff;
 }

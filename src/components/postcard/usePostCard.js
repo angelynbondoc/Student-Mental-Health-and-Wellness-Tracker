@@ -88,14 +88,33 @@ export default function usePostCard(post) {
       is_anonymous: false,
       is_flagged: false,
     });
-    if (!error) {
-      setShowConfirm(false);
-      const { data } = await supabase
-        .from("posts")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (data) setPosts(data);
+    console.log('share debug:', { post_author: post.author_id, current: currentUser.id, different: post.author_id !== currentUser.id });
+  if (!error) {
+    setShowConfirm(false);
+
+    // Notify original post author
+    if (post.author_id && post.author_id !== currentUser.id) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', currentUser.id)
+        .single();
+
+    const { error: notifError } = await supabase.from('notifications').insert({
+      user_id: post.author_id,
+      type: 'share',
+      content: `${profile?.display_name ?? 'Someone'} shared your post.`,
+      post_id: post.id,
+    });
+    if (notifError) console.error('notif insert failed:', notifError);
     }
+
+    const { data } = await supabase
+      .from("posts")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (data) setPosts(data);
+  }
   };
 
   return {

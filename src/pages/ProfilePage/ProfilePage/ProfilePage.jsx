@@ -368,8 +368,11 @@ export default function ProfilePage() {
     setPhotoModal(false);
   };
 
-  const handleDeletePost = (id) =>
+  const handleDeletePost = async (id) => {
+    const { error } = await supabase.from('posts').delete().eq('id', id);
+    if (error) { console.error('delete error:', error); return; }
     setPosts((prev) => prev.filter((p) => p.id !== id));
+  };
 
   const handleLeave = async (communityId) => {
     const { error } = await supabase

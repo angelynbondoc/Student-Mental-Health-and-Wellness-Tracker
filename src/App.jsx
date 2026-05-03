@@ -88,13 +88,23 @@ function App() {
   useEffect(() => {
     if (!currentUser) return; // wait for auth
     async function fetchCommunities() {
-      const { data } = await supabase
-        .from("community_members")
-        .select("community_id, communities(*)")
-        .eq("user_id", currentUser.id)
-        .eq("communities.status", "approved");
+      const [{ data: memberships }, { data: general }] = await Promise.all([
+        supabase
+          .from("community_members")
+          .select("community_id, communities(*)")
+          .eq("user_id", currentUser.id)
+          .eq("communities.status", "approved"),
+        supabase
+          .from("communities")
+          .select("*")
+          .eq("is_general", true)
+          .single(),
+      ]);
 
-      if (data) setCommunities(data.map((row) => row.communities).filter(Boolean));
+      const joined = (memberships ?? []).map((row) => row.communities).filter(Boolean);
+      const generalAlreadyIn = joined.some(c => c.is_general);
+      const all = generalAlreadyIn ? joined : [general, ...joined].filter(Boolean);
+      setCommunities(all);
     }
     fetchCommunities();
   }, [currentUser]); // re-run when user is available
@@ -176,18 +186,36 @@ function App() {
   // ── Batch 3 ────────────────────────────────────────────────────────────────
   const [notifications, setNotifications] = useState([]);
 
-  useEffect(() => {
-    if (!currentUser) return;
-    async function fetchNotifications() {
-      const { data } = await supabase
-        .from("notifications")
-        .select("*")
-        .eq("user_id", currentUser.id)
-        .order("created_at", { ascending: false });
-      if (data) setNotifications(data);
-    }
-    fetchNotifications();
-  }, [currentUser?.id]);
+useEffect(() => {
+  if (!currentUser) return;
+
+  async function fetchNotifications() {
+    const { data } = await supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .order('created_at', { ascending: false });
+    if (data) setNotifications(data);
+  }
+
+  fetchNotifications();
+
+  const channel = supabase
+    .channel('notifications-realtime')
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${currentUser.id}`,
+      },
+      () => fetchNotifications()
+    )
+    .subscribe((status) => console.log('realtime status:', status));
+
+  return () => supabase.removeChannel(channel);
+}, [currentUser?.id]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const contextValue = {
