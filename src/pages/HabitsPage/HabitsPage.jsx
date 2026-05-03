@@ -123,7 +123,7 @@ export default function HabitsPage() {
 
 
   return (
-    <PageShell heading="My Habits" sub="Track your daily wellness rituals ✨">
+    <PageShell heading="My Habits" sub="Track your daily wellness rituals ">
       <div className="hp-list">
         {loading ? (
           <p style={{ textAlign: "center", padding: "24px", color: "var(--text)" }}>Loading…</p>

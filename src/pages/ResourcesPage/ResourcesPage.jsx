@@ -3,12 +3,6 @@ import { supabase } from "../../supabase";
 import { PageShell, EmptyState } from "../../components/ui";
 import "./ResourcesPage.css";
 
-const CATEGORY_EMOJI = {
-  "Breathing Exercises": "🫁",
-  Mindfulness: "🧘",
-  "Crisis Support": "🆘",
-};
-const getCategoryEmoji = (cat) => CATEGORY_EMOJI[cat] ?? "📌";
 
 export default function ResourcesPage() {
   const [resources, setResources] = useState([]);

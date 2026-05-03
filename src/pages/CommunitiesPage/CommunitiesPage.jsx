@@ -117,7 +117,7 @@ export default function CommunitiesPage() {
 
   return (
     <PageShell
-      heading="🌐 Communities"
+      heading="Communities"
       sub="Join communities that match your interests."
     >
       {loading ? (
@@ -127,7 +127,7 @@ export default function CommunitiesPage() {
           {/* ── Joined ── */}
           {joined.length > 0 && (
             <div className="cp-section">
-              <div className="cp-section-label">✅ Communities you've joined</div>
+              <div className="cp-section-label"> Communities you've joined</div>
               <div className="cp-grid">
                 {joined.map(c => <CommunityCard key={c.id} community={c} />)}
               </div>
@@ -137,7 +137,7 @@ export default function CommunitiesPage() {
           {/* ── All others ── */}
           {others.length > 0 && (
             <div className="cp-section">
-              <div className="cp-section-label">🌐 All communities</div>
+              <div className="cp-section-label">All communities</div>
               <div className="cp-grid">
                 {others.map(c => <CommunityCard key={c.id} community={c} />)}
               </div>

@@ -6,14 +6,14 @@
 //   Desktop (≥1024px): top bar + left sidebar + full-width main
 //   Mobile  (<1024px):  top bar + full-width main + fixed bottom tab bar
 // =============================================================================
-import React, { useContext, useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import AppContext from '../../AppContext';
-import { NotificationsPanel } from '../notifications';
-import TopBar from './TopBar';
-import Sidebar from './Sidebar';
-import BottomNav from './BottomNav';
-import './MobileLayout.css';
+import React, { useContext, useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
+import AppContext from "../../AppContext";
+import { NotificationsPanel } from "../notifications";
+import TopBar from "./TopBar";
+import Sidebar from "./Sidebar";
+import BottomNav from "./BottomNav";
+import "./MobileLayout.css";
 
 export default function MobileLayout() {
   const { currentUser, notifications, setSearchQuery } = useContext(AppContext);
@@ -21,22 +21,21 @@ export default function MobileLayout() {
   const [showNotifPanel, setShowNotifPanel] = useState(false);
 
   const unreadCount = notifications.filter(
-    (n) => currentUser && n.user_id === currentUser.id && !n.is_read
+    (n) => currentUser && n.user_id === currentUser.id && !n.is_read,
   ).length;
 
-const [searchQuery] = useState('');
+  const [searchQuery] = useState("");
 
-const handleSearch = (query) => {
-  setSearchQuery(query);
-  if (query) navigate('/home');
-};
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    if (query) navigate("/home");
+  };
 
   return (
     <div className="neu-shell">
-
       <TopBar
         displayName={currentUser.display_name}
-        isAdmin={currentUser.role === 'admin'}
+        isAdmin={currentUser.role === "admin"}
         unreadCount={unreadCount}
         onBellClick={() => setShowNotifPanel((v) => !v)}
         onSearch={handleSearch}
@@ -48,9 +47,12 @@ const handleSearch = (query) => {
           <NotificationsPanel />
           <button
             className="neu-view-all-btn"
-            onClick={() => { setShowNotifPanel(false); navigate('/inbox'); }}
+            onClick={() => {
+              setShowNotifPanel(false);
+              
+            }}
           >
-            View all in Inbox →
+            View all notifications
           </button>
         </div>
       )}
@@ -63,7 +65,6 @@ const handleSearch = (query) => {
       </div>
 
       <BottomNav />
-
     </div>
   );
 }
