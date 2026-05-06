@@ -20,9 +20,6 @@ export function useAdminDashboard() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // ---------------------------------------------------------------------------
-  // Fetch reports
-  // ---------------------------------------------------------------------------
   useEffect(() => {
     async function fetchReports() {
       const { data, error } = await supabase
@@ -72,9 +69,6 @@ export function useAdminDashboard() {
     fetchReports();
   }, []);
 
-  // ---------------------------------------------------------------------------
-  // Fetch pending communities
-  // ---------------------------------------------------------------------------
   useEffect(() => {
     async function fetchPendingCommunities() {
       const { data, error } = await supabase
@@ -104,19 +98,31 @@ export function useAdminDashboard() {
     showToast('Community approved!');
   };
 
+  // PR D — Community rejection notification
   const rejectCommunity = async (id, reason) => {
     const { error } = await supabase
       .from('communities')
       .update({ status: 'rejected', rejection_reason: reason, reviewed_at: new Date().toISOString() })
       .eq('id', id);
     if (error) { console.error(error); return; }
+
+    const community = pendingCommunities.find(c => c.id === id);
     setPendingCommunities(prev => prev.filter(c => c.id !== id));
+
+    if (community?.creator?.id) {
+      await supabase.from('notifications').insert({
+        user_id: community.creator.id,
+        type: 'moderation',
+        title: 'Community Proposal Rejected',
+        content: reason?.trim()
+          ? `Your community "${community.name}" was rejected. Reason: ${reason.trim()}`
+          : `Your community "${community.name}" was rejected by an administrator.`,
+      });
+    }
+
     showToast('Community rejected.', 'danger');
   };
 
-  // ---------------------------------------------------------------------------
-  // Fetch users
-  // ---------------------------------------------------------------------------
   useEffect(() => {
     async function fetchUsers() {
       const { data, error } = await supabase
@@ -143,9 +149,6 @@ export function useAdminDashboard() {
     fetchUsers();
   }, []);
 
-  // ---------------------------------------------------------------------------
-  // Fetch user reports
-  // ---------------------------------------------------------------------------
   const [userReports, setUserReports] = useState([]);
   const [selUserReport, setSelUserReport] = useState(null);
   const [userModal, setUserModal] = useState(null);
@@ -155,15 +158,15 @@ export function useAdminDashboard() {
       const { data, error } = await supabase
         .from('reports')
         .select(`
-  id, reason, details, created_at, reporter_id, target_user_id,
-  status, resolution,
-  reporter:profiles!reports_reporter_id_fkey (
-    id, display_name
-  ),
-  target:profiles!reports_target_user_id_fkey (
-    id, display_name
-  )
-`)
+          id, reason, details, created_at, reporter_id, target_user_id,
+          status, resolution,
+          reporter:profiles!reports_reporter_id_fkey (
+            id, display_name
+          ),
+          target:profiles!reports_target_user_id_fkey (
+            id, display_name
+          )
+        `)
         .eq('type', 'profile')
         .order('created_at', { ascending: false });
 
@@ -171,11 +174,11 @@ export function useAdminDashboard() {
 
       const normalized = data.map(r => ({
         id: r.id,
-  reason: r.reason,
-  details: r.details,
-  status: r.status ?? 'pending',       // ← reads from DB now
-  resolution: r.resolution ?? null,    // ← reads from DB now
-  reportedAt: r.created_at,
+        reason: r.reason,
+        details: r.details,
+        status: r.status ?? 'pending',
+        resolution: r.resolution ?? null,
+        reportedAt: r.created_at,
         reporter: {
           name: r.reporter?.display_name ?? 'Unknown',
           avatar: (r.reporter?.display_name?.[0] ?? 'U').toUpperCase(),
@@ -192,9 +195,6 @@ export function useAdminDashboard() {
     fetchUserReports();
   }, []);
 
-  // ---------------------------------------------------------------------------
-  // Resolve post report
-  // ---------------------------------------------------------------------------
   const resolvePost = async (id, res) => {
     const report = reports.find(r => r.id === id);
 
@@ -219,9 +219,6 @@ export function useAdminDashboard() {
     );
   };
 
-  // ---------------------------------------------------------------------------
-  // Toggle user suspend/reactivate
-  // ---------------------------------------------------------------------------
   const toggleUser = async (uid, status) => {
     const newRole = status === 'suspended' ? 'suspended' : 'student';
 
@@ -241,73 +238,70 @@ export function useAdminDashboard() {
     );
   };
 
+  // PR C — Suspend user notification
   const resolveUserReport = async (id, resolution) => {
-  if (resolution === "suspended") {
-    const report = userReports.find(r => r.id === id);
-    const uid = report?.reportedUser?.id;
+    if (resolution === "suspended") {
+      const report = userReports.find(r => r.id === id);
+      const uid = report?.reportedUser?.id;
 
-    if (uid) {
-      const { error } = await supabase
-        .from("profiles")
-        .update({ role: "suspended" })
-        .eq("id", uid);
-      if (error) console.error("suspend profile error:", error);
-      else {
-        setUsers(prev =>
-          prev.map(u => u.id === uid ? { ...u, status: "suspended", role: "suspended" } : u)
-        );
+      if (uid) {
+        const { error } = await supabase
+          .from("profiles")
+          .update({ role: "suspended" })
+          .eq("id", uid);
+        if (error) console.error("suspend profile error:", error);
+        else {
+          setUsers(prev =>
+            prev.map(u => u.id === uid ? { ...u, status: "suspended", role: "suspended" } : u)
+          );
+
+          await supabase.from("notifications").insert({
+            user_id: uid,
+            type: "moderation",
+            title: "Account Suspended",
+            content: note?.trim()
+              ? `Your account has been suspended. Reason: ${note.trim()}`
+              : "Your account has been suspended by an administrator.",
+          });
+        }
       }
     }
-  }
 
-  // best-effort DB update — don't block UI if columns are missing
-  const { error } = await supabase
-    .from("reports")
-    .update({ status: "resolved", resolution })
-    .eq("id", id);
+    const { error } = await supabase
+      .from("reports")
+      .update({ status: "resolved", resolution })
+      .eq("id", id);
 
-  if (error) console.error("resolve report error:", error);
+    if (error) console.error("resolve report error:", error);
 
-  // always update local state regardless of DB result
-  setUserReports(prev =>
-    prev.map(r => r.id === id
-      ? { ...r, status: "resolved", resolution, adminNote: note }
-      : r
-    )
-  );
-  setUserModal(null);
-  setSelUserReport(null);
-  setNote("");
-  showToast(
-    resolution === "suspended" ? "User suspended." : "Report dismissed.",
-    resolution === "suspended" ? "danger" : "success"
-  );
-};
+    setUserReports(prev =>
+      prev.map(r => r.id === id
+        ? { ...r, status: "resolved", resolution, adminNote: note }
+        : r
+      )
+    );
+    setUserModal(null);
+    setSelUserReport(null);
+    setNote("");
+    showToast(
+      resolution === "suspended" ? "User suspended." : "Report dismissed.",
+      resolution === "suspended" ? "danger" : "success"
+    );
+  };
 
-  // ---------------------------------------------------------------------------
-  // NEW: Broadcast announcement to all or selected users
-  // ---------------------------------------------------------------------------
-  //
-  // Inserts one row per recipient into the `notifications` table:
-  //   { user_id, type: 'announcement', message, title, is_read: false }
-  //
-  // targetType: 'all' | 'selected'
-  // selectedUserIds: string[] (only used when targetType === 'selected')
-  // ---------------------------------------------------------------------------
   const broadcastNotification = async ({ title, message, targetType, selectedUserIds }) => {
     if (!message.trim()) {
       showToast('Message cannot be empty.', 'danger');
       return false;
     }
 
-    // Resolve recipient IDs
     let recipientIds = [];
 
     if (targetType === 'all') {
       const { data, error } = await supabase
         .from('profiles')
         .select('id')
-        .neq('role', 'suspended');  // skip suspended users — adjust as needed
+        .neq('role', 'suspended');
 
       if (error) {
         console.error('broadcast fetch users error:', error);
@@ -324,7 +318,6 @@ export function useAdminDashboard() {
       return false;
     }
 
-    // Build the notification rows
     const rows = recipientIds.map(uid => ({
       user_id: uid,
       type: 'announcement',
@@ -333,7 +326,6 @@ export function useAdminDashboard() {
       is_read: false,
     }));
 
-    // Supabase supports batch inserts natively
     const { error } = await supabase.from('notifications').insert(rows);
 
     if (error) {
@@ -343,12 +335,9 @@ export function useAdminDashboard() {
     }
 
     showToast(`Announcement sent to ${recipientIds.length} user(s)!`);
-    return true;  // signals success so the form can reset
+    return true;
   };
 
-  // ---------------------------------------------------------------------------
-  // Misc helpers & derived values
-  // ---------------------------------------------------------------------------
   const closeSidebar = () => setSidebarOpen(false);
 
   const pendingPosts = reports.filter(r => r.status === 'pending').length;
