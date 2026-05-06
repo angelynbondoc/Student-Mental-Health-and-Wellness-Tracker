@@ -8,8 +8,8 @@ import ReportedUsersTab from "../../components/admin/ReportedUserTab"
 import UserManagementTab from "../../components/admin/UserManagementTab"
 import PostReportModal from "../../components/admin/PostReportModal";
 import UserReportModal from "../../components/admin/UserReportModal";
-import CommunityReviewTab from "../../components/admin/CommunityReviewTab";
-import BroadcastTab from "../../components/admin/BroadcastTab"; 
+import CommunityReviewTab from "../../components/admin/CommunityReviewTab/CommunityReviewTab";
+import BroadcastTab from "../../components/admin/BroadcastTab/BroadcastTab";
 
 export default function AdminDashboard() {
   const {
