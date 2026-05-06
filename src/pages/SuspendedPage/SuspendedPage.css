@@ -1,0 +1,119 @@
+.sp-root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fef2f2;
+  padding: 1.5rem;
+}
+
+.sp-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  padding: 2.5rem 2rem;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+}
+
+.sp-icon-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #fee2e2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+}
+
+.sp-icon {
+  color: #dc2626;
+}
+
+.sp-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #dc2626;
+  margin: 0 0 0.5rem;
+}
+
+.sp-sub {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 0 0 1.5rem;
+}
+
+.sp-message-box {
+  background: #fef9c3;
+  border: 1px solid #fde047;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.sp-message-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #92400e;
+  margin: 0 0 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sp-message-text {
+  font-size: 0.875rem;
+  color: #1f2937;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.sp-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.sp-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s;
+}
+
+.sp-btn:hover { opacity: 0.88; }
+
+.sp-btn--primary {
+  background: #dc2626;
+  color: #fff;
+}
+
+.sp-btn--ghost {
+  background: transparent;
+  border: 1.5px solid #d1d5db;
+  color: #374151;
+}
+
+.sp-appeal-placeholder {
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.82rem;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.sp-appeal-placeholder p { margin: 0; }
+
+.sp-footer {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin: 0;
+}

@@ -18,6 +18,8 @@ import UserProfilePage from "./pages/ProfilePage/UserProfilePage/UserProfilePage
 import OnboardingPage from "./pages/OnboardingPage/OnboardingPage";
 import AuthCallback from "./pages/AuthCallback";
 import { supabase } from "./supabase";
+import SuspendedPage from "./pages/SuspendedPage/SuspendedPage";
+
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -244,6 +246,7 @@ useEffect(() => {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/suspended" element={<SuspendedPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
 
@@ -264,7 +267,10 @@ useEffect(() => {
                 <Navigate to="/login" replace />
               ) : !profileReady ? (
                 <div>Loading...</div>
-              ) : currentUser.role === "admin" ||
+              ) : currentUser.role === "suspended" ? (
+                <Navigate to="/suspended" replace />
+              )
+               : currentUser.role === "admin" ||
                 currentUser.role === "superadmin" ? (
                 <Navigate to="/admin" replace />
               ) : !currentUser.privacy_acknowledged ? (

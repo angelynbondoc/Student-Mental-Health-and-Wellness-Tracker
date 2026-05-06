@@ -5,6 +5,8 @@ import AppContext from "../AppContext";
 const AdminRouteGuard = ({ children }) => {
   const { currentUser } = useContext(AppContext)
 
+
+  
   if (!currentUser) {
     return <Navigate to="/login" replace />
   }
