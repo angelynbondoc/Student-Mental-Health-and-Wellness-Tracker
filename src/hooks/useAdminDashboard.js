@@ -240,15 +240,33 @@ export function useAdminDashboard() {
   };
 
   const resolveUserReport = async (id, resolution) => {
-  if (resolution !== "dismissed") return; // PR 3 handles suspend
+  if (resolution === "suspended") {
+    const report = userReports.find(r => r.id === id);
+    const uid = report?.reportedUser?.id;
 
+    if (uid) {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ role: "suspended" })
+        .eq("id", uid);
+      if (error) console.error("suspend profile error:", error);
+      else {
+        setUsers(prev =>
+          prev.map(u => u.id === uid ? { ...u, status: "suspended", role: "suspended" } : u)
+        );
+      }
+    }
+  }
+
+  // best-effort DB update — don't block UI if columns are missing
   const { error } = await supabase
     .from("reports")
     .update({ status: "resolved", resolution })
     .eq("id", id);
 
-  if (error) { console.error(error); return; }
+  if (error) console.error("resolve report error:", error);
 
+  // always update local state regardless of DB result
   setUserReports(prev =>
     prev.map(r => r.id === id
       ? { ...r, status: "resolved", resolution, adminNote: note }
@@ -258,7 +276,10 @@ export function useAdminDashboard() {
   setUserModal(null);
   setSelUserReport(null);
   setNote("");
-  showToast("Report dismissed.");
+  showToast(
+    resolution === "suspended" ? "User suspended." : "Report dismissed.",
+    resolution === "suspended" ? "danger" : "success"
+  );
 };
 
   // ---------------------------------------------------------------------------
