@@ -147,6 +147,8 @@ export function useAdminDashboard() {
   // Fetch user reports
   // ---------------------------------------------------------------------------
   const [userReports, setUserReports] = useState([]);
+  const [selUserReport, setSelUserReport] = useState(null);
+  const [userModal, setUserModal] = useState(null);
 
   useEffect(() => {
     async function fetchUserReports() {
@@ -318,9 +320,9 @@ export function useAdminDashboard() {
     userReports,
     users,
     selReport, setSelReport,
-    selUserReport: null, setSelUserReport: () => {},
+    selUserReport, setSelUserReport,
     postModal, setPostModal,
-    userModal: null, setUserModal: () => {},
+    userModal, setUserModal,
     note, setNote,
     toast,
     search, setSearch,
