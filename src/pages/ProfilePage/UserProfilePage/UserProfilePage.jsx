@@ -150,7 +150,12 @@ export default function UserProfilePage() {
 
           <div className="up-identity">
             <h1 className="up-display-name">{profile.display_name}</h1>
-            {profile.program && <p className="up-program">{profile.program}</p>}
+            {profile.program && (
+              <>
+                <p className="up-program">{profile.program.name}</p>
+                <p className="up-college">{profile.program.college?.name}</p>
+              </>
+            )}
             {profile.bio && <p className="up-bio">{profile.bio}</p>}
             <p className="up-joined">
               Joined {formatJoinDate(profile.created_at)}

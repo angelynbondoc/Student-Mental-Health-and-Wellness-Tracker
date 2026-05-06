@@ -8,6 +8,8 @@ import ReportedUsersTab from "../../components/admin/ReportedUserTab"
 import UserManagementTab from "../../components/admin/UserManagementTab"
 import PostReportModal from "../../components/admin/PostReportModal";
 import UserReportModal from "../../components/admin/UserReportModal";
+import CommunityReviewTab from "../../components/admin/CommunityReviewTab";
+import BroadcastTab from "../../components/admin/BroadcastTab"; 
 
 export default function AdminDashboard() {
   const {
@@ -25,6 +27,11 @@ export default function AdminDashboard() {
     search, setSearch,
     pendingPosts, pendingUsers, resolved, suspended,
     resolvePost, resolveUserReport, toggleUser,
+    pendingCommunities,
+    approveCommunity,
+    rejectCommunity,
+    pendingCommunityCount,
+    broadcastNotification,  // ← NEW
   } = useAdminDashboard();
 
   return (
@@ -47,16 +54,19 @@ export default function AdminDashboard() {
           pendingUsers={pendingUsers}
           resolved={resolved}
           suspended={suspended}
+          pendingCommunityCount={pendingCommunityCount}
+          hasBroadcast
         />
 
         <main className="admin-main">
 
           {/* Stats row */}
           <div className="admin-stats-grid">
-            <StatCard label="Pending Post Reports" value={pendingPosts} sub="Awaiting review" accent="var(--warn)" />
-            <StatCard label="Pending User Reports" value={pendingUsers} sub="Awaiting review" accent="#E65100" />
-            <StatCard label="Resolved Reports"     value={resolved}     sub="All time"        accent="var(--primary)" />
-            <StatCard label="Suspended Users"      value={suspended}    sub="Currently restricted" accent="var(--danger)" />
+            <StatCard label="Pending Post Reports" value={pendingPosts}          sub="Awaiting review"        accent="var(--warn)" />
+            <StatCard label="Pending User Reports" value={pendingUsers}          sub="Awaiting review"        accent="#E65100" />
+            <StatCard label="Pending Communities"  value={pendingCommunityCount} sub="Awaiting approval"      accent="var(--primary)" />
+            <StatCard label="Resolved Reports"     value={resolved}              sub="All time"               accent="var(--primary)" />
+            <StatCard label="Suspended Users"      value={suspended}             sub="Currently restricted"   accent="var(--danger)" />
           </div>
 
           {tab === "reports" && (
@@ -79,12 +89,28 @@ export default function AdminDashboard() {
             />
           )}
 
+          {tab === "communities" && (
+            <CommunityReviewTab
+              communities={pendingCommunities}
+              onApprove={approveCommunity}
+              onReject={rejectCommunity}
+            />
+          )}
+
           {tab === "users" && (
             <UserManagementTab
               users={users}
               search={search}
               setSearch={setSearch}
               toggleUser={toggleUser}
+            />
+          )}
+
+          {/* ── NEW: Broadcast tab ────────────────────────────────────── */}
+          {tab === "broadcast" && (
+            <BroadcastTab
+              users={users}
+              broadcastNotification={broadcastNotification}
             />
           )}
 

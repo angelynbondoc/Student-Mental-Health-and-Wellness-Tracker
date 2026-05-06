@@ -1,5 +1,61 @@
 # Changelog
 
+## [1.2.0] - Admin Dashboard Bug Fixes - 2026-05-06
+
+### Fixed
+- **Admin: Reported Users — Details Button:** Wired `selUserReport` and `userModal` state
+  in `useAdminDashboard.js`; modal now opens correctly on click. (#62, #63)
+- **Admin: Reported Users — Dismiss & Suspend User Buttons:** Implemented
+  `resolveUserReport` logic to update report status and user role via Supabase.
+  Modal confirm buttons now functional. (#64)
+- **Admin: Persist Report Actions on Reload:** Added `status` and `resolution` columns
+  to the `reports` table and updated RLS UPDATE policy to allow `superadmin` role.
+  Dismiss and Suspend actions now survive page refresh. (#65)
+- **Admin: Community Review — Approve/Reject Persist on Reload:** Added RLS UPDATE
+  policy on `communities` table for `superadmin`, `admin`, and `administrator` roles.
+- **Admin: User Suspension Persists on Reload:** Added RLS UPDATE policy on `profiles`
+  table for admin roles to allow role changes from the dashboard.
+- **Profile: General Community Leave Button:** Removed Leave button from the General
+  community in the Profile page communities list.
+
+### Security
+- Extended all admin-gated RLS policies to recognize `superadmin`, `admin`, and
+  `administrator` role values across `reports`, `communities`, and `profiles` tables.
+
+---
+
+## [1.1.3] - Notifications & UI Polish - 2026-05-03
+
+### Fixed
+- **Notifications:** Fixed notification policies and realtime notification delivery. (#61)
+
+### Improved
+- **UI/UX:** General interface improvements across the application. (#42)
+
+---
+
+## [1.1.2] - Notifications & Community Backend - 2026-05-02
+
+### Added
+- **Notifications:** Improved notification system and admin broadcast announcements. (#43)
+- **Community Review:** Continued backend-database integration for community review
+  feature in admin dashboard. (#41)
+
+---
+
+## [1.1.1] - Sprint 2 Features & Integrations - 2026-05-01
+
+### Added
+- **Habits & Resources:** Integrated Habits and Resources pages; fixed Supabase
+  client lock crash. (#37)
+- **Backend Integration:** Full backend-database integration including mockData removal,
+  RLS policies, auth, moderation, and search. (#38)
+- **KM Documents:** Added Framework Memo, Architecture, and Conceptual Report
+  documents. (#40)
+
+### Changed
+- **UI/UX:** Improved overall UI/UX across the application. (#42)
+
 ## [1.1.0] - Authentication Architecture Pivot - 2026-04-25
 
 ### Changed

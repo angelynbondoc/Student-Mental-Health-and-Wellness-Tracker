@@ -1,8 +1,8 @@
 // =============================================================================
-// OnboardingPage.jsx — frontend only, lucide-react icons, NEULogo1.png
-// Flow: Terms & Conditions → Course Selection → Welcome
+// OnboardingPage.jsx
+// Flow: Terms → College → Program → Communities → Welcome
 // =============================================================================
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FileText,
@@ -20,104 +20,38 @@ import {
   ArrowRight,
   PartyPopper,
   ChevronDown,
+  Sparkles,
 } from "lucide-react";
 import AppContext from "../../AppContext";
 import "./OnboardingPage.css";
 import { supabase } from "../../supabase";
 
-// ── NEU Course catalogue ──────────────────────────────────────────────────────
-const COURSES = [
-  { id: "bscs", code: "BSCS", name: "BS Computer Science", dept: "Technology" },
-  {
-    id: "bsit",
-    code: "BSIT",
-    name: "BS Information Technology",
-    dept: "Technology",
-  },
-  { id: "bsed", code: "BSEd", name: "BS Education", dept: "Education" },
-  {
-    id: "beed",
-    code: "BEEd",
-    name: "Bachelor of Early Education",
-    dept: "Education",
-  },
-  {
-    id: "bsba",
-    code: "BSBA",
-    name: "BS Business Administration",
-    dept: "Business",
-  },
-  { id: "bsacct", code: "BSA", name: "BS Accountancy", dept: "Business" },
-  { id: "bsn", code: "BSN", name: "BS Nursing", dept: "Health Sciences" },
-  {
-    id: "bsmt",
-    code: "BSMT",
-    name: "BS Medical Technology",
-    dept: "Health Sciences",
-  },
-  {
-    id: "bspsych",
-    code: "BSPsych",
-    name: "BS Psychology",
-    dept: "Social Sciences",
-  },
-  {
-    id: "absoc",
-    code: "AB Soc",
-    name: "AB Sociology",
-    dept: "Social Sciences",
-  },
-  {
-    id: "bsarch",
-    code: "BSArch",
-    name: "BS Architecture",
-    dept: "Engineering",
-  },
-  {
-    id: "bsce",
-    code: "BSCE",
-    name: "BS Civil Engineering",
-    dept: "Engineering",
-  },
-  {
-    id: "bsee",
-    code: "BSEE",
-    name: "BS Electrical Engineering",
-    dept: "Engineering",
-  },
-  {
-    id: "bsme",
-    code: "BSME",
-    name: "BS Mechanical Engineering",
-    dept: "Engineering",
-  },
-  {
-    id: "bscrim",
-    code: "BSCrim",
-    name: "BS Criminology",
-    dept: "Law & Justice",
-  },
-  {
-    id: "bshrm",
-    code: "BSHRM",
-    name: "BS Hotel & Restaurant Mgmt",
-    dept: "Hospitality",
-  },
-  {
-    id: "bstm",
-    code: "BSTM",
-    name: "BS Tourism Management",
-    dept: "Hospitality",
-  },
-];
-
-const DEPARTMENTS = ["All", ...new Set(COURSES.map((c) => c.dept))];
+// ── Community emoji map ───────────────────────────────────────────────────────
+const COMMUNITY_EMOJI = {
+  "Programming & Dev": "💻",
+  "Design & Animation": "🎨",
+  "Gaming & Esports": "🎮",
+  "Media & Content Creation": "📰",
+  "Finance & Investing": "📈",
+  "Startups & Side Hustles": "🚀",
+  "Politics & Current Events": "🌍",
+  "Science & Research": "🔬",
+  "Music & Performing Arts": "🎵",
+  "Sports & Fitness": "🏃",
+  "Mental Health & Wellness": "🧠",
+  "Travel & Culture": "✈️",
+  "Books & Learning": "📖",
+  "Food & Lifestyle": "🍳",
+  "Engineering & Making": "⚙️",
+};
 
 // ── Step bar ──────────────────────────────────────────────────────────────────
 function StepBar({ current }) {
   const steps = [
     { label: "Terms", icon: ScrollText },
-    { label: "Courses", icon: GraduationCap },
+    { label: "College", icon: GraduationCap },
+    { label: "Program", icon: BookOpen },
+    { label: "Communities", icon: Users },
     { label: "Done", icon: CheckCircle2 },
   ];
 
@@ -163,9 +97,8 @@ function StepTerms({ onAgree, onDisagree, loading }) {
 
   function handleScroll(e) {
     const el = e.currentTarget;
-    if (el.scrollHeight - el.scrollTop <= el.clientHeight + 48) {
+    if (el.scrollHeight - el.scrollTop <= el.clientHeight + 48)
       setScrolledToEnd(true);
-    }
   }
 
   const TNC_SECTIONS = [
@@ -247,7 +180,6 @@ function StepTerms({ onAgree, onDisagree, loading }) {
             </p>
           </div>
         </div>
-
         {TNC_SECTIONS.map((s, i) => (
           <div className="ob-tnc-section" key={i}>
             <div className="ob-tnc-section-title">
@@ -267,7 +199,6 @@ function StepTerms({ onAgree, onDisagree, loading }) {
             )}
           </div>
         ))}
-
         <div className="ob-tnc-contact">
           <p>
             Questions? Contact the NEU Guidance and Counseling Office or email{" "}
@@ -326,7 +257,6 @@ function StepTerms({ onAgree, onDisagree, loading }) {
           )}
         </button>
       </div>
-
       <p className="ob-hint">
         <AlertTriangle size={11} />
         Disagreeing will return you to the login page.
@@ -335,14 +265,27 @@ function StepTerms({ onAgree, onDisagree, loading }) {
   );
 }
 
-// ── Step 2: Course Selection ──────────────────────────────────────────────────
-function StepCourses({ selected, onToggle, onBack, onSubmit, loading, error }) {
-  const [activeDept, setActiveDept] = useState("All");
+// ── Step 2: College Selection ─────────────────────────────────────────────────
+function StepCollege({ onBack, onSelect }) {
+  const [colleges, setColleges] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const visible =
-    activeDept === "All"
-      ? COURSES
-      : COURSES.filter((c) => c.dept === activeDept);
+  useEffect(() => {
+    async function fetch() {
+      const { data } = await supabase
+        .from("colleges")
+        .select("id, name")
+        .order("name");
+      if (data) setColleges(data);
+      setLoading(false);
+    }
+    fetch();
+  }, []);
+
+  // Shorten long college names for cards
+  function shortName(name) {
+    return name.replace("College of ", "").replace("School of ", "");
+  }
 
   return (
     <div className="ob-section">
@@ -351,53 +294,226 @@ function StepCourses({ selected, onToggle, onBack, onSubmit, loading, error }) {
           <GraduationCap size={20} />
         </div>
         <div>
-          <h2 className="ob-title">What are you studying?</h2>
+          <h2 className="ob-title">Which college are you in?</h2>
+          <p className="ob-subtitle">Select your college to continue</p>
+        </div>
+      </div>
+
+      {loading ? (
+        <p className="ob-loading">Loading colleges…</p>
+      ) : (
+        <div className="ob-courses-grid">
+          {colleges.map((c) => (
+            <button
+              key={c.id}
+              className="ob-course-card"
+              onClick={() => onSelect(c)}
+            >
+              <div className="ob-course-name">College of</div>
+              <div className="ob-course-code">{shortName(c.name)}</div>
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="ob-btn-row">
+        <button className="ob-btn-ghost" onClick={onBack}>
+          <ChevronLeft size={15} /> Back
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Step 3: Program Selection ─────────────────────────────────────────────────
+function StepProgram({ college, onBack, onSelect }) {
+  const [programs, setPrograms] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetch() {
+      const { data } = await supabase
+        .from("programs")
+        .select("id, name")
+        .eq("college_id", college.id)
+        .order("name");
+      if (data) setPrograms(data);
+      setLoading(false);
+    }
+    fetch();
+  }, [college.id]);
+
+  return (
+    <div className="ob-section">
+      <div className="ob-section-header">
+        <div className="ob-section-icon ob-section-icon--green">
+          <BookOpen size={20} />
+        </div>
+        <div>
+          <h2 className="ob-title">What's your program?</h2>
+          <p className="ob-subtitle">{college.name}</p>
+        </div>
+      </div>
+
+      {loading ? (
+        <p className="ob-loading">Loading programs…</p>
+      ) : (
+        <div className="ob-courses-grid">
+          {programs.map((p) => (
+            <button
+              key={p.id}
+              className="ob-course-card"
+              onClick={() => onSelect(p)}
+            >
+              <div className="ob-course-name">{p.name}</div>
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="ob-btn-row">
+        <button className="ob-btn-ghost" onClick={onBack}>
+          <ChevronLeft size={15} /> Back
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Step 4: Community Selection ───────────────────────────────────────────────
+function StepCommunities({ program, onBack, onSubmit, loading, error }) {
+  const [allCommunities, setAllCommunities] = useState([]);
+  const [suggestedIds, setSuggestedIds] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [fetching, setFetching] = useState(true);
+
+  useEffect(() => {
+    async function fetch() {
+      const [{ data: communities }, { data: mappings }] = await Promise.all([
+        supabase
+          .from("communities")
+          .select("id, name, emoji")
+          .eq("status", "approved")
+          .eq("is_general", false)
+          .order("name"),
+        supabase
+          .from("program_community_map")
+          .select("community_id")
+          .eq("program_id", program.id),
+      ]);
+
+      const suggested = (mappings ?? []).map((m) => m.community_id);
+      setAllCommunities(communities ?? []);
+      setSuggestedIds(suggested);
+      setSelectedIds(suggested); // pre-select suggested
+      setFetching(false);
+    }
+    fetch();
+  }, [program.id]);
+
+  function toggle(id) {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  }
+
+  const suggested = allCommunities.filter((c) => suggestedIds.includes(c.id));
+  const others = allCommunities.filter((c) => !suggestedIds.includes(c.id));
+
+  return (
+    <div className="ob-section">
+      <div className="ob-section-header">
+        <div className="ob-section-icon ob-section-icon--green">
+          <Users size={20} />
+        </div>
+        <div>
+          <h2 className="ob-title">Your communities</h2>
           <p className="ob-subtitle">
-            Pick your course(s) — we'll add you to the right communities
+            Suggested for {program.name} — add more if you like
           </p>
         </div>
       </div>
 
-      <div className="ob-dept-pills">
-        {DEPARTMENTS.map((d) => (
-          <button
-            key={d}
-            className={`ob-dept-pill ${activeDept === d ? "ob-dept-pill--active" : ""}`}
-            onClick={() => setActiveDept(d)}
-          >
-            {d}
-          </button>
-        ))}
-      </div>
+      {fetching ? (
+        <p className="ob-loading">Loading communities…</p>
+      ) : (
+        <>
+          {suggested.length > 0 && (
+            <>
+              <div className="ob-community-section-label">
+                <Sparkles size={13} /> Suggested for your program
+              </div>
+              <div className="ob-courses-grid">
+                {suggested.map((c) => {
+                  const isSel = selectedIds.includes(c.id);
+                  return (
+                    <button
+                      key={c.id}
+                      className={`ob-course-card ob-course-card--community ${isSel ? "ob-course-card--selected" : ""}`}
+                      onClick={() => toggle(c.id)}
+                    >
+                      <div className="ob-community-emoji">
+                        {c.emoji ?? COMMUNITY_EMOJI[c.name] ?? "🌐"}
+                      </div>
+                      <div className="ob-course-name">{c.name}</div>
+                      <div className="ob-course-code ob-suggested-badge">
+                        Suggested
+                      </div>
+                      {isSel && (
+                        <div className="ob-course-check">
+                          <Check size={11} strokeWidth={3} />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
 
-      <div className="ob-courses-grid">
-        {visible.map((course) => {
-          const isSel = selected.includes(course.id);
-          return (
-            <button
-              key={course.id}
-              className={`ob-course-card ${isSel ? "ob-course-card--selected" : ""}`}
-              onClick={() => onToggle(course.id)}
-              aria-pressed={isSel}
-            >
-              <div className="ob-course-code">{course.code}</div>
-              <div className="ob-course-name">{course.name}</div>
-              {isSel && (
-                <div className="ob-course-check">
-                  <Check size={11} strokeWidth={3} />
-                </div>
-              )}
-            </button>
-          );
-        })}
-      </div>
+          {others.length > 0 && (
+            <>
+              <div
+                className="ob-community-section-label"
+                style={{ marginTop: 16 }}
+              >
+                <Users size={13} /> All communities
+              </div>
+              <div className="ob-courses-grid">
+                {others.map((c) => {
+                  const isSel = selectedIds.includes(c.id);
+                  return (
+                    <button
+                      key={c.id}
+                      className={`ob-course-card ob-course-card--community ${isSel ? "ob-course-card--selected" : ""}`}
+                      onClick={() => toggle(c.id)}
+                    >
+                      <div className="ob-community-emoji">
+                        {c.emoji ?? COMMUNITY_EMOJI[c.name] ?? "🌐"}
+                      </div>
+                      <div className="ob-course-name">{c.name}</div>
+                      {isSel && (
+                        <div className="ob-course-check">
+                          <Check size={11} strokeWidth={3} />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
 
-      {selected.length > 0 && (
-        <p className="ob-selected-summary">
-          <CheckCircle2 size={14} className="ob-selected-icon" />
-          <span className="ob-selected-count">{selected.length}</span>
-          {selected.length === 1 ? " course selected" : " courses selected"}
-        </p>
+          {selectedIds.length > 0 && (
+            <p className="ob-selected-summary">
+              <CheckCircle2 size={14} className="ob-selected-icon" />
+              <span className="ob-selected-count">{selectedIds.length}</span>
+              {selectedIds.length === 1
+                ? " community selected"
+                : " communities selected"}
+            </p>
+          )}
+        </>
       )}
 
       {error && (
@@ -412,8 +528,8 @@ function StepCourses({ selected, onToggle, onBack, onSubmit, loading, error }) {
         </button>
         <button
           className="ob-btn-primary"
-          onClick={onSubmit}
-          disabled={selected.length === 0 || loading}
+          onClick={() => onSubmit(selectedIds)}
+          disabled={selectedIds.length === 0 || loading || fetching}
         >
           {loading ? (
             "Setting up…"
@@ -424,16 +540,11 @@ function StepCourses({ selected, onToggle, onBack, onSubmit, loading, error }) {
           )}
         </button>
       </div>
-
-      <p className="ob-hint">
-        <Users size={11} />
-        You can update your communities anytime from your profile.
-      </p>
     </div>
   );
 }
 
-// ── Step 3: Welcome ───────────────────────────────────────────────────────────
+// ── Step 5: Welcome ───────────────────────────────────────────────────────────
 function StepWelcome({ displayName, courseCount, onContinue }) {
   return (
     <div className="ob-welcome">
@@ -446,22 +557,19 @@ function StepWelcome({ displayName, courseCount, onContinue }) {
         <div className="ob-welcome-ring ob-welcome-ring--1" />
         <div className="ob-welcome-ring ob-welcome-ring--2" />
       </div>
-
       <div className="ob-welcome-badge">
         <PartyPopper size={18} />
         Welcome to MindSpace
       </div>
-
       <h2 className="ob-welcome-title">You're all set, {displayName}!</h2>
       <p className="ob-welcome-body">
         You've been added to <strong>{courseCount}</strong>{" "}
-        {courseCount === 1 ? "community" : "communities"} based on your course
-        selection. Start exploring, sharing, and connecting with your peers.
+        {courseCount === 1 ? "community" : "communities"}. Start exploring,
+        sharing, and connecting with your peers.
       </p>
-
       <div className="ob-welcome-stats">
         <div className="ob-welcome-stat">
-          <GraduationCap size={18} className="ob-welcome-stat-icon" />
+          <Users size={18} className="ob-welcome-stat-icon" />
           <span className="ob-welcome-stat-value">{courseCount}</span>
           <span className="ob-welcome-stat-label">
             {courseCount === 1 ? "Community" : "Communities"}
@@ -469,7 +577,7 @@ function StepWelcome({ displayName, courseCount, onContinue }) {
         </div>
         <div className="ob-welcome-stat-divider" />
         <div className="ob-welcome-stat">
-          <Users size={18} className="ob-welcome-stat-icon" />
+          <GraduationCap size={18} className="ob-welcome-stat-icon" />
           <span className="ob-welcome-stat-value">NEU</span>
           <span className="ob-welcome-stat-label">Institution</span>
         </div>
@@ -480,7 +588,6 @@ function StepWelcome({ displayName, courseCount, onContinue }) {
           <span className="ob-welcome-stat-label">Verified</span>
         </div>
       </div>
-
       <button
         className="ob-btn-primary ob-btn-primary--wide"
         onClick={onContinue}
@@ -491,56 +598,56 @@ function StepWelcome({ displayName, courseCount, onContinue }) {
   );
 }
 
-// ── Main OnboardingPage ───────────────────────────────────────────────────────
+// ── Main ──────────────────────────────────────────────────────────────────────
 export default function OnboardingPage() {
   const navigate = useNavigate();
   const { currentUser, setCurrentUser } = useContext(AppContext);
+
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [selectedCourses, setSelectedCourses] = useState([]);
+  const [selectedCollege, setCollege] = useState(null);
+  const [selectedProgram, setProgram] = useState(null);
+  const [joinedCount, setJoinedCount] = useState(0);
 
   const displayName = currentUser?.display_name?.split(" ")[0] ?? "there";
 
-  function handleDisagree() {
-    navigate("/login", { replace: true });
-  }
-
-  function handleAgree() {
-    setStep(2);
-  }
-
-  function handleToggle(id) {
-    setSelectedCourses((prev) =>
-      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
-    );
-  }
-
-  async function handleSubmit() {
+  async function handleSubmit(selectedCommunityIds) {
     if (!currentUser) return;
     setError("");
     setLoading(true);
 
     try {
-      // Mark privacy as acknowledged
       const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ privacy_acknowledged: true })
-        .eq('id', currentUser.id);
-
+        .from("profiles")
+        .update({ privacy_acknowledged: true, program_id: selectedProgram.id })
+        .eq("id", currentUser.id);
       if (profileError) throw profileError;
 
-      // Join selected course communities
-      if (selectedCourses.length > 0) {
-        const memberships = selectedCourses.map(courseId => ({
+      if (selectedCommunityIds.length > 0) {
+        const memberships = selectedCommunityIds.map((id) => ({
           user_id: currentUser.id,
-          community_id: courseId,
+          community_id: id,
         }));
-        await supabase.from('community_members').upsert(memberships);
+        const { error: joinError } = await supabase
+          .from("community_members")
+          .upsert(memberships, {
+            onConflict: "community_id,user_id",
+            ignoreDuplicates: true,
+          });
+        if (joinError) throw joinError;
+        setJoinedCount(selectedCommunityIds.length);
       }
 
-      setCurrentUser(prev => ({ ...prev, privacy_acknowledged: true }));
-      setStep(3);
+      setCurrentUser((prev) => ({
+        ...prev,
+        privacy_acknowledged: true,
+        program: {
+          name: selectedProgram.name,
+          college: { name: selectedCollege.name },
+        },
+      }));
+      setStep(5);
     } catch (err) {
       setError("Something went wrong. Please try again.");
       console.error(err);
@@ -551,7 +658,6 @@ export default function OnboardingPage() {
 
   return (
     <div className="ob-page">
-      {/* ── Brand bar ── */}
       <div className="ob-brand">
         <img
           src="/NEULogo1.png"
@@ -565,31 +671,51 @@ export default function OnboardingPage() {
       </div>
 
       <div className="ob-card">
-        {step < 3 && <StepBar current={step} />}
+        {step < 5 && <StepBar current={step} />}
 
         {step === 1 && (
           <StepTerms
-            onAgree={handleAgree}
-            onDisagree={handleDisagree}
+            onAgree={() => setStep(2)}
+            onDisagree={() => navigate("/login", { replace: true })}
             loading={loading}
           />
         )}
 
         {step === 2 && (
-          <StepCourses
-            selected={selectedCourses}
-            onToggle={handleToggle}
+          <StepCollege
             onBack={() => setStep(1)}
+            onSelect={(college) => {
+              setCollege(college);
+              setStep(3);
+            }}
+          />
+        )}
+
+        {step === 3 && selectedCollege && (
+          <StepProgram
+            college={selectedCollege}
+            onBack={() => setStep(2)}
+            onSelect={(program) => {
+              setProgram(program);
+              setStep(4);
+            }}
+          />
+        )}
+
+        {step === 4 && selectedProgram && (
+          <StepCommunities
+            program={selectedProgram}
+            onBack={() => setStep(3)}
             onSubmit={handleSubmit}
             loading={loading}
             error={error}
           />
         )}
 
-        {step === 3 && (
+        {step === 5 && (
           <StepWelcome
             displayName={displayName}
-            courseCount={selectedCourses.length}
+            courseCount={joinedCount}
             onContinue={() => navigate("/home", { replace: true })}
           />
         )}

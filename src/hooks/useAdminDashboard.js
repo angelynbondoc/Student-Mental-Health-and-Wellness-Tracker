@@ -13,44 +13,30 @@ export function useAdminDashboard() {
   const [note, setNote] = useState("");
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState("");
+  const [pendingCommunities, setPendingCommunities] = useState([]);
 
   const showToast = (msg, type = "success") => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 3000);
   };
 
-  // Fetch reports with post and reporter info
   useEffect(() => {
     async function fetchReports() {
       const { data, error } = await supabase
         .from('reports')
         .select(`
-          id,
-          reason,
-          created_at,
-          post_id,
-          reporter_id,
+          id, reason, created_at, post_id, reporter_id,
           posts_view (
-            id,
-            content,
-            author_id,
-            is_flagged,
-            created_at
+            id, content, author_id, is_flagged, created_at
           ),
           reporter:profiles!reports_reporter_id_fkey (
-            id,
-            display_name,
-            email
+            id, display_name, email
           )
         `)
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('fetch reports error:', error)
-        return
-      }
+      if (error) { console.error('fetch reports error:', error); return; }
 
-      // Normalize to shape the UI expects
       const normalized = data.map(r => ({
         id: r.id,
         reason: r.reason,
@@ -75,27 +61,76 @@ export function useAdminDashboard() {
           name: r.reporter?.display_name ?? r.reporter?.email ?? 'Unknown',
           avatar: (r.reporter?.display_name?.[0] ?? 'U').toUpperCase(),
           program: '',
-        }
-      }))
+        },
+      }));
 
-      setReports(normalized)
+      setReports(normalized);
+    }
+    fetchReports();
+  }, []);
+
+  useEffect(() => {
+    async function fetchPendingCommunities() {
+      const { data, error } = await supabase
+        .from('communities')
+        .select(`
+          id, name, category, emoji, status, created_at,
+          creator:profiles!communities_created_by_fkey (
+            id, display_name, moderation_strikes
+          )
+        `)
+        .eq('status', 'pending')
+        .order('created_at', { ascending: true });
+
+      if (error) { console.error('fetch pending communities error:', error); return; }
+      setPendingCommunities(data ?? []);
+    }
+    fetchPendingCommunities();
+  }, []);
+
+  const approveCommunity = async (id) => {
+    const { error } = await supabase
+      .from('communities')
+      .update({ status: 'approved', reviewed_at: new Date().toISOString() })
+      .eq('id', id);
+    if (error) { console.error(error); return; }
+    setPendingCommunities(prev => prev.filter(c => c.id !== id));
+    showToast('Community approved!');
+  };
+
+  // PR D — Community rejection notification
+  const rejectCommunity = async (id, reason) => {
+    const { error } = await supabase
+      .from('communities')
+      .update({ status: 'rejected', rejection_reason: reason, reviewed_at: new Date().toISOString() })
+      .eq('id', id);
+    if (error) { console.error(error); return; }
+
+    const community = pendingCommunities.find(c => c.id === id);
+    setPendingCommunities(prev => prev.filter(c => c.id !== id));
+
+    if (community?.creator?.id) {
+      await supabase.from('notifications').insert({
+        user_id: community.creator.id,
+        type: 'moderation',
+        title: 'Community Proposal Rejected',
+        content: reason?.trim()
+          ? `Your community "${community.name}" was rejected. Reason: ${reason.trim()}`
+          : `Your community "${community.name}" was rejected by an administrator.`,
+      });
     }
 
-    fetchReports()
-  }, [])
+    showToast('Community rejected.', 'danger');
+  };
 
-  // Fetch all users (profiles)
   useEffect(() => {
     async function fetchUsers() {
       const { data, error } = await supabase
         .from('profiles')
         .select('id, display_name, email, role, created_at')
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('fetch users error:', error)
-        return
-      }
+      if (error) { console.error('fetch users error:', error); return; }
 
       const normalized = data.map(u => ({
         id: u.id,
@@ -107,83 +142,24 @@ export function useAdminDashboard() {
         joinedAt: u.created_at,
         status: u.role === 'suspended' ? 'suspended' : 'active',
         role: u.role,
-      }))
+      }));
 
-      setUsers(normalized)
+      setUsers(normalized);
     }
-
-    fetchUsers()
-  }, [])
-
-  // Resolve a post report — dismiss or remove post
-  const resolvePost = async (id, res) => {
-    const report = reports.find(r => r.id === id)
-
-    if (res === 'removed' && report?.post?.id) {
-      // Delete the post from DB
-      await supabase
-        .from('posts')
-        .delete()
-        .eq('id', report.post.id)
-    } else {
-      // Just unflag the post
-      await supabase
-        .from('posts')
-        .update({ is_flagged: false })
-        .eq('id', report?.post?.id)
-    }
-
-    setReports(prev =>
-      prev.map(r => r.id === id
-        ? { ...r, status: 'resolved', resolution: res, adminNote: note }
-        : r
-      )
-    )
-    setPostModal(null)
-    setSelReport(null)
-    setNote("")
-    showToast(
-      res === 'removed' ? 'Post removed.' : 'Report dismissed.',
-      res === 'removed' ? 'danger' : 'success'
-    )
-  }
-
-  // Toggle user suspend/reactivate
-  const toggleUser = async (uid, status) => {
-    const newRole = status === 'suspended' ? 'suspended' : 'student'
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({ role: newRole })
-      .eq('id', uid)
-
-    if (error) {
-      console.error('toggle user error:', error)
-      return
-    }
-
-    setUsers(prev =>
-      prev.map(u => u.id === uid ? { ...u, status } : u)
-    )
-    showToast(
-      status === 'suspended' ? 'User suspended.' : 'User reactivated.',
-      status === 'suspended' ? 'danger' : 'success'
-    )
-  }
+    fetchUsers();
+  }, []);
 
   const [userReports, setUserReports] = useState([]);
+  const [selUserReport, setSelUserReport] = useState(null);
+  const [userModal, setUserModal] = useState(null);
 
   useEffect(() => {
     async function fetchUserReports() {
       const { data, error } = await supabase
         .from('reports')
         .select(`
-          id,
-          reason,
-          details,
-          created_at,
-          reporter_id,
-          target_user_id,
+          id, reason, details, created_at, reporter_id, target_user_id,
+          status, resolution,
           reporter:profiles!reports_reporter_id_fkey (
             id, display_name
           ),
@@ -200,7 +176,8 @@ export function useAdminDashboard() {
         id: r.id,
         reason: r.reason,
         details: r.details,
-        status: 'pending',
+        status: r.status ?? 'pending',
+        resolution: r.resolution ?? null,
         reportedAt: r.created_at,
         reporter: {
           name: r.reporter?.display_name ?? 'Unknown',
@@ -215,15 +192,157 @@ export function useAdminDashboard() {
 
       setUserReports(normalized);
     }
-
     fetchUserReports();
   }, []);
 
-  const closeSidebar = () => setSidebarOpen(false)
+  const resolvePost = async (id, res) => {
+    const report = reports.find(r => r.id === id);
 
-  const pendingPosts = reports.filter(r => r.status === 'pending').length
-  const resolved = reports.filter(r => r.status === 'resolved').length
-  const suspended = users.filter(u => u.status === 'suspended').length
+    if (res === 'removed' && report?.post?.id) {
+      await supabase.from('posts').delete().eq('id', report.post.id);
+    } else {
+      await supabase.from('posts').update({ is_flagged: false }).eq('id', report?.post?.id);
+    }
+
+    setReports(prev =>
+      prev.map(r => r.id === id
+        ? { ...r, status: 'resolved', resolution: res, adminNote: note }
+        : r
+      )
+    );
+    setPostModal(null);
+    setSelReport(null);
+    setNote("");
+    showToast(
+      res === 'removed' ? 'Post removed.' : 'Report dismissed.',
+      res === 'removed' ? 'danger' : 'success'
+    );
+  };
+
+  const toggleUser = async (uid, status) => {
+    const newRole = status === 'suspended' ? 'suspended' : 'student';
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ role: newRole })
+      .eq('id', uid);
+
+    if (error) { console.error('toggle user error:', error); return; }
+
+    setUsers(prev =>
+      prev.map(u => u.id === uid ? { ...u, status } : u)
+    );
+    showToast(
+      status === 'suspended' ? 'User suspended.' : 'User reactivated.',
+      status === 'suspended' ? 'danger' : 'success'
+    );
+  };
+
+  // PR C — Suspend user notification
+  const resolveUserReport = async (id, resolution) => {
+    if (resolution === "suspended") {
+      const report = userReports.find(r => r.id === id);
+      const uid = report?.reportedUser?.id;
+
+      if (uid) {
+        const { error } = await supabase
+          .from("profiles")
+          .update({ role: "suspended" })
+          .eq("id", uid);
+        if (error) console.error("suspend profile error:", error);
+        else {
+          setUsers(prev =>
+            prev.map(u => u.id === uid ? { ...u, status: "suspended", role: "suspended" } : u)
+          );
+
+          await supabase.from("notifications").insert({
+            user_id: uid,
+            type: "moderation",
+            title: "Account Suspended",
+            content: note?.trim()
+              ? `Your account has been suspended. Reason: ${note.trim()}`
+              : "Your account has been suspended by an administrator.",
+          });
+        }
+      }
+    }
+
+    const { error } = await supabase
+      .from("reports")
+      .update({ status: "resolved", resolution })
+      .eq("id", id);
+
+    if (error) console.error("resolve report error:", error);
+
+    setUserReports(prev =>
+      prev.map(r => r.id === id
+        ? { ...r, status: "resolved", resolution, adminNote: note }
+        : r
+      )
+    );
+    setUserModal(null);
+    setSelUserReport(null);
+    setNote("");
+    showToast(
+      resolution === "suspended" ? "User suspended." : "Report dismissed.",
+      resolution === "suspended" ? "danger" : "success"
+    );
+  };
+
+  const broadcastNotification = async ({ title, message, targetType, selectedUserIds }) => {
+    if (!message.trim()) {
+      showToast('Message cannot be empty.', 'danger');
+      return false;
+    }
+
+    let recipientIds = [];
+
+    if (targetType === 'all') {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .neq('role', 'suspended');
+
+      if (error) {
+        console.error('broadcast fetch users error:', error);
+        showToast('Failed to fetch users.', 'danger');
+        return false;
+      }
+      recipientIds = data.map(u => u.id);
+    } else {
+      recipientIds = selectedUserIds ?? [];
+    }
+
+    if (recipientIds.length === 0) {
+      showToast('No recipients selected.', 'danger');
+      return false;
+    }
+
+    const rows = recipientIds.map(uid => ({
+      user_id: uid,
+      type: 'announcement',
+      title: title.trim() || 'Admin Announcement',
+      message: message.trim(),
+      is_read: false,
+    }));
+
+    const { error } = await supabase.from('notifications').insert(rows);
+
+    if (error) {
+      console.error('broadcast insert error:', error);
+      showToast('Broadcast failed. Check console.', 'danger');
+      return false;
+    }
+
+    showToast(`Announcement sent to ${recipientIds.length} user(s)!`);
+    return true;
+  };
+
+  const closeSidebar = () => setSidebarOpen(false);
+
+  const pendingPosts = reports.filter(r => r.status === 'pending').length;
+  const resolved     = reports.filter(r => r.status === 'resolved').length;
+  const suspended    = users.filter(u => u.status === 'suspended').length;
   const pendingUsers = userReports.filter(r => r.status === 'pending').length;
 
   return {
@@ -232,7 +351,7 @@ export function useAdminDashboard() {
     filter, setFilter,
     urFilter, setUrFilter,
     reports,
-    userReports, // user reports coming from reports table filtered by type
+    userReports,
     users,
     selReport, setSelReport,
     selUserReport: null, setSelUserReport: () => {},
@@ -246,7 +365,12 @@ export function useAdminDashboard() {
     resolved,
     suspended,
     resolvePost,
-    resolveUserReport: () => {},
+    resolveUserReport,
     toggleUser,
-  }
+    pendingCommunities,
+    approveCommunity,
+    rejectCommunity,
+    pendingCommunityCount: pendingCommunities.length,
+    broadcastNotification,
+  };
 }

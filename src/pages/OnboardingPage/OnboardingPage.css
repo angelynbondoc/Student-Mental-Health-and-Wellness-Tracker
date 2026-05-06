@@ -853,6 +853,75 @@
   background: #e8e8e8;
 }
 
+.ob-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.ob-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.ob-select {
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  background: var(--surface);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.ob-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ob-loading {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 24px 0;
+  font-size: 14px;
+}
+
+.ob-community-section-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.ob-community-emoji {
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.ob-suggested-badge {
+  background: var(--primary-light, #e8f5e9);
+  color: var(--primary, #2e7d32);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.ob-course-card--community {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+
 /* ── responsive ── */
 @media (max-width: 480px) {
   .ob-card {

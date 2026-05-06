@@ -132,6 +132,12 @@
   letter-spacing: 0.06em;
 }
 
+.up-college {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
 /* ── Edit Button ──────────────────────────────────────────────────────────── */
 .pp-edit-btn {
   margin-top: 12px;

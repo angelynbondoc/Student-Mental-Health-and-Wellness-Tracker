@@ -8,7 +8,7 @@ import PostHeader from "../PostHeader/PostHeader";
 import PostMenu from "../PostMenu/PostMenu";
 import ActionBar from "../ActionBar";
 import ShareConfirm from "../ShareConfirm";
-import CommentSection from "../CommentSection";
+import CommentSection from "../CommentSection/CommentSection";
 import ReportModal from "../../ui/ReportModal/ReportModal";
 import "./PostCard.css";
 

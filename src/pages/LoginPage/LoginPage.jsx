@@ -45,9 +45,13 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
+      
+      await supabase.auth.signOut()
+
       const { error: authError } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
+          prompt: 'select_account consent',
           hd: "neu.edu.ph", // restrict to NEU accounts
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: { prompt: "select_account" },
