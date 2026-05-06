@@ -5,7 +5,6 @@ import { supabase } from "../../supabase";
 export default function usePostCard(post) {
   const { currentUser, setPosts } = useContext(AppContext);
 
-
   const [showConfirm, setShowConfirm] = useState(false);
   const [showComments, setShowComments] = useState(false);
 
@@ -46,6 +45,16 @@ export default function usePostCard(post) {
         .select("id")
         .single();
       if (data) setMyReactionId(data.id);
+
+      // Notify post author on like only (not unlike)
+      if (post.author_id && post.author_id !== currentUser.id) {
+        await supabase.from("notifications").insert({
+          user_id: post.author_id,
+          type: "reaction",
+          content: `${currentUser.display_name ?? "Someone"} liked your post.`,
+          post_id: post.id,
+        });
+      }
     }
     reactingRef.current = false;
   };
@@ -69,16 +78,28 @@ export default function usePostCard(post) {
     const { error } = await supabase
       .from("comments")
       .insert({ post_id: post.id, author_id: currentUser.id, content, is_anonymous: isAnonymous });
-    if (!error) setCommentCount((n) => n + 1);
+    if (!error) {
+      setCommentCount((n) => n + 1);
+      // Notify post author on comment
+      if (post.author_id && post.author_id !== currentUser.id) {
+        await supabase.from("notifications").insert({
+          user_id: post.author_id,
+          type: "comment",
+          content: isAnonymous
+            ? "Someone commented on your post."
+            : `${currentUser.display_name ?? "Someone"} commented on your post.`,
+          post_id: post.id,
+        });
+      }
+    }
   };
 
   // ── Share ──────────────────────────────────────────────────────────────────
   const handleShare = async () => {
     if (!currentUser) return;
-    
-    // Strip the prefix so re-shares don't chain
-    const originalContent = post.content.startsWith('[Shared Post]: ')
-      ? post.content.slice('[Shared Post]: '.length)
+
+    const originalContent = post.content.startsWith("[Shared Post]: ")
+      ? post.content.slice("[Shared Post]: ".length)
       : post.content;
 
     const { error } = await supabase.from("posts").insert({
@@ -88,33 +109,33 @@ export default function usePostCard(post) {
       is_anonymous: false,
       is_flagged: false,
     });
-    console.log('share debug:', { post_author: post.author_id, current: currentUser.id, different: post.author_id !== currentUser.id });
-  if (!error) {
-    setShowConfirm(false);
 
-    // Notify original post author
-    if (post.author_id && post.author_id !== currentUser.id) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('display_name')
-        .eq('id', currentUser.id)
-        .single();
+    if (!error) {
+      setShowConfirm(false);
 
-    const { error: notifError } = await supabase.from('notifications').insert({
-      user_id: post.author_id,
-      type: 'share',
-      content: `${profile?.display_name ?? 'Someone'} shared your post.`,
-      post_id: post.id,
-    });
-    if (notifError) console.error('notif insert failed:', notifError);
+      // Notify original post author
+      if (post.author_id && post.author_id !== currentUser.id) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("display_name")
+          .eq("id", currentUser.id)
+          .single();
+
+        const { error: notifError } = await supabase.from("notifications").insert({
+          user_id: post.author_id,
+          type: "share",
+          content: `${profile?.display_name ?? "Someone"} shared your post.`,
+          post_id: post.id,
+        });
+        if (notifError) console.error("notif insert failed:", notifError);
+      }
+
+      const { data } = await supabase
+        .from("posts")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (data) setPosts(data);
     }
-
-    const { data } = await supabase
-      .from("posts")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (data) setPosts(data);
-  }
   };
 
   return {
