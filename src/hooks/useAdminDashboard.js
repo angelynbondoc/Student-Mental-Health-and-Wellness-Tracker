@@ -155,14 +155,15 @@ export function useAdminDashboard() {
       const { data, error } = await supabase
         .from('reports')
         .select(`
-          id, reason, details, created_at, reporter_id, target_user_id,
-          reporter:profiles!reports_reporter_id_fkey (
-            id, display_name
-          ),
-          target:profiles!reports_target_user_id_fkey (
-            id, display_name
-          )
-        `)
+  id, reason, details, created_at, reporter_id, target_user_id,
+  status, resolution,
+  reporter:profiles!reports_reporter_id_fkey (
+    id, display_name
+  ),
+  target:profiles!reports_target_user_id_fkey (
+    id, display_name
+  )
+`)
         .eq('type', 'profile')
         .order('created_at', { ascending: false });
 
@@ -170,10 +171,11 @@ export function useAdminDashboard() {
 
       const normalized = data.map(r => ({
         id: r.id,
-        reason: r.reason,
-        details: r.details,
-        status: 'pending',
-        reportedAt: r.created_at,
+  reason: r.reason,
+  details: r.details,
+  status: r.status ?? 'pending',       // ← reads from DB now
+  resolution: r.resolution ?? null,    // ← reads from DB now
+  reportedAt: r.created_at,
         reporter: {
           name: r.reporter?.display_name ?? 'Unknown',
           avatar: (r.reporter?.display_name?.[0] ?? 'U').toUpperCase(),
