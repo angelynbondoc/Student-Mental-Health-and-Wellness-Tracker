@@ -162,6 +162,8 @@ function ProfilePostCard({ post, community, onDelete, isShared }) {
 // ── Community Row ─────────────────────────────────────────────────────────────
 function CommunityRow({ community, onLeave }) {
   const [confirming, setConfirming] = useState(false);
+  const isGeneral = community.name?.toLowerCase() === "general";
+
   return (
     <>
       <div className="pp-community-row">
@@ -174,13 +176,17 @@ function CommunityRow({ community, onLeave }) {
             {community.description ?? "Community"}
           </span>
         </div>
-        <button
-          className="pp-icon-btn pp-icon-btn--danger"
-          onClick={() => setConfirming(true)}
-        >
-          <LogOut size={14} /> Leave
-        </button>
+
+        {!isGeneral && (
+          <button
+            className="pp-icon-btn pp-icon-btn--danger"
+            onClick={() => setConfirming(true)}
+          >
+            <LogOut size={14} /> Leave
+          </button>
+        )}
       </div>
+
       {confirming && (
         <ConfirmModal
           title={`Leave "${community.name}"?`}
