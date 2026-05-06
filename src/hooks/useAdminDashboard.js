@@ -239,6 +239,28 @@ export function useAdminDashboard() {
     );
   };
 
+  const resolveUserReport = async (id, resolution) => {
+  if (resolution !== "dismissed") return; // PR 3 handles suspend
+
+  const { error } = await supabase
+    .from("reports")
+    .update({ status: "resolved", resolution })
+    .eq("id", id);
+
+  if (error) { console.error(error); return; }
+
+  setUserReports(prev =>
+    prev.map(r => r.id === id
+      ? { ...r, status: "resolved", resolution, adminNote: note }
+      : r
+    )
+  );
+  setUserModal(null);
+  setSelUserReport(null);
+  setNote("");
+  showToast("Report dismissed.");
+};
+
   // ---------------------------------------------------------------------------
   // NEW: Broadcast announcement to all or selected users
   // ---------------------------------------------------------------------------
@@ -331,7 +353,7 @@ export function useAdminDashboard() {
     resolved,
     suspended,
     resolvePost,
-    resolveUserReport: () => {},
+    resolveUserReport,
     toggleUser,
     pendingCommunities,
     approveCommunity,
