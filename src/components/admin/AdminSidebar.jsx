@@ -1,4 +1,4 @@
-import { Flag, ShieldAlert, Users, LayoutGrid, Megaphone, LogOut, FileText } from "lucide-react";
+import { Flag, ShieldAlert, Users, LayoutGrid, Megaphone, LogOut, FileText, BookMarked } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabase";
@@ -9,13 +9,14 @@ const NAV_ITEMS = [
   { key: "users",        label: "User Management",  Icon: Users },
   { key: "communities",  label: "Community Review", Icon: LayoutGrid },
   { key: "appeals",      label: "Appeals",          Icon: FileText },
+  { key: "resources",    label: "Resource Review",  Icon: BookMarked },
   { key: "broadcast",    label: "Broadcast",        Icon: Megaphone },
 ];
 
 export default function AdminSidebar({
   tab, setTab, sidebarOpen, closeSidebar,
   pendingPosts, pendingUsers, resolved, suspended,
-  pendingCommunityCount, appealCount,
+  pendingCommunityCount, pendingResourceCount, appealCount,
 }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -31,6 +32,7 @@ export default function AdminSidebar({
     userreports:  pendingUsers,
     users:        0,
     communities:  pendingCommunityCount,
+    resources:    pendingResourceCount,
     appeals:      appealCount,
     broadcast:    0,
   };
@@ -69,6 +71,7 @@ export default function AdminSidebar({
           ["Post Reports",        pendingPosts,          "var(--warn)"],
           ["User Reports",        pendingUsers,          "var(--warn)"],
           ["Pending Communities", pendingCommunityCount, "var(--primary)"],
+          ["Pending Resources",   pendingResourceCount,  "var(--primary)"],
           ["Resolved",            resolved,              "var(--primary)"],
           ["Suspended",           suspended,             "var(--danger)"],
         ].map(([label, value, color]) => (

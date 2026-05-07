@@ -9,6 +9,7 @@ import UserManagementTab from "../../components/admin/UserManagementTab"
 import PostReportModal from "../../components/admin/PostReportModal";
 import UserReportModal from "../../components/admin/UserReportModal";
 import CommunityReviewTab from "../../components/admin/CommunityReviewTab/CommunityReviewTab";
+import ResourceReviewTab from "../../components/admin/ResourceReviewTab"; 
 import BroadcastTab from "../../components/admin/BroadcastTab/BroadcastTab";
 import AppealsTab from "../../components/admin/AppealsTab";
 
@@ -31,6 +32,10 @@ export default function AdminDashboard() {
     pendingCommunities,
     approveCommunity, rejectCommunity,
     pendingCommunityCount,
+    pendingResources,      
+    approveResource,      
+    rejectResource,        
+    pendingResourceCount,  
     broadcastNotification,
     appeals, resolveAppeal, rejectAppeal, appealCount,
   } = useAdminDashboard();
@@ -56,15 +61,17 @@ export default function AdminDashboard() {
           resolved={resolved}
           suspended={suspended}
           pendingCommunityCount={pendingCommunityCount}
+          pendingResourceCount={pendingResourceCount}
           appealCount={appealCount}
         />
 
         <main className="admin-main">
 
-          <div className="admin-stats-grid">
+          <div className="admin-stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
             <StatCard label="Pending Post Reports" value={pendingPosts}          sub="Awaiting review"      accent="var(--warn)" />
             <StatCard label="Pending User Reports" value={pendingUsers}          sub="Awaiting review"      accent="#E65100" />
             <StatCard label="Pending Communities"  value={pendingCommunityCount} sub="Awaiting approval"    accent="var(--primary)" />
+            <StatCard label="Pending Resources"    value={pendingResourceCount}  sub="Awaiting approval"    accent="var(--primary)" />
             <StatCard label="Resolved Reports"     value={resolved}              sub="All time"             accent="var(--primary)" />
             <StatCard label="Suspended Users"      value={suspended}             sub="Currently restricted" accent="var(--danger)" />
           </div>
@@ -94,6 +101,13 @@ export default function AdminDashboard() {
               communities={pendingCommunities}
               onApprove={approveCommunity}
               onReject={rejectCommunity}
+            />
+          )}
+          {tab === "resources" && (
+            <ResourceReviewTab
+              resources={pendingResources}
+              onApprove={approveResource}
+              onReject={rejectResource}
             />
           )}
 

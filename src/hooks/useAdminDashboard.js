@@ -14,6 +14,7 @@ export function useAdminDashboard() {
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState("");
   const [pendingCommunities, setPendingCommunities] = useState([]);
+  const [pendingResources, setPendingResources] = useState([]);
 
   const showToast = (msg, type = "success") => {
     setToast({ msg, type });
@@ -87,6 +88,45 @@ export function useAdminDashboard() {
     }
     fetchPendingCommunities();
   }, []);
+    
+  useEffect(() => {
+      async function fetchPendingResources() {
+        const { data, error } = await supabase
+          .from('resources')
+          .select(`
+            id, title, year, key_idea, findings, citation, url, created_at,
+            submitter:profiles!resources_submitted_by_fkey (
+              id, display_name
+            )
+          `)
+          .eq('status', 'pending')
+          .order('created_at', { ascending: true });
+
+        if (error) { console.error('fetch pending resources error:', error); return; }
+        setPendingResources(data ?? []);
+      }
+      fetchPendingResources();
+    }, []);
+
+    const approveResource = async (id) => {
+      const { error } = await supabase
+        .from('resources')
+        .update({ status: 'approved' })
+        .eq('id', id);
+      if (error) { console.error(error); return; }
+      setPendingResources(prev => prev.filter(r => r.id !== id));
+      showToast('Resource approved!');
+    };
+
+  const rejectResource = async (id) => {
+    const { error } = await supabase
+      .from('resources')
+      .update({ status: 'rejected' })
+      .eq('id', id);
+    if (error) { console.error(error); return; }
+    setPendingResources(prev => prev.filter(r => r.id !== id));
+    showToast('Resource rejected.', 'danger');
+  };
 
   const approveCommunity = async (id) => {
     const { error } = await supabase
@@ -378,6 +418,10 @@ export function useAdminDashboard() {
     pendingCommunities,
     approveCommunity, rejectCommunity,
     pendingCommunityCount: pendingCommunities.length,
+    pendingResources,
+    approveResource, 
+    rejectResource,  
+    pendingResourceCount: pendingResources.length,
     broadcastNotification,
     appeals, resolveAppeal, rejectAppeal, appealCount,
   };
