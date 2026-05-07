@@ -1,4 +1,4 @@
-import { Flag, ShieldAlert, Users, LayoutGrid, Megaphone, LogOut } from "lucide-react";
+import { Flag, ShieldAlert, Users, LayoutGrid, Megaphone, LogOut, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabase";
@@ -8,19 +8,14 @@ const NAV_ITEMS = [
   { key: "userreports",  label: "Reported Users",   Icon: ShieldAlert },
   { key: "users",        label: "User Management",  Icon: Users },
   { key: "communities",  label: "Community Review", Icon: LayoutGrid },
-  { key: "broadcast",    label: "Broadcast",        Icon: Megaphone }, 
+  { key: "appeals",      label: "Appeals",          Icon: FileText },
+  { key: "broadcast",    label: "Broadcast",        Icon: Megaphone },
 ];
 
 export default function AdminSidebar({
-  tab,
-  setTab,
-  sidebarOpen,
-  closeSidebar,
-  pendingPosts,
-  pendingUsers,
-  resolved,
-  suspended,
-  pendingCommunityCount,
+  tab, setTab, sidebarOpen, closeSidebar,
+  pendingPosts, pendingUsers, resolved, suspended,
+  pendingCommunityCount, appealCount,
 }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -36,7 +31,8 @@ export default function AdminSidebar({
     userreports:  pendingUsers,
     users:        0,
     communities:  pendingCommunityCount,
-    broadcast:    0, 
+    appeals:      appealCount,
+    broadcast:    0,
   };
 
   async function handleSignOut() {
@@ -46,25 +42,17 @@ export default function AdminSidebar({
 
   return (
     <>
-      {/* Mobile overlay */}
       <div
         className={`admin-sidebar-overlay ${sidebarOpen ? "open" : ""}`}
         onClick={closeSidebar}
       />
-
       <aside className={`admin-sidebar ${sidebarOpen ? "open" : ""}`}>
-
-        {/* ── Navigation ───────────────────────────────────────────────────── */}
         <div className="admin-sidebar__label">Navigation</div>
-
         {NAV_ITEMS.map((item) => (
           <button
             key={item.key}
             className={`admin-sidebar__nav-btn ${tab === item.key ? "active" : ""}`}
-            onClick={() => {
-              setTab(item.key);
-              closeSidebar();
-            }}
+            onClick={() => { setTab(item.key); closeSidebar(); }}
           >
             <item.Icon size={16} />
             {item.label}
@@ -90,7 +78,6 @@ export default function AdminSidebar({
           </div>
         ))}
 
-        {/* ── Footer: email + Sign Out ─────────────────────────────────────── */}
         <div className="admin-sidebar__footer">
           <hr className="admin-sidebar__divider" />
           <div className="admin-sidebar__user-email" title={email}>
@@ -101,7 +88,6 @@ export default function AdminSidebar({
             Sign Out
           </button>
         </div>
-
       </aside>
     </>
   );
