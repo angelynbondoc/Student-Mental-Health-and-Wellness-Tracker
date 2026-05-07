@@ -37,6 +37,7 @@ export default function AdminDashboard() {
     rejectResource,        
     pendingResourceCount,  
     broadcastNotification,
+    createAdminPost,
     appeals, resolveAppeal, rejectAppeal, appealCount,
   } = useAdminDashboard();
 
@@ -132,6 +133,7 @@ export default function AdminDashboard() {
             <BroadcastTab
               users={users}
               broadcastNotification={broadcastNotification}
+              createAdminPost={createAdminPost}
             />
           )}
 
