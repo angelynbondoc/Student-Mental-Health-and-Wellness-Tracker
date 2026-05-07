@@ -1,0 +1,395 @@
+/* =============================================================================
+   PhotoEditorModal.css — NEU MindSpace
+   Photo picker modal: preset avatars + upload with drag-to-reposition + zoom
+============================================================================= */
+
+/* ── Overlay ──────────────────────────────────────────────────────────────── */
+.pem-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: pem-fade 0.18s ease;
+}
+
+@keyframes pem-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Modal box ────────────────────────────────────────────────────────────── */
+.pem-modal {
+  background: var(--color-white);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.24);
+  animation: pem-slide 0.2s ease;
+  overflow: hidden;
+}
+
+@keyframes pem-slide {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+.pem-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 0;
+}
+
+.pem-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.pem-close {
+  background: var(--color-surface);
+  border: none;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  transition: background 0.15s;
+}
+.pem-close:hover { background: var(--color-border); }
+
+/* ── Tabs ─────────────────────────────────────────────────────────────────── */
+.pem-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 16px 24px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pem-tab {
+  padding: 10px 18px;
+  border: none;
+  background: none;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  border-radius: 0;
+}
+
+.pem-tab:hover { color: var(--color-text); }
+
+.pem-tab--active {
+  color: var(--color-primary);
+  font-weight: 700;
+  border-bottom-color: var(--color-primary);
+}
+
+/* ── Body ─────────────────────────────────────────────────────────────────── */
+.pem-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+/* ── Presets layout ───────────────────────────────────────────────────────── */
+.pem-presets-layout {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.pem-presets-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.pem-preset-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+  background: var(--color-surface);
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+
+.pem-preset-item:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 14px rgba(46, 125, 50, 0.2);
+}
+
+.pem-preset-item--active {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+}
+
+.pem-preset-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pem-preset-check {
+  position: absolute;
+  inset: 0;
+  background: rgba(46, 125, 50, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+/* Preview column */
+.pem-preview-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 140px;
+}
+
+.pem-preview-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin: 0;
+}
+
+.pem-preview-hint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-align: center;
+  margin: 0;
+}
+
+/* ── Crop circle ──────────────────────────────────────────────────────────── */
+.pem-crop-circle {
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--color-primary);
+  box-shadow: 0 4px 20px rgba(46, 125, 50, 0.2);
+  background: var(--color-surface);
+  flex-shrink: 0;
+}
+
+.pem-crop-placeholder {
+  border-radius: 50%;
+  border: 2px dashed var(--color-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  background: var(--color-surface);
+}
+
+/* ── Upload tab layout ────────────────────────────────────────────────────── */
+.pem-upload-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Drop zone */
+.pem-dropzone {
+  width: 100%;
+  border: 2px dashed var(--color-border);
+  border-radius: 16px;
+  background: var(--color-surface);
+  cursor: pointer;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.pem-dropzone:hover,
+.pem-dropzone--over {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.pem-drop-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom: 4px;
+}
+
+.pem-drop-main {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.pem-drop-sub {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ── Editor (drag-to-reposition) ──────────────────────────────────────────── */
+.pem-editor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+
+.pem-editor-hint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pem-editor-hint::before {
+  content: "✦";
+  color: var(--color-accent);
+}
+
+/* Crop frame wrapper — handles mouse events */
+.pem-crop-wrap {
+  position: relative;
+  cursor: grab;
+  user-select: none;
+  border-radius: 50%;
+}
+
+.pem-crop-wrap--dragging {
+  cursor: grabbing;
+}
+
+/* Decorative ring outside the circle */
+.pem-crop-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px dashed rgba(46, 125, 50, 0.35);
+  pointer-events: none;
+}
+
+/* ── Zoom row ─────────────────────────────────────────────────────────────── */
+.pem-zoom-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.pem-zoom-btn {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.pem-zoom-btn:hover { background: var(--color-primary-light); color: var(--color-primary); }
+
+.pem-zoom-slider {
+  flex: 1;
+  accent-color: var(--color-primary);
+  height: 4px;
+  cursor: pointer;
+}
+
+/* ── Editor sub-actions ───────────────────────────────────────────────────── */
+.pem-editor-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.pem-text-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+  padding: 4px 0;
+  transition: opacity 0.15s;
+}
+.pem-text-btn:hover { opacity: 0.7; }
+.pem-text-btn--danger { color: var(--color-danger); }
+
+.pem-file-hidden { display: none; }
+
+/* ── Footer ───────────────────────────────────────────────────────────────── */
+.pem-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--color-border);
+}
+
+/* ── Mobile ───────────────────────────────────────────────────────────────── */
+@media (max-width: 540px) {
+  .pem-presets-layout {
+    flex-direction: column;
+  }
+
+  .pem-presets-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .pem-preview-col {
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
+    min-width: unset;
+  }
+}
