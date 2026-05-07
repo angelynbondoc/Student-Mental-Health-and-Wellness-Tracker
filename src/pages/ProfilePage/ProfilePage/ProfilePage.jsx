@@ -1,55 +1,31 @@
-// =============================================================================
-// ProfilePage.jsx — refactored to use PhotoEditorModal for profile pictures
-// =============================================================================
 import React, { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AppContext from "../../../AppContext";
 import {
-  Pencil,
-  Trash2,
-  LogOut,
-  X,
-  Check,
-  FileText,
-  Repeat2,
-  Users,
-  AlertTriangle,
-  Camera,
+  Pencil, Trash2, LogOut, X, Check,
+  FileText, Repeat2, Users, AlertTriangle, Camera,
 } from "lucide-react";
 import PhotoEditorModal from "../Photoeditormodal/Photoeditormodal";
 import "./ProfilePage.css";
-import { supabase } from "../../../supabase"; // adjust path if needed
+import { supabase } from "../../../supabase";
 
-// ── Confirmation Modal ────────────────────────────────────────────────────────
 const handleLogout = async () => {
   await supabase.auth.signOut();
   window.location.href = "/login";
 };
-function ConfirmModal({
-  title,
-  message,
-  confirmLabel,
-  onConfirm,
-  onCancel,
-  danger,
-}) {
+
+function ConfirmModal({ title, message, confirmLabel, onConfirm, onCancel, danger }) {
   return (
     <div className="pp-overlay" onClick={onCancel}>
       <div className="pp-modal" onClick={(e) => e.stopPropagation()}>
-        <div
-          className={`pp-modal-icon ${danger ? "pp-modal-icon--danger" : "pp-modal-icon--warn"}`}
-        >
+        <div className={`pp-modal-icon ${danger ? "pp-modal-icon--danger" : "pp-modal-icon--warn"}`}>
           <AlertTriangle size={22} />
         </div>
         <h3 className="pp-modal-title">{title}</h3>
         <p className="pp-modal-msg">{message}</p>
         <div className="pp-modal-actions">
-          <button className="pp-btn pp-btn--ghost" onClick={onCancel}>
-            Cancel
-          </button>
-          <button
-            className={`pp-btn ${danger ? "pp-btn--danger" : "pp-btn--primary"}`}
-            onClick={onConfirm}
-          >
+          <button className="pp-btn pp-btn--ghost" onClick={onCancel}>Cancel</button>
+          <button className={`pp-btn ${danger ? "pp-btn--danger" : "pp-btn--primary"}`} onClick={onConfirm}>
             {confirmLabel}
           </button>
         </div>
@@ -58,12 +34,10 @@ function ConfirmModal({
   );
 }
 
-// ── Avatar display ────────────────────────────────────────────────────────────
 function Avatar({ profile, size = 88, onClick }) {
   const letter = (profile?.display_name?.[0] ?? "U").toUpperCase();
   const hasPhoto = !!profile?.photo_url;
 
-  // For uploaded photos, apply saved offset/scale
   const imgStyle =
     !profile?.is_preset && profile?.photo_offset
       ? {
@@ -84,56 +58,31 @@ function Avatar({ profile, size = 88, onClick }) {
       title={onClick ? "Change profile picture" : undefined}
     >
       {hasPhoto ? (
-        <img
-          src={profile.photo_url}
-          alt={profile.display_name}
-          style={imgStyle}
-          draggable={false}
-        />
+        <img src={profile.photo_url} alt={profile.display_name} style={imgStyle} draggable={false} />
       ) : (
-        <span className="pp-avatar-letter" style={{ fontSize: size * 0.38 }}>
-          {letter}
-        </span>
+        <span className="pp-avatar-letter" style={{ fontSize: size * 0.38 }}>{letter}</span>
       )}
-      {onClick && (
-        <div className="pp-avatar-edit-overlay">
-          <Camera size={18} />
-        </div>
-      )}
+      {onClick && <div className="pp-avatar-edit-overlay"><Camera size={18} /></div>}
     </div>
   );
 }
 
-// ── Post Card ─────────────────────────────────────────────────────────────────
 function ProfilePostCard({ post, community, onDelete, isShared }) {
   const [confirming, setConfirming] = useState(false);
   return (
     <>
       <div className="pp-post-card">
         <div className="pp-post-meta">
-          <span className="pp-post-community">
-            {community?.name ?? "Unknown community"}
-          </span>
+          <span className="pp-post-community">{community?.name ?? "Unknown community"}</span>
           <span className="pp-post-dot">·</span>
           <span className="pp-post-date">
-            {new Date(post.created_at).toLocaleDateString("en-PH", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })}
+            {new Date(post.created_at).toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" })}
           </span>
-          {isShared && (
-            <span className="pp-shared-tag">
-              <Repeat2 size={11} /> Shared
-            </span>
-          )}
+          {isShared && <span className="pp-shared-tag"><Repeat2 size={11} /> Shared</span>}
         </div>
         <p className="pp-post-body">{post.body ?? post.content ?? "—"}</p>
         <div className="pp-post-footer">
-          <button
-            className="pp-icon-btn pp-icon-btn--danger"
-            onClick={() => setConfirming(true)}
-          >
+          <button className="pp-icon-btn pp-icon-btn--danger" onClick={() => setConfirming(true)}>
             <Trash2 size={14} /> {isShared ? "Remove" : "Delete"}
           </button>
         </div>
@@ -148,10 +97,7 @@ function ProfilePostCard({ post, community, onDelete, isShared }) {
               : "This will permanently delete your post. This action cannot be undone."
           }
           confirmLabel={isShared ? "Remove" : "Delete"}
-          onConfirm={() => {
-            onDelete(post.id);
-            setConfirming(false);
-          }}
+          onConfirm={() => { onDelete(post.id); setConfirming(false); }}
           onCancel={() => setConfirming(false)}
         />
       )}
@@ -159,10 +105,10 @@ function ProfilePostCard({ post, community, onDelete, isShared }) {
   );
 }
 
-// ── Community Row ─────────────────────────────────────────────────────────────
 function CommunityRow({ community, onLeave }) {
   const [confirming, setConfirming] = useState(false);
-  const isGeneral = community.name?.toLowerCase() === "general";
+  const navigate = useNavigate();
+  const isGeneral = community.is_general || community.name === "General";
 
   return (
     <>
@@ -170,11 +116,15 @@ function CommunityRow({ community, onLeave }) {
         <div className="pp-community-avatar">
           {community.name?.[0]?.toUpperCase() ?? "?"}
         </div>
-        <div className="pp-community-info">
+
+        {/* ── Clickable info → navigate to filtered feed ── */}
+        <div
+          className="pp-community-info"
+          style={{ cursor: "pointer", flex: 1 }}
+          onClick={() => navigate(`/home?community=${community.id}`)}
+        >
           <span className="pp-community-name">{community.name}</span>
-          <span className="pp-community-desc">
-            {community.description ?? "Community"}
-          </span>
+          <span className="pp-community-desc">{community.description ?? "Community"}</span>
         </div>
 
         {!isGeneral && (
@@ -187,15 +137,12 @@ function CommunityRow({ community, onLeave }) {
         )}
       </div>
 
-      {confirming && (
+      {!isGeneral && confirming && (
         <ConfirmModal
           title={`Leave "${community.name}"?`}
           message="You will no longer see posts from this community in your feed. You can rejoin anytime."
           confirmLabel="Leave"
-          onConfirm={() => {
-            onLeave(community.id);
-            setConfirming(false);
-          }}
+          onConfirm={() => { onLeave(community.id); setConfirming(false); }}
           onCancel={() => setConfirming(false)}
         />
       )}
@@ -203,28 +150,19 @@ function CommunityRow({ community, onLeave }) {
   );
 }
 
-// ── Edit Profile Form (no photo upload here — handled by modal) ───────────────
 function EditProfileForm({ profile, onSave, onCancel, onOpenPhotoModal }) {
   const [displayName, setDisplayName] = useState(profile.display_name ?? "");
   const [bio, setBio] = useState(profile.bio ?? "");
 
   return (
     <div className="pp-edit-form">
-      {/* Inline photo change button */}
       <div className="pp-field">
         <label className="pp-label">Profile Picture</label>
-        <button
-          className="pp-change-photo-btn"
-          type="button"
-          onClick={onOpenPhotoModal}
-        >
+        <button className="pp-change-photo-btn" type="button" onClick={onOpenPhotoModal}>
           <Camera size={15} />
-          {profile.photo_url
-            ? "Change photo or avatar"
-            : "Choose photo or avatar"}
+          {profile.photo_url ? "Change photo or avatar" : "Choose photo or avatar"}
         </button>
       </div>
-
       <div className="pp-field">
         <label className="pp-label">Display Name</label>
         <input
@@ -235,7 +173,6 @@ function EditProfileForm({ profile, onSave, onCancel, onOpenPhotoModal }) {
           placeholder="Your display name"
         />
       </div>
-
       <div className="pp-field">
         <label className="pp-label">Bio</label>
         <textarea
@@ -248,17 +185,11 @@ function EditProfileForm({ profile, onSave, onCancel, onOpenPhotoModal }) {
         />
         <span className="pp-char-count">{bio.length}/160</span>
       </div>
-
       <div className="pp-edit-actions">
-        <button className="pp-btn pp-btn--ghost" onClick={onCancel}>
-          <X size={14} /> Cancel
-        </button>
+        <button className="pp-btn pp-btn--ghost" onClick={onCancel}><X size={14} /> Cancel</button>
         <button
           className="pp-btn pp-btn--primary"
-          onClick={() => {
-            if (displayName.trim())
-              onSave({ display_name: displayName.trim(), bio: bio.trim() });
-          }}
+          onClick={() => { if (displayName.trim()) onSave({ display_name: displayName.trim(), bio: bio.trim() }); }}
         >
           <Check size={14} /> Save changes
         </button>
@@ -267,23 +198,18 @@ function EditProfileForm({ profile, onSave, onCancel, onOpenPhotoModal }) {
   );
 }
 
-// ── Main ProfilePage ──────────────────────────────────────────────────────────
 const TABS = [
-  { id: "posts", label: "My Posts", icon: FileText },
-  { id: "shared", label: "Shared", icon: Repeat2 },
-  { id: "communities", label: "Communities", icon: Users },
+  { id: "posts",       label: "My Posts",     icon: FileText },
+  { id: "shared",      label: "Shared",       icon: Repeat2 },
+  { id: "communities", label: "Communities",  icon: Users },
 ];
 
 export default function ProfilePage() {
   const {
-    currentUser,
-    setCurrentUser,
-    profiles,
-    setProfiles,
-    posts,
-    setPosts,
-    communities,
-    setCommunities,
+    currentUser, setCurrentUser,
+    profiles, setProfiles,
+    posts, setPosts,
+    communities, setCommunities,
   } = useContext(AppContext);
 
   const [activeTab, setActiveTab] = useState("posts");
@@ -305,32 +231,18 @@ export default function ProfilePage() {
   );
   const myCommunities = communities;
 
-  // Save text fields only
   const handleSaveProfile = async ({ display_name, bio }) => {
-    const { error } = await supabase
-      .from('profiles')
-      .update({ display_name, bio })
-      .eq('id', currentUser.id);
-
-    if (error) {
-      console.error('save failed:', error);
-      return;
-    }
-
-    setProfiles(prev =>
-      prev.map(p => p.id === currentUser.id ? { ...p, display_name, bio } : p)
-    );
+    const { error } = await supabase.from('profiles').update({ display_name, bio }).eq('id', currentUser.id);
+    if (error) { console.error('save failed:', error); return; }
+    setProfiles(prev => prev.map(p => p.id === currentUser.id ? { ...p, display_name, bio } : p));
     setCurrentUser(prev => ({ ...prev, display_name, bio }));
     setEditing(false);
   };
 
-  // Save photo from modal
   const handleSavePhoto = async ({ photo_url, offsetX = 0, offsetY = 0, scale = 1, is_preset = false }) => {
     let finalUrl = photo_url;
 
-    // Only upload to storage if it's a real file (base64), not a preset URL
     if (!is_preset) {
-      // Convert base64 to a file blob
       const res = await fetch(photo_url);
       const blob = await res.blob();
       const ext = blob.type.split('/')[1] || 'jpg';
@@ -340,28 +252,14 @@ export default function ProfilePage() {
         .from('avatars')
         .upload(filePath, blob, { upsert: true, contentType: blob.type });
 
-      if (uploadError) {
-        console.error('upload failed:', uploadError);
-        return;
-      }
+      if (uploadError) { console.error('upload failed:', uploadError); return; }
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-
+      const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
       finalUrl = publicUrl;
     }
 
-    // Now save the URL (short string) to the DB
-    const { error } = await supabase
-      .from('profiles')
-      .update({ photo_url: finalUrl })
-      .eq('id', currentUser.id);
-
-    if (error) {
-      console.error('photo save failed:', error);
-      return;
-    }
+    const { error } = await supabase.from('profiles').update({ photo_url: finalUrl }).eq('id', currentUser.id);
+    if (error) { console.error('photo save failed:', error); return; }
 
     setProfiles(prev =>
       prev.map(p =>
@@ -386,33 +284,24 @@ export default function ProfilePage() {
       .delete()
       .eq('community_id', communityId)
       .eq('user_id', currentUser.id);
-
     if (error) { console.error('leave error:', error); return; }
-
     setCommunities(prev => prev.filter(c => c.id !== communityId));
   };
 
   const stats = [
-    { label: "Posts", value: myPosts.length },
-    { label: "Shared", value: sharedPosts.length },
+    { label: "Posts",       value: myPosts.length },
+    { label: "Shared",      value: sharedPosts.length },
     { label: "Communities", value: myCommunities.length },
   ];
 
   return (
     <div className="pp-shell">
-      {/* ── Profile Header ─────────────────────────────────────────────────── */}
       <div className="pp-header">
         <div className="pp-header-bg" />
         <div className="pp-header-content">
           <div className="pp-avatar-wrap">
-            <Avatar
-              profile={profile}
-              size={88}
-              onClick={() => setPhotoModal(true)}
-            />
-            {currentUser.role === "admin" && (
-              <span className="pp-avatar-badge">Admin</span>
-            )}
+            <Avatar profile={profile} size={88} onClick={() => setPhotoModal(true)} />
+            {currentUser.role === "admin" && <span className="pp-avatar-badge">Admin</span>}
           </div>
 
           <div className="pp-header-info">
@@ -442,17 +331,10 @@ export default function ProfilePage() {
                   ))}
                 </div>
                 <div className="pp-profile-actions">
-                  <button
-                    className="pp-btn pp-btn--outline pp-edit-btn"
-                    onClick={() => setEditing(true)}
-                  >
+                  <button className="pp-btn pp-btn--outline pp-edit-btn" onClick={() => setEditing(true)}>
                     <Pencil size={14} /> Edit Profile
                   </button>
-
-                  <button
-                    className="pp-btn pp-btn--ghost pp-logout-btn"
-                    onClick={handleLogout}
-                  >
+                  <button className="pp-btn pp-btn--ghost pp-logout-btn" onClick={handleLogout}>
                     <LogOut size={14} /> Log out
                   </button>
                 </div>
@@ -462,7 +344,6 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* ── Tabs ───────────────────────────────────────────────────────────── */}
       <div className="pp-tabs">
         {TABS.map((tab) => {
           const TabIcon = tab.icon;
@@ -478,7 +359,6 @@ export default function ProfilePage() {
         })}
       </div>
 
-      {/* ── Content ────────────────────────────────────────────────────────── */}
       <div className="pp-content">
         {activeTab === "posts" && (
           <div className="pp-list">
@@ -493,9 +373,7 @@ export default function ProfilePage() {
                   key={post.id}
                   post={post}
                   isShared={false}
-                  community={communities.find(
-                    (c) => c.id === post.community_id,
-                  )}
+                  community={communities.find((c) => c.id === post.community_id)}
                   onDelete={handleDeletePost}
                 />
               ))
@@ -516,9 +394,7 @@ export default function ProfilePage() {
                   key={post.id}
                   post={post}
                   isShared
-                  community={communities.find(
-                    (c) => c.id === post.community_id,
-                  )}
+                  community={communities.find((c) => c.id === post.community_id)}
                   onDelete={handleDeletePost}
                 />
               ))
@@ -535,18 +411,13 @@ export default function ProfilePage() {
               </div>
             ) : (
               myCommunities.map((community) => (
-                <CommunityRow
-                  key={community.id}
-                  community={community}
-                  onLeave={handleLeave}
-                />
+                <CommunityRow key={community.id} community={community} onLeave={handleLeave} />
               ))
             )}
           </div>
         )}
       </div>
 
-      {/* ── Photo Editor Modal ──────────────────────────────────────────────── */}
       {photoModal && (
         <PhotoEditorModal
           current={profile.photo_url}
