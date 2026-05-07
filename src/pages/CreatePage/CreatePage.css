@@ -30,9 +30,38 @@
   --transition: 150ms ease;
 }
 
+/* ──────────────────────────────────────────────────────────────────────────
+   DESKTOP-ONLY: keep the form at a readable width, but center it within a
+   wider page-shell. This gives the form intentional breathing room on big
+   screens instead of looking lost in empty space.
+   Forms should NEVER stretch — wide form inputs hurt usability.
+   Stays inactive on tablet/mobile so MobileLayout renders normally.
+   ────────────────────────────────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .page-shell:has(.create-page),
+  .page-shell:has(.create-page) .page-inner {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding-left: 32px;
+    padding-right: 32px;
+    box-sizing: border-box;
+  }
+
+  /* Lift the form upward on desktop so it isn't buried at the top of the page */
+  .create-page {
+    padding-top: 2.5rem;
+  }
+
+  /* Slightly larger title on desktop — the page can carry it */
+  .create-page__title {
+    font-size: 2rem;
+  }
+}
+
 /* ── Page wrapper ── */
 .create-page {
-  max-width: 600px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 1.5rem 1rem 4rem;
   font-family: 'Inter', sans-serif;
