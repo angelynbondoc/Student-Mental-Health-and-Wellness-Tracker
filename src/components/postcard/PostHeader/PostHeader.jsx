@@ -4,9 +4,10 @@
 // /profile/:authorId so the user sees the full UserProfilePage.
 // Props unchanged except we now receive authorId (the raw UUID).
 // =============================================================================
-import React from 'react';
+import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './PostHeader.css'; // your existing file — no changes needed there
+import AppContext from '../../../AppContext';
+import './PostHeader.css'; 
 
 function getInitials(name = '') {
   return name
@@ -28,7 +29,7 @@ function timeAgo(isoString) {
 }
 
 export default function PostHeader({
-  authorId,        // ← NEW: raw user UUID (pass from PostCard)
+  authorId,        // ← raw user UUID (pass from PostCard)
   displayName,
   communityName,
   createdAt,
@@ -36,6 +37,7 @@ export default function PostHeader({
   avatarUrl,       // ← optional: pass profile.avatar_url from PostCard
 }) {
   const navigate = useNavigate();
+  const { currentUser } = useContext(AppContext);
 
   // Anonymous posts must not link to a profile
   const isClickable = displayName !== 'Anonymous' && Boolean(authorId);
@@ -43,7 +45,13 @@ export default function PostHeader({
   function handleAuthorClick(e) {
     if (!isClickable) return;
     e.stopPropagation(); // prevent outer card clicks from interfering
-    navigate(`/profile/${authorId}`);
+    
+    // Check if the post belongs to the current user
+    if (currentUser?.id === authorId) {
+      navigate('/profile');
+    } else {
+      navigate(`/profile/${authorId}`);
+    }
   }
 
   const initials = getInitials(displayName);
