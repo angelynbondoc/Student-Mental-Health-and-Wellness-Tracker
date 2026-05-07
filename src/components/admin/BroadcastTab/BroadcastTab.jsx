@@ -3,7 +3,8 @@
 // Admin tab for composing and sending announcements to all/specific users
 // or posting directly to the General community.
 // =============================================================================
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { supabase } from '../../../supabase';
 import {
   Megaphone,
   Send,
@@ -12,7 +13,9 @@ import {
   Users as UsersIcon,
   UserCheck,
   Bell,
-  MessageSquare
+  MessageSquare,
+  Trash2,
+  Edit2
 } from 'lucide-react';
 import './BroadcastTab.css';
 
@@ -27,6 +30,50 @@ export default function BroadcastTab({ users = [], broadcastNotification, create
   const [userSearch, setUserSearch]   = useState('');
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [sending, setSending]         = useState(false);
+
+  // Past Broadcasts State
+  const [pastBroadcasts, setPastBroadcasts] = useState([]);
+  const [editingId, setEditingId] = useState(null);
+  const [editContent, setEditContent] = useState("");
+  const [isFetchingPosts, setIsFetchingPosts] = useState(false);
+
+  useEffect(() => {
+    if (broadcastMode === 'post') {
+      fetchBroadcasts();
+    }
+  }, [broadcastMode]);
+
+  async function fetchBroadcasts() {
+    setIsFetchingPosts(true);
+    const { data } = await supabase
+      .from('posts')
+      .select('id, content, created_at')
+      .ilike('content', '[Admin Broadcast]\n%')
+      .order('created_at', { ascending: false });
+    if (data) setPastBroadcasts(data);
+    setIsFetchingPosts(false);
+  }
+
+  async function handleDeleteBroadcast(id) {
+    if (!window.confirm("Delete this broadcast permanently?")) return;
+    const { error } = await supabase.from('posts').delete().eq('id', id);
+    if (!error) {
+      setPastBroadcasts(prev => prev.filter(p => p.id !== id));
+    }
+  }
+
+  async function handleSaveEdit(id) {
+    if (!editContent.trim()) return;
+    const { error } = await supabase
+      .from('posts')
+      .update({ content: `[Admin Broadcast]\n${editContent.trim()}` })
+      .eq('id', id);
+    
+    if (!error) {
+      setPastBroadcasts(prev => prev.map(p => p.id === id ? { ...p, content: `[Admin Broadcast]\n${editContent.trim()}` } : p));
+      setEditingId(null);
+    }
+  }
 
   // ── Derived data ─────────────────────────────────────────────────────────
   const eligibleUsers = useMemo(
@@ -92,6 +139,7 @@ export default function BroadcastTab({ users = [], broadcastNotification, create
       const ok = await createAdminPost(message);
       if (ok) {
         setMessage('');
+        fetchBroadcasts();
       }
     }
     
@@ -343,6 +391,71 @@ export default function BroadcastTab({ users = [], broadcastNotification, create
                         aria-hidden="true"
                       >
                         {isSelected && <Check size={12} strokeWidth={3} />}
+                      </div>
+                    </li>
+                  );
+                })
+              )}
+            </ul>
+          </aside>
+        )}
+
+        {/* ── RIGHT: Recent Broadcasts (only when 'post') ─────────────────── */}
+        {broadcastMode === 'post' && (
+          <aside className="bc-picker">
+            <div className="bc-picker__header">
+              <div>
+                <p className="bc-picker__title">Recent Broadcasts</p>
+                <p className="bc-picker__count">Manage your community posts</p>
+              </div>
+            </div>
+
+            <ul className="bc-user-list" style={{ padding: '8px' }}>
+              {isFetchingPosts ? (
+                <li className="bc-user-empty"><span>Loading...</span></li>
+              ) : pastBroadcasts.length === 0 ? (
+                <li className="bc-user-empty">
+                  <MessageSquare size={20} strokeWidth={1.5} aria-hidden="true" />
+                  <span>No past broadcasts.</span>
+                </li>
+              ) : (
+                pastBroadcasts.map(p => {
+                  const contentText = p.content.replace('[Admin Broadcast]\n', '').trim();
+                  const isEditing = editingId === p.id;
+
+                  return (
+                    <li key={p.id} className="bc-user-row" style={{ flexDirection: 'column', alignItems: 'flex-start', padding: '12px', cursor: 'default' }}>
+                      {isEditing ? (
+                        <textarea 
+                          className="bc-textarea"
+                          style={{ minHeight: '60px', marginBottom: '8px', padding: '8px' }}
+                          value={editContent}
+                          onChange={e => setEditContent(e.target.value)}
+                        />
+                      ) : (
+                        <p style={{ fontSize: '13px', color: 'var(--bc-text)', marginBottom: '8px', lineHeight: 1.5, wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
+                          {contentText}
+                        </p>
+                      )}
+                      
+                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                        <span style={{ fontSize: '11px', color: 'var(--bc-text-muted)' }}>
+                          {new Date(p.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </span>
+                        
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          {isEditing ? (
+                            <>
+                              <button onClick={() => setEditingId(null)} style={{ background: 'none', border: 'none', color: 'var(--bc-text-secondary)', fontSize: '12px', cursor: 'pointer', fontWeight: 500 }}>Cancel</button>
+                              <button onClick={() => handleSaveEdit(p.id)} style={{ background: 'none', border: 'none', color: 'var(--bc-green)', fontSize: '12px', cursor: 'pointer', fontWeight: 600 }}>Save</button>
+                            </>
+                          ) : (
+                            <>
+                              <button onClick={() => { setEditingId(p.id); setEditContent(contentText); }} style={{ background: 'none', border: 'none', color: 'var(--bc-text-secondary)', fontSize: '12px', cursor: 'pointer', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '3px' }}><Edit2 size={12}/> Edit</button>
+                              <button onClick={() => handleDeleteBroadcast(p.id)} style={{ background: 'none', border: 'none', color: 'var(--bc-danger)', fontSize: '12px', cursor: 'pointer', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '3px' }}><Trash2 size={12}/> Delete</button>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </li>
                   );

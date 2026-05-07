@@ -98,9 +98,12 @@ export default function usePostCard(post) {
   const handleShare = async () => {
     if (!currentUser) return;
 
-    const originalContent = post.content.startsWith("[Shared Post]: ")
-      ? post.content.slice("[Shared Post]: ".length)
-      : post.content;
+    let originalContent = post.content;
+    if (originalContent.startsWith("[Shared Post]:")) {
+      originalContent = originalContent.replace("[Shared Post]:", "").trim();
+    } else if (originalContent.startsWith("[Admin Broadcast]\n")) {
+      originalContent = originalContent.replace("[Admin Broadcast]\n", "").trim();
+    }
 
     const { error } = await supabase.from("posts").insert({
       author_id: currentUser.id,

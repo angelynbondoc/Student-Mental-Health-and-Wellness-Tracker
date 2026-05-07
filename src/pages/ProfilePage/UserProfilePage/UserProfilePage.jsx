@@ -76,7 +76,8 @@ export default function UserProfilePage() {
           (p) =>
             p.author_id === userId &&
             !p.is_anonymous &&
-            !p.content.startsWith("[Shared Post]:"),
+            !p.content?.startsWith("[Shared Post]:") &&
+            !p.content?.startsWith("[Admin Broadcast]\n"),
         )
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)),
     [posts, userId],

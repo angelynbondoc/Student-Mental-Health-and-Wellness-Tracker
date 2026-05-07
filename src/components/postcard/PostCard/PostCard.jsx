@@ -21,24 +21,28 @@ export default function PostCard({ post }) {
   const author = profiles.find((p) => p.id === post.author_id);
   const isAdmin = author?.role === "admin" || author?.role === "superadmin";
 
-  const isAdminBroadcast = post.content?.startsWith("[Admin Broadcast]:");
+  const isAdminBroadcast = post.content?.startsWith("[Admin Broadcast]\n");
 
-  const displayName = isAdminBroadcast
+  const displayName = isAdminBroadcast || isAdmin
     ? "Admin"
     : post.is_anonymous
     ? "Anonymous"
-    : isAdmin
-    ? "Admin"
     : author?.display_name ?? "Unknown";
+
+  const displayAvatar = isAdminBroadcast || isAdmin
+    ? "/NEULogo1.png"
+    : post.is_anonymous
+    ? null
+    : author?.photo_url;
 
   const community = communities.find((c) => c.id === post.community_id);
   const isShared = post.content?.startsWith("[Shared Post]:");
 
   let displayContent = post.content;
   if (isAdminBroadcast) {
-    displayContent = displayContent.replace("[Admin Broadcast]:", "").trim();
+    displayContent = displayContent.replace("[Admin Broadcast]\n", "").trim();
   } else if (isShared) {
-    displayContent = displayContent.replace("[Shared Post]:", "").trim();
+    displayContent = displayContent.replace("[Shared Post]\n", "").trim();
   }
 
   const {
@@ -71,8 +75,8 @@ export default function PostCard({ post }) {
       <div className="pc-card">
         <div className="pc-header-row">
           <PostHeader
-            authorId={post.is_anonymous ? null : post.author_id}
-            avatarUrl={post.is_anonymous ? null : isAdmin ? null : author?.photo_url}
+            authorId={post.is_anonymous || isAdminBroadcast ? null : post.author_id}
+            avatarUrl={displayAvatar}
             displayName={displayName}
             communityName={community?.name ?? "Community"}
             createdAt={post.created_at}

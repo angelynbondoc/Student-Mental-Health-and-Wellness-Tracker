@@ -438,13 +438,13 @@ export function useAdminDashboard() {
       return false;
     }
 
-    const { error } = await supabase.from('posts').insert({
-          author_id: userId,
-          community_id: general.id,
-          content: `[Admin Broadcast]: ${content.trim()}`,
-          is_anonymous: false,
-          is_flagged: false,
-        });
+  const { error } = await supabase.from('posts').insert({
+        author_id: userId,
+        community_id: general.id,
+        content: `[Admin Broadcast]\n ${content.trim()}`,
+        is_anonymous: false,
+        is_flagged: false,
+      });
 
     if (error) {
       showToast('Failed to create post.', 'danger');
