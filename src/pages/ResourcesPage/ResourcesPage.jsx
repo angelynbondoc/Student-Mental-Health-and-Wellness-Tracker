@@ -10,6 +10,7 @@ import {
   FileText,
 } from "lucide-react";
 import { supabase } from "../../supabase";
+import AppContext from "../../AppContext";
 import { PageShell, EmptyState } from "../../components/ui";
 import "./ResourcesPage.css";
 
@@ -116,6 +117,7 @@ function LoadingSkeleton() {
 
 /* ─── Page export ────────────────────────────────────────────────────────── */
 export default function ResourcesPage() {
+  const { currentUser } = useContext(AppContext);
   const [articles, setArticles] = useState([]);
   const [loading, setLoading]   = useState(true);
   const [search, setSearch]     = useState("");
@@ -125,6 +127,7 @@ export default function ResourcesPage() {
       const { data, error } = await supabase
         .from("resources")
         .select("id, title, year, key_idea, findings, citation, url, content")
+        .eq("status", "approved")
         .order("year", { ascending: false });
       if (data) setArticles(data);
       if (error) console.error("Resources fetch error:", error);

@@ -22,46 +22,45 @@ export default function HomePage() {
     .filter(post =>
       (post.community_id === GENERAL_ID || joinedIds.has(post.community_id)) &&
       (!selectedCommunityId || post.community_id === selectedCommunityId) &&
-      (!searchQuery || 
+      (!searchQuery ||
         post.content?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         matchingCommunityIds.includes(post.community_id)
       )
     )
-      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-  const activeCommunityName = communities.find(
-    (c) => c.id === selectedCommunityId,
-  )?.name;
+  const activeCommunityName = communities.find((c) => c.id === selectedCommunityId)?.name;
 
-  // ── Scroll-to-post from notification click ──────────────────────────────
+  // ── Pre-select community from profile page navigation ──────────────────
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const communityId = params.get('community');
+    if (communityId) setSelectedCommunityId(communityId);
+  }, [location.search]);
+
+  // ── Scroll-to-post from notification click ─────────────────────────────
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const postId = params.get('post');
     if (!postId || didScrollRef.current) return;
 
-    // Wait for posts to be in the list
     const postExists = posts.some(p => p.id === postId);
     if (!postExists) return;
 
     setHighlightedPostId(postId);
     didScrollRef.current = true;
 
-    // Small delay to let the DOM render
     setTimeout(() => {
       const el = document.getElementById(`post-${postId}`);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 150);
 
-    // Remove highlight after 3 seconds
     setTimeout(() => setHighlightedPostId(null), 3000);
   }, [location.search, posts]);
 
   return (
     <div className="page-shell">
       <div className="page-inner">
-        {/* ── Community filter bar ─────────────────────────────────────────── */}
         <div className="hp-filter">
           <div className="hp-filter-label-row">
             <p className="hp-filter-label">Browse by community:</p>
@@ -73,40 +72,29 @@ export default function HomePage() {
                 <button
                   key={community.id}
                   className={`chip${isActive ? " chip--active" : ""}`}
-                  onClick={() =>
-                    setSelectedCommunityId(isActive ? null : community.id)
-                  }
+                  onClick={() => setSelectedCommunityId(isActive ? null : community.id)}
                 >
                   {community.name}
                 </button>
               );
             })}
             {selectedCommunityId && (
-              <button
-                className="chip chip--clear"
-                onClick={() => setSelectedCommunityId(null)}
-              >
+              <button className="chip chip--clear" onClick={() => setSelectedCommunityId(null)}>
                 ✕ Clear
               </button>
             )}
           </div>
         </div>
 
-        {/* ── Feed header ──────────────────────────────────────────────────── */}
         <div className="hfeed-header">
           <h2 className="hfeed-title">
-            <span>
-              {selectedCommunityId
-                ? `Posts in "${activeCommunityName}"`
-                : "All Posts"}
-            </span>
+            <span>{selectedCommunityId ? `Posts in "${activeCommunityName}"` : "All Posts"}</span>
           </h2>
           <span className="hfeed-count">
             {filteredPosts.length} post{filteredPosts.length !== 1 ? "s" : ""}
           </span>
         </div>
 
-        {/* ── Post list ────────────────────────────────────────────────────── */}
         {filteredPosts.length === 0 ? (
           <div className="hfeed-empty">
             <div className="hfeed-empty__icon">🌱</div>

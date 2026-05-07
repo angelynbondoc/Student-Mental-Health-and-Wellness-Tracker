@@ -28,9 +28,7 @@
   margin: 0 auto 1.25rem;
 }
 
-.sp-icon {
-  color: #dc2626;
-}
+.sp-icon { color: #dc2626; }
 
 .sp-title {
   font-size: 1.5rem;
@@ -86,14 +84,16 @@
   cursor: pointer;
   border: none;
   transition: opacity 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
-.sp-btn:hover { opacity: 0.88; }
+.sp-btn:hover:not(:disabled) { opacity: 0.88; }
+.sp-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.sp-btn--primary {
-  background: #dc2626;
-  color: #fff;
-}
+.sp-btn--primary { background: #dc2626; color: #fff; }
 
 .sp-btn--ghost {
   background: transparent;
@@ -101,16 +101,84 @@
   color: #374151;
 }
 
-.sp-appeal-placeholder {
-  background: #f3f4f6;
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  font-size: 0.82rem;
-  color: #6b7280;
-  line-height: 1.6;
+.sp-btn--submit { background: #1d4ed8; color: #fff; }
+
+.sp-btn--sm { padding: 0.6rem 1rem; font-size: 0.85rem; }
+
+/* ── Appeal form ── */
+.sp-appeal-form {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: left;
 }
 
-.sp-appeal-placeholder p { margin: 0; }
+.sp-appeal-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.25rem;
+}
+
+.sp-appeal-hint {
+  font-size: 0.78rem;
+  color: #6b7280;
+  margin: 0 0 0.75rem;
+  line-height: 1.5;
+}
+
+.sp-appeal-textarea {
+  width: 100%;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.85rem;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: inherit;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.sp-appeal-textarea:focus {
+  outline: none;
+  border-color: #1d4ed8;
+}
+
+.sp-appeal-error {
+  font-size: 0.78rem;
+  color: #dc2626;
+  margin: 0 0 0.5rem;
+}
+
+.sp-appeal-btns {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+/* ── Appeal success ── */
+.sp-appeal-success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 1rem;
+  font-size: 0.85rem;
+  color: #166534;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.sp-appeal-success p { margin: 0; }
+
+.sp-appeal-success-icon {
+  color: #16a34a;
+  margin-bottom: 4px;
+}
 
 .sp-footer {
   font-size: 0.75rem;
