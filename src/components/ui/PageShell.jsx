@@ -1,25 +1,31 @@
 // =============================================================================
 // PageShell.jsx
-// Reusable page wrapper — every page uses the same outer shell:
-//   centered column, max-width inner, heading + subheading.
-//
-// Replaces the repeated .neu-X / .neu-X-inner / .neu-X-heading / .neu-X-sub
-// pattern that was copy-pasted into all 6 pages.
+// Reusable page wrapper.
 //
 // Usage:
-//   <PageShell heading="My Page" sub="A short description" narrow>
-//     {children}
-//   </PageShell>
+//   <PageShell heading="..." sub="...">           // default width
+//   <PageShell heading="..." sub="..." narrow>    // narrower than default
+//   <PageShell heading="..." sub="..." wide>      // full-bleed wide
 // =============================================================================
 import React from 'react';
 
-export default function PageShell({ heading, sub, narrow = false, children }) {
+export default function PageShell({
+  heading,
+  sub,
+  narrow = false,
+  wide = false,
+  children,
+}) {
+  const variant = wide
+    ? ' page-inner--wide'
+    : narrow
+    ? ' page-inner--narrow'
+    : '';
+
   return (
     <div className="page-shell">
-      <div className={`page-inner${narrow ? ' page-inner--narrow' : ''}`}>
-        {heading && (
-          <h2 className={`page-heading${sub ? '' : ''}`}>{heading}</h2>
-        )}
+      <div className={`page-inner${variant}`}>
+        {heading && <h2 className="page-heading">{heading}</h2>}
         {sub && <p className="page-sub">{sub}</p>}
         {children}
       </div>

@@ -3,6 +3,25 @@
    Shared: page-shell, page-inner, page-heading, page-sub, empty-state
    ============================================================================= */
 
+/* ──────────────────────────────────────────────────────────────────────────
+   DESKTOP-ONLY: widen the PageShell so the community grid uses more screen.
+   The grid auto-fills, so wider page = more cards per row.
+   Stays inactive on tablet/mobile so MobileLayout renders normally.
+   ────────────────────────────────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .page-shell:has(.cp-grid),
+  .page-shell:has(.cp-grid) .page-inner,
+  .page-shell:has(.cp-section),
+  .page-shell:has(.cp-section) .page-inner {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding-left: 32px;
+    padding-right: 32px;
+    box-sizing: border-box;
+  }
+}
+
 .cp-loading {
   text-align: center;
   padding: 24px;
@@ -98,7 +117,6 @@
   margin: 0;
   line-height: 1.5;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
