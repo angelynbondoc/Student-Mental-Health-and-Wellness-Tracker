@@ -246,7 +246,22 @@ useEffect(() => {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/suspended" element={<SuspendedPage />} />
+          <Route 
+              path="/suspended" 
+              element={
+                !authReady ? (
+                  <div>Loading...</div>
+                ) : !currentUser ? (
+                  <Navigate to="/login" replace />
+                ) : !profileReady ? (
+                  <div>Loading...</div>
+                ) : currentUser.role !== "suspended" ? (
+                  <Navigate to="/home" replace />
+                ) : (
+                  <SuspendedPage />
+                )
+              } 
+            />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
 
