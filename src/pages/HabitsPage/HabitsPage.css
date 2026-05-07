@@ -1,0 +1,417 @@
+/* =============================================================================
+   HabitsPage.css — NEU MindSpace
+   Habit cards + expandable tracking panels:
+     Water tracker · Meditation breathing animation · Walk countdown timer
+============================================================================= */
+
+/* ── Habit list ───────────────────────────────────────────────────────────── */
+.hp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Habit card row ───────────────────────────────────────────────────────── */
+.hp-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px;
+}
+
+.hp-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.hp-emoji {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.hp-name {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 2px;
+  line-height: 1.3;
+}
+
+.hp-streak {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* Actions area on right side of card */
+.hp-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.hp-track-btn {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  border: 1.5px solid transparent;
+  border-radius: 100px;
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.hp-track-btn:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary);
+}
+
+.hp-done-badge {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  border-radius: 100px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+/* Admin form */
+.hp-admin-box {
+  margin-top: 32px;
+  background: #FFF8E1;
+  border: 1.5px dashed #F5C400;
+  border-radius: 14px;
+  padding: 16px 20px;
+}
+
+.hp-admin-label {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  color: #7B6000;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.hp-admin-row {
+  display: flex;
+  gap: 10px;
+}
+
+.hp-admin-btn {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0 18px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.hp-admin-btn:hover { background: #256427; }
+
+/* ── Panel wrapper (card + expandable panel below) ────────────────────────── */
+.habit-panel-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Shared panel base ────────────────────────────────────────────────────── */
+.habit-panel {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  animation: panel-open 0.22s ease;
+}
+
+@keyframes panel-open {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.panel-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin: 0;
+  text-align: center;
+}
+
+/* ── WATER TRACKER ────────────────────────────────────────────────────────── */
+.water-panel { background: linear-gradient(180deg, #E3F2FD 0%, var(--color-white) 60%); }
+
+.water-glasses-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.water-glass-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  transition: transform 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.water-glass-btn:hover { transform: scale(1.15) translateY(-4px); }
+.water-glass-btn--filled .glass-svg { filter: drop-shadow(0 2px 6px rgba(30,136,229,0.4)); }
+
+.glass-svg { display: block; }
+
+.water-progress-text {
+  font-size: 13px;
+  color: #1565C0;
+  font-weight: 500;
+  text-align: center;
+  margin: 0;
+  font-family: var(--font-body);
+}
+
+/* ── MEDITATION PANEL ─────────────────────────────────────────────────────── */
+.meditation-panel {
+  background: linear-gradient(180deg, #F3E5F5 0%, var(--color-white) 70%);
+}
+
+.breath-stage {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.breath-ring {
+  position: absolute;
+  border-radius: 50%;
+  transition: transform 1s ease-in-out, background 0.5s ease;
+}
+
+.breath-ring--outer {
+  width: 180px;
+  height: 180px;
+}
+
+.breath-ring--mid {
+  width: 150px;
+  height: 150px;
+}
+
+.breath-orb {
+  position: relative;
+  z-index: 2;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 1s ease-in-out, box-shadow 1s ease, background 0.5s ease;
+  cursor: default;
+  user-select: none;
+}
+
+.breath-phase-label {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: #1A1A1A;
+  line-height: 1;
+}
+
+.breath-countdown {
+  font-family: var(--font-body);
+  font-size: 20px;
+  font-weight: 700;
+  color: #1A1A1A;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.breath-arc {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Phase chips */
+.breath-phases-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.breath-phase-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  transition: all 0.3s ease;
+  min-width: 58px;
+  text-align: center;
+}
+
+.breath-phase-chip--active {
+  color: #1A1A1A;
+  font-weight: 700;
+  transform: scale(1.05);
+}
+
+.chip-dur {
+  font-size: 10px;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+/* Meditation controls */
+.med-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.med-btn {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 100px;
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.med-btn--reset {
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  border: 1.5px solid var(--color-border);
+}
+.med-btn--reset:hover:not(:disabled) { background: var(--color-border); }
+.med-btn--reset:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.med-btn--primary {
+  background: var(--color-primary);
+  color: white;
+  min-width: 110px;
+  box-shadow: 0 4px 14px rgba(46, 125, 50, 0.3);
+}
+.med-btn--primary:hover { background: #256427; transform: translateY(-1px); }
+.med-btn--pause { background: #EF6C00; box-shadow: 0 4px 14px rgba(239, 108, 0, 0.3); }
+.med-btn--pause:hover { background: #D84315; }
+
+.med-hint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-align: center;
+  margin: 0;
+  font-family: var(--font-body);
+}
+
+/* ── WALK TIMER ───────────────────────────────────────────────────────────── */
+.walk-panel { background: linear-gradient(180deg, #E8F5E9 0%, var(--color-white) 60%); }
+
+.walk-timer-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.walk-ring-svg {
+  width: 200px;
+  height: 200px;
+  filter: drop-shadow(0 4px 16px rgba(46, 125, 50, 0.15));
+}
+
+.walk-emoji-text { font-size: 32px; }
+
+/* Stats row */
+.walk-stats-row {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+}
+
+.walk-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.walk-stat-val {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.walk-stat-lbl {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: var(--font-body);
+}
+
+.walk-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .hp-card { padding: 14px 16px; }
+  .hp-name { font-size: 14px; }
+  .habit-panel { padding: 18px 16px; }
+  .water-glasses-row { gap: 6px; }
+  .breath-stage { width: 170px; height: 170px; }
+  .breath-orb { width: 90px; height: 90px; }
+  .breath-ring--outer { width: 155px; height: 155px; }
+  .breath-ring--mid { width: 125px; height: 125px; }
+  .walk-ring-svg { width: 170px; height: 170px; }
+  .walk-stats-row { gap: 16px; }
+  .walk-stat-val { font-size: 17px; }
+}

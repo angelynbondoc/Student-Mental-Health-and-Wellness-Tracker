@@ -1,0 +1,117 @@
+/* =============================================================================
+   CreatePage.css
+   NEU MindSpace — Create post page styles.
+   All shared styles (page-shell, form-card, field-label, field-input,
+   field-textarea, btn-submit, notice--red, notice--gold) live in shared.css.
+   ============================================================================= */
+
+/* ── Anonymous checkbox row ───────────────────────────────────────────────── */
+.cp-anon-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 0 4px;
+  cursor: pointer;
+}
+.cp-anon-row__label {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+/* ── Custom checkbox — replaces black browser default ────────────────────── */
+.cp-anon-row input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-input-bg);
+  cursor: pointer;
+  flex-shrink: 0;
+  position: relative;
+  transition: all 0.15s ease;
+}
+.cp-anon-row input[type="checkbox"]:checked {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.cp-anon-row input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 0px;
+  width: 5px;
+  height: 9px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+
+/* ── Custom community dropdown ────────────────────────────────────────────── */
+.cs-wrapper {
+  position: relative;
+}
+.cs-trigger {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-input-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+.cs-trigger:hover,
+.cs-trigger:focus {
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 3px var(--color-primary-ring);
+  outline: none;
+}
+.cs-chevron {
+  color: var(--color-text-faint);
+  transition: transform 0.2s ease;
+}
+.cs-chevron--open {
+  transform: rotate(180deg);
+  color: var(--color-primary);
+}
+
+.cs-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  overflow: hidden;
+}
+.cs-option {
+  padding: 11px 14px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.cs-option:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+.cs-option--active {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 600;
+}

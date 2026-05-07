@@ -1,0 +1,625 @@
+/* =============================================================================
+   JournalPage.css — enhanced interactive version
+   NEU MindSpace design tokens: Poppins + DM Sans, green/gold palette
+============================================================================= */
+
+/* ── Success toast ────────────────────────────────────────────────────────── */
+.jp-toast {
+  background: #E8F5E9;
+  border: 1.5px solid #A5D6A7;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: #2E7D32;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: jp-toast-in 0.3s ease;
+}
+
+@keyframes jp-toast-in {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Form card ────────────────────────────────────────────────────────────── */
+.jp-form-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 28px 24px;
+  margin-bottom: 28px;
+  transition: background 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle mood-tinted top stripe */
+.jp-form-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--mood-accent, #A5D6A7);
+  transition: background 0.4s ease;
+}
+
+/* ── Step indicator ───────────────────────────────────────────────────────── */
+.jp-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 28px;
+}
+
+.jp-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.jp-step-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  transition: all 0.25s ease;
+}
+
+.jp-step--active .jp-step-circle {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+  box-shadow: 0 2px 10px rgba(46,125,50,0.35);
+}
+
+.jp-step--done .jp-step-circle {
+  background: #E8F5E9;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.jp-step-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.jp-step--active .jp-step-label { color: var(--color-primary); }
+.jp-step--done  .jp-step-label  { color: var(--color-primary); }
+
+.jp-step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--color-border);
+  margin: 0 4px;
+  margin-bottom: 18px;
+  transition: background 0.3s ease;
+}
+
+.jp-step-line--done { background: var(--color-primary); }
+
+/* ── Step content ─────────────────────────────────────────────────────────── */
+.jp-step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: jp-step-in 0.22s ease;
+}
+
+@keyframes jp-step-in {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.jp-step-heading {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.jp-step-sub {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+/* ── Mood selector ────────────────────────────────────────────────────────── */
+.jp-mood-row {
+  display: flex;
+  gap: 8px;
+}
+
+.jp-mood-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 4px;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.jp-mood-btn:hover {
+  transform: translateY(-3px);
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+.jp-mood-btn--active {
+  transform: translateY(-4px) scale(1.06);
+  border-color: var(--color-accent);
+}
+
+.jp-mood-emoji {
+  font-size: 26px;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+.jp-mood-btn--active .jp-mood-emoji {
+  transform: scale(1.2);
+}
+
+.jp-mood-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: var(--color-text-muted);
+  text-align: center;
+  font-weight: 500;
+}
+
+.jp-mood-btn--active .jp-mood-label {
+  font-weight: 700;
+  color: var(--mood-text, var(--color-primary));
+}
+
+/* Mood color bar */
+.jp-mood-bar {
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.35s ease;
+}
+
+/* ── Navigation buttons ───────────────────────────────────────────────────── */
+.jp-step-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.jp-next-btn,
+.jp-submit-btn {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+  background: var(--color-primary);
+  border: none;
+  border-radius: 100px;
+  padding: 11px 24px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  box-shadow: 0 4px 14px rgba(46,125,50,0.25);
+}
+
+.jp-next-btn:hover,
+.jp-submit-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(46,125,50,0.35);
+}
+
+.jp-submit-btn:disabled {
+  background: var(--color-border) !important;
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.jp-back-btn {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: none;
+  border: 1.5px solid var(--color-border);
+  border-radius: 100px;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.jp-back-btn:hover {
+  background: var(--color-surface);
+  border-color: var(--color-text-muted);
+}
+
+/* ── Context fields ───────────────────────────────────────────────────────── */
+.jp-context-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.jp-context-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.jp-field-label {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.jp-input {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.jp-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+  background: white;
+}
+
+/* ── Writing prompt chip ──────────────────────────────────────────────────── */
+.jp-prompt-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--mood-bg, #E8F5E9);
+  border: 1.5px solid var(--mood-accent, #A5D6A7);
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.jp-prompt-chip:hover {
+  transform: scale(1.01);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+}
+
+.jp-prompt-icon { font-size: 16px; flex-shrink: 0; }
+
+.jp-prompt-text {
+  flex: 1;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+  font-style: italic;
+}
+
+.jp-prompt-shuffle {
+  font-size: 16px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.jp-prompt-chip:hover .jp-prompt-shuffle { transform: rotate(180deg); }
+
+/* ── Textarea ─────────────────────────────────────────────────────────────── */
+.jp-textarea {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  resize: vertical;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+
+.jp-textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+  background: white;
+}
+
+.jp-textarea::placeholder { color: var(--color-text-muted); }
+
+/* ── Word count ───────────────────────────────────────────────────────────── */
+.jp-wordcount-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.jp-wordcount {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.jp-encouragement {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-primary);
+  font-weight: 500;
+  text-align: right;
+}
+
+.jp-wc-bar-bg {
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.jp-wc-bar-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.3s ease, background 0.4s ease;
+}
+
+/* ── Mood trend chart ─────────────────────────────────────────────────────── */
+.jp-trend-wrap {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+
+.jp-trend-label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin: 0 0 10px;
+}
+
+.jp-trend-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ── Past entries ─────────────────────────────────────────────────────────── */
+.jp-past-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.jp-past-heading {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.jp-past-count {
+  background: var(--color-primary);
+  color: white;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 100px;
+  padding: 2px 9px;
+}
+
+.jp-entries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Entry card ───────────────────────────────────────────────────────────── */
+.jp-entry-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  overflow: hidden;
+  border-left: 4px solid var(--entry-accent, #A5D6A7);
+  transition: box-shadow 0.15s;
+}
+
+.jp-entry-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+
+.jp-entry-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.jp-entry-mood-dot {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.jp-entry-emoji { font-size: 20px; }
+
+.jp-entry-meta-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.jp-entry-mood-label {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.jp-entry-date {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.jp-entry-preview {
+  flex: 1;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.jp-expand-btn {
+  background: none;
+  border: none;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.jp-expand-btn:hover { color: var(--color-text); }
+
+/* ── Entry expanded body ──────────────────────────────────────────────────── */
+.jp-entry-body {
+  padding: 0 16px 16px;
+  border-top: 1px solid var(--color-border);
+  animation: jp-expand 0.2s ease;
+}
+
+@keyframes jp-expand {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.jp-entry-text {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--color-text);
+  margin: 14px 0 12px;
+}
+
+.jp-entry-extras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.jp-extra-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--entry-bg, #F5F5F5);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+/* ── Entry actions ────────────────────────────────────────────────────────── */
+.jp-entry-actions { display: flex; justify-content: flex-end; }
+
+.jp-confirm-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jp-confirm-text {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.jp-action-btn {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.jp-action-btn:hover { background: var(--color-border); }
+
+.jp-action-btn--danger {
+  color: var(--color-danger);
+  border-color: #FFCDD2;
+  background: #FFF5F5;
+}
+.jp-action-btn--danger:hover {
+  background: var(--color-danger);
+  color: white;
+  border-color: var(--color-danger);
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .jp-mood-row   { gap: 6px; }
+  .jp-form-card  { padding: 20px 16px; }
+}
+
+@media (max-width: 480px) {
+  .jp-mood-emoji { font-size: 20px; }
+  .jp-mood-label { font-size: 9px; }
+  .jp-entry-preview { display: none; }
+  .jp-step-label { display: none; }
+}
