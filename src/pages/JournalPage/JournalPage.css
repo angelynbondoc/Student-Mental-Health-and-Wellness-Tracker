@@ -3,6 +3,51 @@
    NEU MindSpace design tokens: Poppins + DM Sans, green/gold palette
 ============================================================================= */
 
+/* ──────────────────────────────────────────────────────────────────────────
+   DESKTOP-ONLY: widen the PageShell so the journal flow uses more screen.
+   The form card and past entries stay at readable widths and center within
+   the wider page — journaling is reflective, not dashboard-like.
+   Stays inactive on tablet/mobile so MobileLayout renders normally.
+   ────────────────────────────────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .page-shell:has(.jp-form-card),
+  .page-shell:has(.jp-form-card) .page-inner,
+  .page-shell:has(.jp-entries-list),
+  .page-shell:has(.jp-entries-list) .page-inner {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding-left: 32px;
+    padding-right: 32px;
+    box-sizing: border-box;
+  }
+
+  /* Form card stays narrow — journaling is intimate, focused writing.
+     Wider textareas signal "essay" when we want "private reflection." */
+  .jp-form-card,
+  .jp-toast,
+  .jp-trend-wrap {
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Past entries section header + list shares the form's column width
+     so the whole page reads as a single centered narrative. */
+  .jp-past-header,
+  .jp-entries-list {
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* A bit more vertical breathing room above the form on desktop */
+  .jp-form-card:first-child,
+  .jp-toast + .jp-form-card {
+    margin-top: 1rem;
+  }
+}
+
 /* ── Success toast ────────────────────────────────────────────────────────── */
 .jp-toast {
   background: #E8F5E9;
