@@ -53,10 +53,25 @@ export default function CommentSection({ postId, profiles, onAddComment }) {
       setLoading(true);
       const { data } = await supabase
         .from('comments')
-        .select('id, post_id, author_id, content, created_at, is_anonymous')
+        .select('id, post_id, author_id, content, created_at, is_anonymous, parent_id')
         .eq('post_id', postId)
         .order('created_at', { ascending: true });
-      setComments(data ?? []);
+      
+      if (data) {
+        const topLevel = data.filter(c => !c.parent_id);
+        const replies = data.filter(c => c.parent_id);
+        
+        const repliesMap = {};
+        replies.forEach(r => {
+          if (!repliesMap[r.parent_id]) repliesMap[r.parent_id] = [];
+          repliesMap[r.parent_id].push(r);
+        });
+        
+        setComments(topLevel);
+        setLocalReplies(repliesMap);
+      } else {
+        setComments([]);
+      }
       setLoading(false);
     }
     fetchComments();
@@ -68,12 +83,26 @@ export default function CommentSection({ postId, profiles, onAddComment }) {
     setSubmitting(true);
     setInput('');
     await onAddComment(trimmed, isAnonymous);
+    
     const { data } = await supabase
       .from('comments')
-      .select('id, post_id, author_id, content, created_at, is_anonymous')
+      .select('id, post_id, author_id, content, created_at, is_anonymous, parent_id')
       .eq('post_id', postId)
       .order('created_at', { ascending: true });
-    setComments(data ?? []);
+      
+    if (data) {
+      const topLevel = data.filter(c => !c.parent_id);
+      const replies = data.filter(c => c.parent_id);
+      
+      const repliesMap = {};
+      replies.forEach(r => {
+        if (!repliesMap[r.parent_id]) repliesMap[r.parent_id] = [];
+        repliesMap[r.parent_id].push(r);
+      });
+      
+      setComments(topLevel);
+      setLocalReplies(repliesMap);
+    }
     setSubmitting(false);
   };
 
@@ -92,28 +121,46 @@ export default function CommentSection({ postId, profiles, onAddComment }) {
     }
   };
 
-  // ── Local-only reply handler (no DB yet) ──────────────────────────────────
-  const handleReply = (content, parentId) => {
-    const newReply = {
-      id:           `local-${Date.now()}`,
-      author_id:    currentUser?.id,
-      content,
-      created_at:   new Date().toISOString(),
-      is_anonymous: isAnonymous,
-      parent_id:    parentId,
-      like_count:   0,
-    };
-    setLocalReplies((prev) => ({
-      ...prev,
-      [parentId]: [...(prev[parentId] ?? []), newReply],
-    }));
+// ── Database-backed reply handler ──────────────────────────────────
+  const handleReply = async (content, parentId) => {
+    if (!currentUser) return;
+    
+    const { data, error } = await supabase
+      .from('comments')
+      .insert({
+        post_id: postId,
+        author_id: currentUser.id,
+        content,
+        is_anonymous: isAnonymous,
+        parent_id: parentId
+      })
+      .select()
+      .single();
+
+    if (!error && data) {
+      setLocalReplies((prev) => ({
+        ...prev,
+        [parentId]: [...(prev[parentId] ?? []), data],
+      }));
+    } else {
+      console.error("Failed to post reply:", error);
+    }
   };
 
-  const handleDeleteReply = (replyId, parentId) => {
-    setLocalReplies((prev) => ({
-      ...prev,
-      [parentId]: (prev[parentId] ?? []).filter((r) => r.id !== replyId),
-    }));
+  const handleDeleteReply = async (replyId, parentId) => {
+    const { error } = await supabase
+      .from('comments')
+      .delete()
+      .eq('id', replyId);
+
+    if (!error) {
+      setLocalReplies((prev) => ({
+        ...prev,
+        [parentId]: (prev[parentId] ?? []).filter((r) => r.id !== replyId),
+      }));
+    } else {
+      console.error("Failed to delete reply:", error);
+    }
   };
 
   // ── Current user display info ─────────────────────────────────────────────
