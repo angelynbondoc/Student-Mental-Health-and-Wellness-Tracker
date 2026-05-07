@@ -108,23 +108,51 @@ export function useAdminDashboard() {
       fetchPendingResources();
     }, []);
 
-    const approveResource = async (id) => {
-      const { error } = await supabase
-        .from('resources')
-        .update({ status: 'approved' })
-        .eq('id', id);
-      if (error) { console.error(error); return; }
-      setPendingResources(prev => prev.filter(r => r.id !== id));
-      showToast('Resource approved!');
-    };
+  const approveResource = async (id) => {
+    const resource = pendingResources.find(r => r.id === id);
+    
+    const { error } = await supabase
+      .from('resources')
+      .update({ status: 'approved' })
+      .eq('id', id);
+      
+    if (error) { console.error(error); return; }
+    
+    setPendingResources(prev => prev.filter(r => r.id !== id));
+    
+    if (resource?.submitter?.id) {
+      await supabase.from('notifications').insert({
+        user_id: resource.submitter.id,
+        type: 'system',
+        title: 'Resource Approved',
+        content: `Your resource submission "${resource.title}" has been approved and is now public!`,
+      });
+    }
+
+    showToast('Resource approved!');
+  };
 
   const rejectResource = async (id) => {
+    const resource = pendingResources.find(r => r.id === id);
+    
     const { error } = await supabase
       .from('resources')
       .update({ status: 'rejected' })
       .eq('id', id);
+      
     if (error) { console.error(error); return; }
+    
     setPendingResources(prev => prev.filter(r => r.id !== id));
+    
+    if (resource?.submitter?.id) {
+      await supabase.from('notifications').insert({
+        user_id: resource.submitter.id,
+        type: 'moderation',
+        title: 'Resource Rejected',
+        content: `Your resource submission "${resource.title}" was not approved by the admin.`,
+      });
+    }
+
     showToast('Resource rejected.', 'danger');
   };
 
