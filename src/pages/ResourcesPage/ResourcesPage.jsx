@@ -10,7 +10,6 @@ import {
   FileText,
 } from "lucide-react";
 import { supabase } from "../../supabase";
-import AppContext from "../../AppContext";
 import { PageShell, EmptyState } from "../../components/ui";
 import "./ResourcesPage.css";
 
@@ -117,7 +116,6 @@ function LoadingSkeleton() {
 
 /* ─── Page export ────────────────────────────────────────────────────────── */
 export default function ResourcesPage() {
-  const { currentUser } = useContext(AppContext);
   const [articles, setArticles] = useState([]);
   const [loading, setLoading]   = useState(true);
   const [search, setSearch]     = useState("");
@@ -162,6 +160,7 @@ export default function ResourcesPage() {
     <PageShell
       heading="Resource Library"
       sub="Academic research and readings for your wellbeing."
+      wide
     >
       <div className="ra-root">
         {/* ── Hero strip ──────────────────────────────────────────── */}
