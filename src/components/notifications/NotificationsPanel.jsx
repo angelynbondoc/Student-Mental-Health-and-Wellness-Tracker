@@ -31,7 +31,7 @@ export default function NotificationsPanel() {
     
 
       <div className="neu-notif-list">
-        {myNotifs.map((notif) => (
+        {myNotifs.slice(0, 8).map((notif) => (
           <NotificationItem
             key={notif.id}
             notif={notif}
