@@ -420,6 +420,42 @@ export function useAdminDashboard() {
     return true;
   };
 
+  const createAdminPost = async (content) => {
+    if (!content.trim()) { showToast('Post content cannot be empty.', 'danger'); return false; }
+
+    const { data: userData } = await supabase.auth.getSession();
+    const userId = userData.session?.user?.id;
+    if (!userId) { showToast('Authentication error.', 'danger'); return false; }
+
+    const { data: general, error: genError } = await supabase
+      .from('communities')
+      .select('id')
+      .eq('is_general', true)
+      .single();
+
+    if (genError || !general) {
+      showToast('General community not found.', 'danger');
+      return false;
+    }
+
+    const { error } = await supabase.from('posts').insert({
+          author_id: userId,
+          community_id: general.id,
+          content: `[Admin Broadcast]: ${content.trim()}`,
+          is_anonymous: false,
+          is_flagged: false,
+        });
+
+    if (error) {
+      showToast('Failed to create post.', 'danger');
+      console.error(error);
+      return false;
+    }
+
+    showToast('Posted to General Community!');
+    return true;
+  };
+
   const closeSidebar = () => setSidebarOpen(false);
 
   const pendingPosts  = reports.filter(r => r.status === 'pending').length;
@@ -451,6 +487,7 @@ export function useAdminDashboard() {
     rejectResource,  
     pendingResourceCount: pendingResources.length,
     broadcastNotification,
+    createAdminPost,
     appeals, resolveAppeal, rejectAppeal, appealCount,
   };
 }

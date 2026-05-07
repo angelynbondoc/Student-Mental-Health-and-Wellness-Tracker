@@ -81,6 +81,8 @@
   color: #374151;
   line-height: 1.7;
   margin: 0 0 16px;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 /* ── Action bar ───────────────────────────────────────────────────────────── */

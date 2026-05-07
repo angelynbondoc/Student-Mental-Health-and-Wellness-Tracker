@@ -1,6 +1,7 @@
 // =============================================================================
 // BroadcastTab.jsx
-// Admin tab for composing and sending announcements to all or specific users.
+// Admin tab for composing and sending announcements to all/specific users
+// or posting directly to the General community.
 // =============================================================================
 import React, { useState, useMemo } from 'react';
 import {
@@ -11,13 +12,15 @@ import {
   Users as UsersIcon,
   UserCheck,
   Bell,
+  MessageSquare
 } from 'lucide-react';
 import './BroadcastTab.css';
 
 const MAX_TITLE = 120;
 const MAX_MSG   = 500;
 
-export default function BroadcastTab({ users = [], broadcastNotification }) {
+export default function BroadcastTab({ users = [], broadcastNotification, createAdminPost }) {
+  const [broadcastMode, setBroadcastMode] = useState('notification'); // 'notification' | 'post'
   const [title, setTitle]             = useState('');
   const [message, setMessage]         = useState('');
   const [targetType, setTargetType]   = useState('all');
@@ -53,8 +56,7 @@ export default function BroadcastTab({ users = [], broadcastNotification }) {
   const canSend =
     !sending &&
     message.trim().length > 0 &&
-    title.trim().length > 0 &&
-    !(targetType === 'selected' && selectedIds.size === 0);
+    (broadcastMode === 'post' || (title.trim().length > 0 && !(targetType === 'selected' && selectedIds.size === 0)));
 
   // ── Handlers ─────────────────────────────────────────────────────────────
   const toggleUser = id =>
@@ -71,20 +73,29 @@ export default function BroadcastTab({ users = [], broadcastNotification }) {
 
   const handleSend = async () => {
     setSending(true);
-    const ok = await broadcastNotification({
-      title,
-      message,
-      targetType,
-      selectedUserIds: targetType === 'selected' ? [...selectedIds] : [],
-    });
-    setSending(false);
-    if (ok) {
-      setTitle('');
-      setMessage('');
-      setSelectedIds(new Set());
-      setUserSearch('');
-      setTargetType('all');
+    
+    if (broadcastMode === 'notification') {
+      const ok = await broadcastNotification({
+        title,
+        message,
+        targetType,
+        selectedUserIds: targetType === 'selected' ? [...selectedIds] : [],
+      });
+      if (ok) {
+        setTitle('');
+        setMessage('');
+        setSelectedIds(new Set());
+        setUserSearch('');
+        setTargetType('all');
+      }
+    } else {
+      const ok = await createAdminPost(message);
+      if (ok) {
+        setMessage('');
+      }
     }
+    
+    setSending(false);
   };
 
   const counterClass =
@@ -100,9 +111,9 @@ export default function BroadcastTab({ users = [], broadcastNotification }) {
           <Megaphone size={22} strokeWidth={2} />
         </div>
         <div className="bc-header__text">
-          <h2 className="bc-title">Broadcast Announcement</h2>
+          <h2 className="bc-title">Broadcast & Posts</h2>
           <p className="bc-sub">
-            Send a notification to selected users or to everyone in the community.
+            Send direct notifications to users or post publicly to the General community.
           </p>
         </div>
       </div>
@@ -110,24 +121,52 @@ export default function BroadcastTab({ users = [], broadcastNotification }) {
       <div className="bc-body">
         {/* ── LEFT: Compose card ────────────────────────────────────────── */}
         <section className="bc-compose">
-          {/* Title input */}
+          {/* Mode Switcher */}
           <div className="bc-field">
-            <div className="bc-field__head">
-              <label htmlFor="bc-title" className="bc-label">Title</label>
-              <span className={title.length > MAX_TITLE * 0.9 ? 'bc-counter bc-counter--warn' : 'bc-counter'}>
-                {title.length}/{MAX_TITLE}
-              </span>
+            <div className="bc-segmented" role="tablist" aria-label="Broadcast Mode">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={broadcastMode === 'notification'}
+                className={`bc-segmented__btn ${broadcastMode === 'notification' ? 'is-active' : ''}`}
+                onClick={() => setBroadcastMode('notification')}
+              >
+                <Bell size={15} strokeWidth={2} />
+                <span>Notification</span>
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={broadcastMode === 'post'}
+                className={`bc-segmented__btn ${broadcastMode === 'post' ? 'is-active' : ''}`}
+                onClick={() => setBroadcastMode('post')}
+              >
+                <MessageSquare size={15} strokeWidth={2} />
+                <span>Community Post</span>
+              </button>
             </div>
-            <input
-              id="bc-title"
-              className="bc-input"
-              type="text"
-              placeholder="e.g. System maintenance scheduled"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              maxLength={MAX_TITLE}
-            />
           </div>
+
+          {/* Title input (Notifications only) */}
+          {broadcastMode === 'notification' && (
+            <div className="bc-field">
+              <div className="bc-field__head">
+                <label htmlFor="bc-title" className="bc-label">Title</label>
+                <span className={title.length > MAX_TITLE * 0.9 ? 'bc-counter bc-counter--warn' : 'bc-counter'}>
+                  {title.length}/{MAX_TITLE}
+                </span>
+              </div>
+              <input
+                id="bc-title"
+                className="bc-input"
+                type="text"
+                placeholder="e.g. System maintenance scheduled"
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                maxLength={MAX_TITLE}
+              />
+            </div>
+          )}
 
           {/* Message input */}
           <div className="bc-field">
@@ -140,7 +179,7 @@ export default function BroadcastTab({ users = [], broadcastNotification }) {
             <textarea
               id="bc-msg"
               className="bc-textarea"
-              placeholder="Write your announcement here…"
+              placeholder={broadcastMode === 'notification' ? "Write your announcement here…" : "Write your community post here..."}
               rows={5}
               maxLength={MAX_MSG}
               value={message}
@@ -148,34 +187,36 @@ export default function BroadcastTab({ users = [], broadcastNotification }) {
             />
           </div>
 
-          {/* Audience segmented control */}
-          <div className="bc-field">
-            <label className="bc-label">Audience</label>
-            <div className="bc-segmented" role="tablist" aria-label="Audience">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={targetType === 'all'}
-                className={`bc-segmented__btn ${targetType === 'all' ? 'is-active' : ''}`}
-                onClick={() => setTargetType('all')}
-              >
-                <UsersIcon size={15} strokeWidth={2} />
-                <span>All users</span>
-                <span className="bc-segmented__count">{eligibleUsers.length}</span>
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={targetType === 'selected'}
-                className={`bc-segmented__btn ${targetType === 'selected' ? 'is-active' : ''}`}
-                onClick={() => setTargetType('selected')}
-              >
-                <UserCheck size={15} strokeWidth={2} />
-                <span>Selected</span>
-                <span className="bc-segmented__count">{selectedIds.size}</span>
-              </button>
+          {/* Audience segmented control (Notifications only) */}
+          {broadcastMode === 'notification' && (
+            <div className="bc-field">
+              <label className="bc-label">Audience</label>
+              <div className="bc-segmented" role="tablist" aria-label="Audience">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={targetType === 'all'}
+                  className={`bc-segmented__btn ${targetType === 'all' ? 'is-active' : ''}`}
+                  onClick={() => setTargetType('all')}
+                >
+                  <UsersIcon size={15} strokeWidth={2} />
+                  <span>All users</span>
+                  <span className="bc-segmented__count">{eligibleUsers.length}</span>
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={targetType === 'selected'}
+                  className={`bc-segmented__btn ${targetType === 'selected' ? 'is-active' : ''}`}
+                  onClick={() => setTargetType('selected')}
+                >
+                  <UserCheck size={15} strokeWidth={2} />
+                  <span>Selected</span>
+                  <span className="bc-segmented__count">{selectedIds.size}</span>
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Live preview */}
           <div className="bc-field">
@@ -183,19 +224,32 @@ export default function BroadcastTab({ users = [], broadcastNotification }) {
             <div className="bc-preview">
               <div className="bc-preview__strip" aria-hidden="true" />
               <div className="bc-preview__icon" aria-hidden="true">
-                <Bell size={16} strokeWidth={2} />
+                {broadcastMode === 'notification' ? <Bell size={16} strokeWidth={2} /> : <MessageSquare size={16} strokeWidth={2} />}
               </div>
               <div className="bc-preview__body">
-                <div className="bc-preview__meta">
-                  <span className="bc-preview__source">NEU Wellness · Admin</span>
-                  <span className="bc-preview__dot" aria-hidden="true">·</span>
-                  <span className="bc-preview__time">just now</span>
-                </div>
-                <p className={`bc-preview__title ${!title ? 'is-placeholder' : ''}`}>
-                  {title || 'Announcement title'}
-                </p>
+                {broadcastMode === 'notification' ? (
+                  <>
+                    <div className="bc-preview__meta">
+                      <span className="bc-preview__source">NEU Wellness · Admin</span>
+                      <span className="bc-preview__dot" aria-hidden="true">·</span>
+                      <span className="bc-preview__time">just now</span>
+                    </div>
+                    <p className={`bc-preview__title ${!title ? 'is-placeholder' : ''}`}>
+                      {title || 'Announcement title'}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="bc-preview__meta">
+                      <span className="bc-preview__source">General Community</span>
+                      <span className="bc-preview__dot" aria-hidden="true">·</span>
+                      <span className="bc-preview__time">just now</span>
+                    </div>
+                    <p className="bc-preview__title">Admin</p>
+                  </>
+                )}
                 <p className={`bc-preview__msg ${!message ? 'is-placeholder' : ''}`}>
-                  {message || 'Your message will appear here. Keep it clear, calm, and helpful.'}
+                  {message || (broadcastMode === 'notification' ? 'Your message will appear here. Keep it clear, calm, and helpful.' : 'Your post content will appear here.')}
                 </p>
               </div>
             </div>
@@ -205,32 +259,32 @@ export default function BroadcastTab({ users = [], broadcastNotification }) {
           <div className="bc-send-row">
             <div className="bc-recipient">
               <UsersIcon size={14} strokeWidth={2} />
-              <span>{recipientLabel}</span>
+              <span>{broadcastMode === 'notification' ? recipientLabel : 'General Community'}</span>
             </div>
             <button
               type="button"
               className="bc-send-btn"
               onClick={handleSend}
               disabled={!canSend}
-              aria-label={`Send announcement to ${recipientCount} recipients`}
+              aria-label={broadcastMode === 'notification' ? `Send announcement to ${recipientCount} recipients` : 'Post to General Community'}
             >
               {sending ? (
                 <>
                   <span className="bc-spinner" aria-hidden="true" />
-                  <span>Sending…</span>
+                  <span>{broadcastMode === 'notification' ? 'Sending…' : 'Posting…'}</span>
                 </>
               ) : (
                 <>
                   <Send size={15} strokeWidth={2} />
-                  <span>Send announcement</span>
+                  <span>{broadcastMode === 'notification' ? 'Send announcement' : 'Post to Community'}</span>
                 </>
               )}
             </button>
           </div>
         </section>
 
-        {/* ── RIGHT: User picker (only when 'selected') ─────────────────── */}
-        {targetType === 'selected' && (
+        {/* ── RIGHT: User picker (only when 'selected' + notification) ─────────────────── */}
+        {broadcastMode === 'notification' && targetType === 'selected' && (
           <aside className="bc-picker">
             <div className="bc-picker__header">
               <div>
