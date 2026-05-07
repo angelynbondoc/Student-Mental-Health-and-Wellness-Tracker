@@ -224,7 +224,7 @@ export default function ProfilePage() {
   };
 
   const myPosts = posts.filter(
-    (p) => p.author_id === currentUser.id && !p.content?.startsWith("[Shared Post]:"),
+    (p) => p.author_id === currentUser.id && !p.content?.startsWith("[Shared Post]:") && !p.content?.startsWith("[Admin Broadcast]\n"),
   );
   const sharedPosts = posts.filter(
     (p) => p.author_id === currentUser.id && p.content?.startsWith("[Shared Post]:"),
