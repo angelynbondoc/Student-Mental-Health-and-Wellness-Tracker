@@ -97,7 +97,6 @@ export default function HomePage() {
 
         {filteredPosts.length === 0 ? (
           <div className="hfeed-empty">
-            <div className="hfeed-empty__icon">🌱</div>
             <p className="hfeed-empty__msg">No posts in this community yet.</p>
             <p className="hfeed-empty__hint">Be the first to post here!</p>
           </div>
