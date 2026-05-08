@@ -2,9 +2,19 @@ import React, { useContext, useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AppContext from "../../../AppContext";
 import {
-  Pencil, Trash2, LogOut, X, Check,
-  FileText, Repeat2, Users, AlertTriangle, Camera,
-  MoreVertical, GraduationCap, Mail,
+  Pencil,
+  Trash2,
+  LogOut,
+  X,
+  Check,
+  FileText,
+  Repeat2,
+  Users,
+  AlertTriangle,
+  Camera,
+  MoreVertical,
+  GraduationCap,
+  Mail,
 } from "lucide-react";
 import PhotoEditorModal from "../Photoeditormodal/Photoeditormodal";
 import "./ProfilePage.css";
@@ -16,18 +26,32 @@ const handleLogout = async () => {
 };
 
 /* ─── Confirm modal ──────────────────────────────────────────────────────── */
-function ConfirmModal({ title, message, confirmLabel, onConfirm, onCancel, danger }) {
+function ConfirmModal({
+  title,
+  message,
+  confirmLabel,
+  onConfirm,
+  onCancel,
+  danger,
+}) {
   return (
     <div className="pp-overlay" onClick={onCancel}>
       <div className="pp-modal" onClick={(e) => e.stopPropagation()}>
-        <div className={`pp-modal-icon ${danger ? "pp-modal-icon--danger" : "pp-modal-icon--warn"}`}>
+        <div
+          className={`pp-modal-icon ${danger ? "pp-modal-icon--danger" : "pp-modal-icon--warn"}`}
+        >
           <AlertTriangle size={22} />
         </div>
         <h3 className="pp-modal-title">{title}</h3>
         <p className="pp-modal-msg">{message}</p>
         <div className="pp-modal-actions">
-          <button className="pp-btn pp-btn--ghost" onClick={onCancel}>Cancel</button>
-          <button className={`pp-btn ${danger ? "pp-btn--danger" : "pp-btn--primary"}`} onClick={onConfirm}>
+          <button className="pp-btn pp-btn--ghost" onClick={onCancel}>
+            Cancel
+          </button>
+          <button
+            className={`pp-btn ${danger ? "pp-btn--danger" : "pp-btn--primary"}`}
+            onClick={onConfirm}
+          >
             {confirmLabel}
           </button>
         </div>
@@ -61,11 +85,22 @@ function Avatar({ profile, size = 96, onClick }) {
       title={onClick ? "Change profile picture" : undefined}
     >
       {hasPhoto ? (
-        <img src={profile.photo_url} alt={profile.display_name} style={imgStyle} draggable={false} />
+        <img
+          src={profile.photo_url}
+          alt={profile.display_name}
+          style={imgStyle}
+          draggable={false}
+        />
       ) : (
-        <span className="pp-avatar-letter" style={{ fontSize: size * 0.38 }}>{letter}</span>
+        <span className="pp-avatar-letter" style={{ fontSize: size * 0.38 }}>
+          {letter}
+        </span>
       )}
-      {onClick && <div className="pp-avatar-edit-overlay"><Camera size={18} /></div>}
+      {onClick && (
+        <div className="pp-avatar-edit-overlay">
+          <Camera size={18} />
+        </div>
+      )}
     </div>
   );
 }
@@ -78,7 +113,8 @@ function PostMenu({ onEdit, onDelete, isShared }) {
   useEffect(() => {
     if (!open) return;
     const handleClick = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) setOpen(false);
+      if (menuRef.current && !menuRef.current.contains(e.target))
+        setOpen(false);
     };
     const handleEsc = (e) => e.key === "Escape" && setOpen(false);
     document.addEventListener("mousedown", handleClick);
@@ -108,7 +144,10 @@ function PostMenu({ onEdit, onDelete, isShared }) {
               type="button"
               className="pp-menu-item"
               role="menuitem"
-              onClick={() => { setOpen(false); onEdit?.(); }}
+              onClick={() => {
+                setOpen(false);
+                onEdit?.();
+              }}
             >
               <Pencil size={14} />
               Edit post
@@ -118,7 +157,10 @@ function PostMenu({ onEdit, onDelete, isShared }) {
             type="button"
             className="pp-menu-item pp-menu-item--danger"
             role="menuitem"
-            onClick={() => { setOpen(false); onDelete?.(); }}
+            onClick={() => {
+              setOpen(false);
+              onDelete?.();
+            }}
           >
             <Trash2 size={14} />
             {isShared ? "Remove shared post" : "Delete post"}
@@ -150,7 +192,9 @@ function PostEditor({ post, onSave, onCancel }) {
         <button
           className="pp-btn pp-btn--primary"
           onClick={() => onSave(body.trim())}
-          disabled={!body.trim() || body.trim() === (post.content ?? post.body ?? "")}
+          disabled={
+            !body.trim() || body.trim() === (post.content ?? post.body ?? "")
+          }
         >
           <Check size={14} /> Save changes
         </button>
@@ -160,7 +204,14 @@ function PostEditor({ post, onSave, onCancel }) {
 }
 
 /* ─── Profile post card ──────────────────────────────────────────────────── */
-function ProfilePostCard({ post, community, onDelete, onEdit, isShared }) {
+function ProfilePostCard({
+  post,
+  community,
+  onDelete,
+  onEdit,
+  isShared,
+  profile,
+}) {
   const [confirming, setConfirming] = useState(false);
   const [editing, setEditing] = useState(false);
 
@@ -169,22 +220,46 @@ function ProfilePostCard({ post, community, onDelete, onEdit, isShared }) {
     setEditing(false);
   };
 
+  const bodyText = isShared
+    ? (post.content ?? "").replace(/^\[Shared Post\]:\s*/, "")
+    : (post.content ?? "—");
+
   return (
     <>
       <article className="pp-post-card">
         <header className="pp-post-meta">
-          <span className="pp-post-community">{community?.name ?? "Unknown community"}</span>
-          <span className="pp-post-dot" aria-hidden="true">·</span>
-          <span className="pp-post-date">
-            {new Date(post.created_at).toLocaleDateString("en-PH", {
-              month: "short", day: "numeric", year: "numeric",
-            })}
-          </span>
-          {isShared && (
-            <span className="pp-shared-tag">
-              <Repeat2 size={11} /> Shared
-            </span>
-          )}
+          <div className="pp-post-author-row">
+            <div className="pp-post-author-avatar">
+              {profile?.photo_url ? (
+                <img src={profile.photo_url} alt={profile.display_name} />
+              ) : (
+                <span>{(profile?.display_name?.[0] ?? "U").toUpperCase()}</span>
+              )}
+            </div>
+            <div className="pp-post-author-info">
+              <span className="pp-post-author-name">
+                {profile?.display_name ?? "You"}
+              </span>
+              <span className="pp-post-meta-sub">
+                <span className="pp-post-community">
+                  {community?.name ?? "Unknown community"}
+                </span>
+                <span className="pp-post-dot" aria-hidden="true">·</span>
+                <span className="pp-post-date">
+                  {new Date(post.created_at).toLocaleDateString("en-PH", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </span>
+                {isShared && (
+                  <span className="pp-shared-tag">
+                    <Repeat2 size={11} /> Shared
+                  </span>
+                )}
+              </span>
+            </div>
+          </div>
 
           {!editing && (
             <PostMenu
@@ -202,7 +277,7 @@ function ProfilePostCard({ post, community, onDelete, onEdit, isShared }) {
             onCancel={() => setEditing(false)}
           />
         ) : (
-          <p className="pp-post-body">{post.body ?? post.content ?? "—"}</p>
+          <p className="pp-post-body">{bodyText}</p>
         )}
       </article>
 
@@ -216,7 +291,10 @@ function ProfilePostCard({ post, community, onDelete, onEdit, isShared }) {
               : "This will permanently delete your post. This action cannot be undone."
           }
           confirmLabel={isShared ? "Remove" : "Delete"}
-          onConfirm={() => { onDelete(post.id); setConfirming(false); }}
+          onConfirm={() => {
+            onDelete(post.id);
+            setConfirming(false);
+          }}
           onCancel={() => setConfirming(false)}
         />
       )}
@@ -242,10 +320,14 @@ function CommunityRow({ community, onLeave }) {
           role="button"
           tabIndex={0}
           onClick={() => navigate(`/home?community=${community.id}`)}
-          onKeyDown={(e) => e.key === "Enter" && navigate(`/home?community=${community.id}`)}
+          onKeyDown={(e) =>
+            e.key === "Enter" && navigate(`/home?community=${community.id}`)
+          }
         >
           <span className="pp-community-name">{community.name}</span>
-          <span className="pp-community-desc">{community.description ?? "Community"}</span>
+          <span className="pp-community-desc">
+            {community.description ?? "Community"}
+          </span>
         </div>
 
         {!isGeneral && (
@@ -263,7 +345,10 @@ function CommunityRow({ community, onLeave }) {
           title={`Leave "${community.name}"?`}
           message="You will no longer see posts from this community in your feed. You can rejoin anytime."
           confirmLabel="Leave"
-          onConfirm={() => { onLeave(community.id); setConfirming(false); }}
+          onConfirm={() => {
+            onLeave(community.id);
+            setConfirming(false);
+          }}
           onCancel={() => setConfirming(false)}
         />
       )}
@@ -280,9 +365,15 @@ function EditProfileForm({ profile, onSave, onCancel, onOpenPhotoModal }) {
     <div className="pp-edit-form">
       <div className="pp-field">
         <label className="pp-label">Profile Picture</label>
-        <button className="pp-change-photo-btn" type="button" onClick={onOpenPhotoModal}>
+        <button
+          className="pp-change-photo-btn"
+          type="button"
+          onClick={onOpenPhotoModal}
+        >
           <Camera size={15} />
-          {profile.photo_url ? "Change photo or avatar" : "Choose photo or avatar"}
+          {profile.photo_url
+            ? "Change photo or avatar"
+            : "Choose photo or avatar"}
         </button>
       </div>
       <div className="pp-field">
@@ -313,7 +404,10 @@ function EditProfileForm({ profile, onSave, onCancel, onOpenPhotoModal }) {
         </button>
         <button
           className="pp-btn pp-btn--primary"
-          onClick={() => { if (displayName.trim()) onSave({ display_name: displayName.trim(), bio: bio.trim() }); }}
+          onClick={() => {
+            if (displayName.trim())
+              onSave({ display_name: displayName.trim(), bio: bio.trim() });
+          }}
         >
           <Check size={14} /> Save changes
         </button>
@@ -323,18 +417,22 @@ function EditProfileForm({ profile, onSave, onCancel, onOpenPhotoModal }) {
 }
 
 const TABS = [
-  { id: "posts",       label: "My Posts",     icon: FileText },
-  { id: "shared",      label: "Shared",       icon: Repeat2 },
-  { id: "communities", label: "Communities",  icon: Users },
+  { id: "posts", label: "My Posts", icon: FileText },
+  { id: "shared", label: "Shared", icon: Repeat2 },
+  { id: "communities", label: "Communities", icon: Users },
 ];
 
 /* ─── Page export ────────────────────────────────────────────────────────── */
 export default function ProfilePage() {
   const {
-    currentUser, setCurrentUser,
-    profiles, setProfiles,
-    posts, setPosts,
-    communities, setCommunities,
+    currentUser,
+    setCurrentUser,
+    profiles,
+    setProfiles,
+    posts,
+    setPosts,
+    communities,
+    setCommunities,
   } = useContext(AppContext);
 
   const [activeTab, setActiveTab] = useState("posts");
@@ -349,91 +447,111 @@ export default function ProfilePage() {
   };
 
   const myPosts = posts.filter(
-    (p) => p.author_id === currentUser.id && !p.content?.startsWith("[Shared Post]:") && !p.content?.startsWith("[Admin Broadcast]\n"),
+    (p) =>
+      p.author_id === currentUser.id &&
+      !p.content?.startsWith("[Shared Post]:") &&
+      !p.content?.startsWith("[Admin Broadcast]\n"),
   );
   const sharedPosts = posts.filter(
-    (p) => p.author_id === currentUser.id && p.content?.startsWith("[Shared Post]:"),
+    (p) =>
+      p.author_id === currentUser.id && p.content?.startsWith("[Shared Post]:"),
   );
   const myCommunities = communities;
 
   const handleSaveProfile = async ({ display_name, bio }) => {
-    const { error } = await supabase.from('profiles').update({ display_name, bio }).eq('id', currentUser.id);
-    if (error) { console.error('save failed:', error); return; }
-    setProfiles(prev => prev.map(p => p.id === currentUser.id ? { ...p, display_name, bio } : p));
-    setCurrentUser(prev => ({ ...prev, display_name, bio }));
+    const { error } = await supabase
+      .from("profiles")
+      .update({ display_name, bio })
+      .eq("id", currentUser.id);
+    if (error) { console.error("save failed:", error); return; }
+    setProfiles((prev) =>
+      prev.map((p) => p.id === currentUser.id ? { ...p, display_name, bio } : p),
+    );
+    setCurrentUser((prev) => ({ ...prev, display_name, bio }));
     setEditing(false);
   };
 
-  const handleSavePhoto = async ({ photo_url, offsetX = 0, offsetY = 0, scale = 1, is_preset = false }) => {
+  const handleSavePhoto = async ({
+    photo_url,
+    offsetX = 0,
+    offsetY = 0,
+    scale = 1,
+    is_preset = false,
+  }) => {
     let finalUrl = photo_url;
 
     if (!is_preset) {
       const res = await fetch(photo_url);
       const blob = await res.blob();
-      const ext = blob.type.split('/')[1] || 'jpg';
+      const ext = blob.type.split("/")[1] || "jpg";
       const filePath = `${currentUser.id}/avatar.${ext}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('avatars')
+        .from("avatars")
         .upload(filePath, blob, { upsert: true, contentType: blob.type });
 
-      if (uploadError) { console.error('upload failed:', uploadError); return; }
+      if (uploadError) { console.error("upload failed:", uploadError); return; }
 
-      const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
+      const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(filePath);
       finalUrl = publicUrl;
     }
 
-    const { error } = await supabase.from('profiles').update({ photo_url: finalUrl }).eq('id', currentUser.id);
-    if (error) { console.error('photo save failed:', error); return; }
+    const { error } = await supabase
+      .from("profiles")
+      .update({ photo_url: finalUrl })
+      .eq("id", currentUser.id);
+    if (error) { console.error("photo save failed:", error); return; }
 
-    setProfiles(prev =>
-      prev.map(p =>
+    setProfiles((prev) =>
+      prev.map((p) =>
         p.id === currentUser.id
           ? { ...p, photo_url: finalUrl, is_preset, photo_offset: { x: offsetX, y: offsetY, scale } }
-          : p
-      )
+          : p,
+      ),
     );
-    setCurrentUser(prev => ({ ...prev, photo_url: finalUrl }));
+    setCurrentUser((prev) => ({ ...prev, photo_url: finalUrl }));
     setPhotoModal(false);
   };
 
   const handleDeletePost = async (id) => {
-    const { error } = await supabase.from('posts').delete().eq('id', id);
-    if (error) { console.error('delete error:', error); return; }
+    const { error } = await supabase.from("posts").delete().eq("id", id);
+    if (error) { console.error("delete error:", error); return; }
     setPosts((prev) => prev.filter((p) => p.id !== id));
   };
 
   const handleEditPost = async (id, newContent) => {
     const { error } = await supabase
-      .from('posts')
+      .from("posts")
       .update({ content: newContent })
-      .eq('id', id);
-    if (error) { console.error('edit error:', error); return; }
+      .eq("id", id);
+    if (error) { console.error("edit error:", error); return; }
     setPosts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, content: newContent } : p))
+      prev.map((p) => (p.id === id ? { ...p, content: newContent } : p)),
     );
   };
 
   const handleLeave = async (communityId) => {
     const { error } = await supabase
-      .from('community_members')
+      .from("community_members")
       .delete()
-      .eq('community_id', communityId)
-      .eq('user_id', currentUser.id);
-    if (error) { console.error('leave error:', error); return; }
-    setCommunities(prev => prev.filter(c => c.id !== communityId));
+      .eq("community_id", communityId)
+      .eq("user_id", currentUser.id);
+    if (error) { console.error("leave error:", error); return; }
+    setCommunities((prev) => prev.filter((c) => c.id !== communityId));
   };
 
   const stats = [
-    { label: "Posts",       value: myPosts.length },
-    { label: "Shared",      value: sharedPosts.length },
+    { label: "Posts", value: myPosts.length },
+    { label: "Shared", value: sharedPosts.length },
     { label: "Communities", value: myCommunities.length },
   ];
 
   const activeCount =
-    activeTab === "posts" ? myPosts.length :
-    activeTab === "shared" ? sharedPosts.length :
-    myCommunities.length;
+    activeTab === "posts"
+      ? myPosts.length
+      : activeTab === "shared"
+        ? sharedPosts.length
+        : myCommunities.length;
 
   return (
     <div className="pp-shell">
@@ -445,7 +563,11 @@ export default function ProfilePage() {
 
         <div className="pp-header-content">
           <div className="pp-avatar-wrap">
-            <Avatar profile={profile} size={104} onClick={() => setPhotoModal(true)} />
+            <Avatar
+              profile={profile}
+              size={104}
+              onClick={() => setPhotoModal(true)}
+            />
             {currentUser.role === "admin" && (
               <span className="pp-avatar-badge">Admin</span>
             )}
@@ -496,7 +618,9 @@ export default function ProfilePage() {
                         <span className="pp-stat-value">{s.value}</span>
                         <span className="pp-stat-label">{s.label}</span>
                       </div>
-                      {i < stats.length - 1 && <div className="pp-stat-divider" aria-hidden="true" />}
+                      {i < stats.length - 1 && (
+                        <div className="pp-stat-divider" aria-hidden="true" />
+                      )}
                     </React.Fragment>
                   ))}
                 </div>
@@ -520,9 +644,11 @@ export default function ProfilePage() {
         {TABS.map((tab) => {
           const TabIcon = tab.icon;
           const count =
-            tab.id === "posts" ? myPosts.length :
-            tab.id === "shared" ? sharedPosts.length :
-            myCommunities.length;
+            tab.id === "posts"
+              ? myPosts.length
+              : tab.id === "shared"
+                ? sharedPosts.length
+                : myCommunities.length;
           return (
             <button
               key={tab.id}
@@ -556,6 +682,7 @@ export default function ProfilePage() {
                   key={post.id}
                   post={post}
                   isShared={false}
+                  profile={profile}
                   community={communities.find((c) => c.id === post.community_id)}
                   onDelete={handleDeletePost}
                   onEdit={handleEditPost}
@@ -576,16 +703,34 @@ export default function ProfilePage() {
                 <p className="pp-empty-body">Posts you share from the community will appear here.</p>
               </div>
             ) : (
-              sharedPosts.map((post) => (
-                <ProfilePostCard
-                  key={post.id}
-                  post={post}
-                  isShared
-                  community={communities.find((c) => c.id === post.community_id)}
-                  onDelete={handleDeletePost}
-                  onEdit={handleEditPost}
-                />
-              ))
+              sharedPosts.map((post) => {
+                // Try original_author_id first (DB column added via migration).
+                // Fall back to scanning posts by content match for shares that
+                // were created before the column existed.
+                const originalAuthorId =
+                  post.original_author_id ??
+                  posts.find(
+                    (p) =>
+                      !p.content?.startsWith("[Shared Post]:") &&
+                      post.content === `[Shared Post]: ${p.content}`,
+                  )?.author_id;
+
+                const originalAuthorProfile = profiles.find(
+                  (p) => p.id === originalAuthorId,
+                );
+
+                return (
+                  <ProfilePostCard
+                    key={post.id}
+                    post={post}
+                    isShared
+                    profile={originalAuthorProfile ?? { display_name: "Unknown user" }}
+                    community={communities.find((c) => c.id === post.community_id)}
+                    onDelete={handleDeletePost}
+                    onEdit={handleEditPost}
+                  />
+                );
+              })
             )}
           </div>
         )}
@@ -602,7 +747,11 @@ export default function ProfilePage() {
               </div>
             ) : (
               myCommunities.map((community) => (
-                <CommunityRow key={community.id} community={community} onLeave={handleLeave} />
+                <CommunityRow
+                  key={community.id}
+                  community={community}
+                  onLeave={handleLeave}
+                />
               ))
             )}
           </div>
