@@ -107,6 +107,7 @@ export default function usePostCard(post) {
 
     const { error } = await supabase.from("posts").insert({
       author_id: currentUser.id,
+      original_author_id: post.author_id,
       community_id: post.community_id,
       content: `[Shared Post]: ${originalContent}`,
       is_anonymous: false,
