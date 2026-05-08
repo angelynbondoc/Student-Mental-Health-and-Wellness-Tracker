@@ -1118,3 +1118,17 @@
   gap: 4px;
   flex-wrap: wrap;
 }
+
+.pp-menu-dropdown--portal {
+  position: fixed !important;
+  top: auto;
+  right: auto;
+  z-index: 9999 !important;
+  min-width: 180px;
+  background: #FFFFFF;
+  border: 1px solid #E5E5E0;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(17, 17, 17, 0.10);
+  padding: 5px;
+  animation: ppMenuIn 160ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
