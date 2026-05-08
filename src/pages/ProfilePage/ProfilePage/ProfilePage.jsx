@@ -213,13 +213,28 @@ function ProfilePostCard({ post, community, onDelete, onEdit, isShared, profile,
     setEditing(false);
   };
 
-  const bodyText = isShared
-    ? (post.content ?? "").replace(/^\[Shared Post\]:\s*/, "")
-    : (post.content ?? "—");
+  let bodyText = post.content || "—";
+  if (isShared) {
+    bodyText = bodyText.replace(/^\[Shared Post\]:\s*/, "").trim();
+  }
+  const isAdminBroadcast = bodyText.startsWith("[Admin Broadcast]\n");
+  if (isAdminBroadcast) {
+    bodyText = bodyText.replace(/^\[Admin Broadcast\]\n\s*/, "").trim();
+  }
 
-  // Respect is_anonymous — never expose the real name/photo
-  const displayName  = isAnonymous ? "Anonymous" : (profile?.display_name ?? "Unknown user");
-  const displayPhoto = isAnonymous ? null       : profile?.photo_url;
+  const isAdmin = profile?.role === "admin" || profile?.role === "superadmin";
+
+  const displayName = isAdminBroadcast || isAdmin
+    ? "Admin"
+    : isAnonymous
+    ? "Anonymous"
+    : (profile?.display_name ?? "Unknown user");
+
+  const displayPhoto = isAdminBroadcast || isAdmin
+    ? "/NEULogo1.png"
+    : isAnonymous
+    ? null
+    : profile?.photo_url;
 
   return (
     <>

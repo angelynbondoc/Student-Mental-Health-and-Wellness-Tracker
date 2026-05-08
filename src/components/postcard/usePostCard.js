@@ -96,23 +96,23 @@ export default function usePostCard(post) {
 
   // ── Share ──────────────────────────────────────────────────────────────────
   const handleShare = async () => {
-    if (!currentUser) return;
+  if (!currentUser) return;
 
-    let originalContent = post.content;
-    if (originalContent.startsWith("[Shared Post]:")) {
-      originalContent = originalContent.replace("[Shared Post]:", "").trim();
-    } else if (originalContent.startsWith("[Admin Broadcast]\n")) {
-      originalContent = originalContent.replace("[Admin Broadcast]\n", "").trim();
-    }
+  const trueOriginalAuthorId = post.original_author_id ?? post.author_id;
 
-    const { error } = await supabase.from("posts").insert({
-      author_id: currentUser.id,
-      original_author_id: post.author_id,
-      community_id: post.community_id,
-      content: `[Shared Post]: ${originalContent}`,
-      is_anonymous: false,
-      is_flagged: false,
-    });
+  let originalContent = post.content;
+  if (originalContent.startsWith("[Shared Post]:")) {
+    originalContent = originalContent.replace("[Shared Post]:", "").trim();
+  }
+
+  const { error } = await supabase.from("posts").insert({
+    author_id: currentUser.id,
+    original_author_id: trueOriginalAuthorId,  
+    community_id: post.community_id,
+    content: `[Shared Post]: ${originalContent}`,
+    is_anonymous: false,
+    is_flagged: false
+  });
 
     if (!error) {
       setShowConfirm(false);
