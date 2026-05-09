@@ -1,24 +1,42 @@
 import React, { useState, useEffect, useRef } from "react";
+
 const BREATH_PHASES = [
   { label: "Inhale", duration: 4, scale: 1.35, color: "#A5D6A7" },
-  { label: "Hold", duration: 4, scale: 1.35, color: "#FFF176" },
-  { label: "Exhale", duration: 6, scale: 1.0, color: "#90CAF9" },
-  { label: "Rest", duration: 2, scale: 1.0, color: "#CE93D8" },
+  { label: "Hold",   duration: 4, scale: 1.35, color: "#FFF176" },
+  { label: "Exhale", duration: 6, scale: 1.0,  color: "#90CAF9" },
+  { label: "Rest",   duration: 2, scale: 1.0,  color: "#CE93D8" },
 ];
 
 const TOTAL_CYCLE = BREATH_PHASES.reduce((s, p) => s + p.duration, 0);
+const REQUIRED_SESSIONS = 3;
 
-export function MeditationPanel({
-  habitId,
-  logged,
-  onToggleLog,
-  completionCount,
-}) {
+export function MeditationPanel({ habitId, logged, onToggleLog, completionCount }) {
+  const todayStr = new Date().toISOString().split("T")[0];
+  const storageKey = `meditation_${habitId}_${todayStr}`;
+
   const [showPanel, setShowPanel] = useState(false);
   const [running, setRunning] = useState(false);
-  const [elapsed, setElapsed] = useState(0); // seconds in current cycle
-  const [sessions, setSessions] = useState(0);
+  const [elapsed, setElapsed] = useState(0);
+
+  // Initialize sessions from localStorage
+  const [sessions, setSessions] = useState(() => {
+    if (logged) return REQUIRED_SESSIONS;
+    const saved = localStorage.getItem(storageKey);
+    return saved ? parseInt(saved, 10) : 0;
+  });
+
   const intervalRef = useRef(null);
+
+  // Sync if logged prop changes externally
+  useEffect(() => {
+    if (logged && sessions < REQUIRED_SESSIONS) {
+      setSessions(REQUIRED_SESSIONS);
+      localStorage.setItem(storageKey, REQUIRED_SESSIONS);
+    } else if (!logged && sessions >= REQUIRED_SESSIONS) {
+      setSessions(0);
+      localStorage.setItem(storageKey, 0);
+    }
+  }, [logged, habitId, storageKey, sessions]);
 
   // Determine current phase
   let acc = 0;
@@ -42,7 +60,9 @@ export function MeditationPanel({
           if (next >= TOTAL_CYCLE) {
             setSessions((s) => {
               const ns = s + 1;
-              if (ns >= 3 && !logged) onToggleLog(habitId);
+              // Persist new session count
+              localStorage.setItem(storageKey, ns);
+              if (ns >= REQUIRED_SESSIONS && !logged) onToggleLog(habitId);
               return ns;
             });
             return 0;
@@ -73,8 +93,7 @@ export function MeditationPanel({
           <div>
             <p className="hp-name">Morning Meditation (10 min)</p>
             <p className="hp-streak">
-              {completionCount} total completion
-              {completionCount !== 1 ? "s" : ""}
+              {completionCount} total completion{completionCount !== 1 ? "s" : ""}
             </p>
           </div>
         </div>
@@ -92,8 +111,7 @@ export function MeditationPanel({
       {showPanel && (
         <div className="habit-panel meditation-panel">
           <p className="panel-title">
-            Breathing Exercise · {sessions} cycle{sessions !== 1 ? "s" : ""}{" "}
-            completed
+            Breathing Exercise · {sessions} / {REQUIRED_SESSIONS} cycle{sessions !== 1 ? "s" : ""} completed
           </p>
 
           {/* Animated breathing orb */}
@@ -117,9 +135,7 @@ export function MeditationPanel({
               style={{
                 background: `radial-gradient(circle at 35% 35%, white, ${currentPhase.color})`,
                 transform: `scale(${running ? currentPhase.scale : 1})`,
-                boxShadow: running
-                  ? `0 0 40px ${currentPhase.color}99`
-                  : "none",
+                boxShadow: running ? `0 0 40px ${currentPhase.color}99` : "none",
               }}
             >
               <span className="breath-phase-label">
@@ -130,21 +146,14 @@ export function MeditationPanel({
               )}
             </div>
 
-            {/* Circular progress arc */}
             {running && (
               <svg className="breath-arc" viewBox="0 0 200 200">
                 <circle
-                  cx="100"
-                  cy="100"
-                  r="90"
-                  fill="none"
-                  stroke="#E0E0E0"
-                  strokeWidth="3"
+                  cx="100" cy="100" r="90"
+                  fill="none" stroke="#E0E0E0" strokeWidth="3"
                 />
                 <circle
-                  cx="100"
-                  cy="100"
-                  r="90"
+                  cx="100" cy="100" r="90"
                   fill="none"
                   stroke={currentPhase.color}
                   strokeWidth="3"
@@ -152,9 +161,7 @@ export function MeditationPanel({
                   strokeDashoffset={`${2 * Math.PI * 90 * (1 - breathProgress)}`}
                   strokeLinecap="round"
                   transform="rotate(-90 100 100)"
-                  style={{
-                    transition: "stroke-dashoffset 1s linear, stroke 0.5s ease",
-                  }}
+                  style={{ transition: "stroke-dashoffset 1s linear, stroke 0.5s ease" }}
                 />
               </svg>
             )}
@@ -165,7 +172,11 @@ export function MeditationPanel({
             {BREATH_PHASES.map((p) => (
               <div
                 key={p.label}
-                className={`breath-phase-chip${currentPhase.label === p.label && running ? " breath-phase-chip--active" : ""}`}
+                className={`breath-phase-chip${
+                  currentPhase.label === p.label && running
+                    ? " breath-phase-chip--active"
+                    : ""
+                }`}
                 style={
                   currentPhase.label === p.label && running
                     ? { background: p.color, borderColor: p.color }
@@ -192,7 +203,7 @@ export function MeditationPanel({
           </div>
 
           <p className="med-hint">
-            Complete 3 breathing cycles to mark as done
+            Complete {REQUIRED_SESSIONS} breathing cycles to mark as done
           </p>
         </div>
       )}
