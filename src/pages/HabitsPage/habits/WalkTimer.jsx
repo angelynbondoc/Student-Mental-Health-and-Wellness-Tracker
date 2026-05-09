@@ -1,29 +1,69 @@
-import React, {
-  useState,
-  useEffect,useRef
-} from "react";
-// ── Walk Timer ────────────────────────────────────────────────────────────────
+import React, { useState, useEffect, useRef } from "react";
+
 const WALK_DURATION = 30 * 60; // 30 minutes in seconds
 
 export function WalkTimer({ habitId, logged, onToggleLog, completionCount }) {
+  const todayStr = new Date().toISOString().split("T")[0];
+  const storageKey = `walk_timer_${habitId}_${todayStr}`;
+
   const [showPanel, setShowPanel] = useState(false);
-  const [timeLeft,  setTimeLeft]  = useState(WALK_DURATION);
-  const [running,   setRunning]   = useState(false);
-  const [finished,  setFinished]  = useState(false);
+  const [running, setRunning] = useState(false);
+
+  // Initialize timeLeft and finished from localStorage
+  const [timeLeft, setTimeLeft] = useState(() => {
+    if (logged) return 0;
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return parsed.timeLeft ?? WALK_DURATION;
+    }
+    return WALK_DURATION;
+  });
+
+  const [finished, setFinished] = useState(() => {
+    if (logged) return true;
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return parsed.finished ?? false;
+    }
+    return false;
+  });
+
   const intervalRef = useRef(null);
+
+  // Sync if logged prop changes externally
+  useEffect(() => {
+    if (logged && !finished) {
+      setFinished(true);
+      setTimeLeft(0);
+      const state = { timeLeft: 0, finished: true };
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    } else if (!logged && finished) {
+      setFinished(false);
+      setTimeLeft(WALK_DURATION);
+      const state = { timeLeft: WALK_DURATION, finished: false };
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    }
+  }, [logged, habitId, storageKey, finished]);
 
   useEffect(() => {
     if (running && timeLeft > 0) {
       intervalRef.current = setInterval(() => {
         setTimeLeft((t) => {
-          if (t <= 1) {
+          const next = t - 1;
+          if (next <= 0) {
             clearInterval(intervalRef.current);
             setRunning(false);
             setFinished(true);
+            const state = { timeLeft: 0, finished: true };
+            localStorage.setItem(storageKey, JSON.stringify(state));
             if (!logged) onToggleLog(habitId);
             return 0;
           }
-          return t - 1;
+          // Persist remaining time on every tick
+          localStorage.setItem(storageKey, JSON.stringify({ timeLeft: next, finished: false }));
+          return next;
         });
       }, 1000);
     } else {
@@ -36,6 +76,7 @@ export function WalkTimer({ habitId, logged, onToggleLog, completionCount }) {
     setRunning(false);
     setTimeLeft(WALK_DURATION);
     setFinished(false);
+    localStorage.setItem(storageKey, JSON.stringify({ timeLeft: WALK_DURATION, finished: false }));
   };
 
   const mm = String(Math.floor(timeLeft / 60)).padStart(2, "0");
@@ -50,7 +91,9 @@ export function WalkTimer({ habitId, logged, onToggleLog, completionCount }) {
           <span className="hp-emoji">🌱</span>
           <div>
             <p className="hp-name">30-min walk or exercise</p>
-            <p className="hp-streak">{completionCount} total completion{completionCount !== 1 ? "s" : ""}</p>
+            <p className="hp-streak">
+              {completionCount} total completion{completionCount !== 1 ? "s" : ""}
+            </p>
           </div>
         </div>
         <div className="hp-card-actions">
@@ -64,15 +107,16 @@ export function WalkTimer({ habitId, logged, onToggleLog, completionCount }) {
       {showPanel && (
         <div className="habit-panel walk-panel">
           <p className="panel-title">
-            {finished ? "🎉 Walk complete! Great job!" : running ? "Keep walking! You've got this 💪" : "Set your 30-minute walk timer"}
+            {finished
+              ? "🎉 Walk complete! Great job!"
+              : running
+              ? "Keep walking! You've got this 💪"
+              : "Set your 30-minute walk timer"}
           </p>
 
-          {/* Ring timer */}
           <div className="walk-timer-stage">
             <svg className="walk-ring-svg" viewBox="0 0 200 200">
-              {/* Background track */}
               <circle cx="100" cy="100" r="80" fill="none" stroke="#E8F5E9" strokeWidth="10" />
-              {/* Progress arc */}
               <circle
                 cx="100" cy="100" r="80"
                 fill="none"
@@ -84,11 +128,9 @@ export function WalkTimer({ habitId, logged, onToggleLog, completionCount }) {
                 transform="rotate(-90 100 100)"
                 style={{ transition: "stroke-dashoffset 1s linear" }}
               />
-              {/* Walking figure */}
               <text x="100" y="88" textAnchor="middle" fontSize="32" className="walk-emoji-text">
                 {finished ? "🏆" : running ? "🚶" : "🧍"}
               </text>
-              {/* Time display */}
               <text x="100" y="118" textAnchor="middle" fontSize="22" fontWeight="700" fill="#1A1A1A" fontFamily="Poppins, sans-serif">
                 {mm}:{ss}
               </text>
@@ -98,7 +140,6 @@ export function WalkTimer({ habitId, logged, onToggleLog, completionCount }) {
             </svg>
           </div>
 
-          {/* Stats row */}
           <div className="walk-stats-row">
             <div className="walk-stat">
               <span className="walk-stat-val">{Math.round(progress * 30)}</span>
@@ -114,9 +155,12 @@ export function WalkTimer({ habitId, logged, onToggleLog, completionCount }) {
             </div>
           </div>
 
-          {/* Controls */}
           <div className="walk-controls">
-            <button className="med-btn med-btn--reset" onClick={reset} disabled={timeLeft === WALK_DURATION && !running}>
+            <button
+              className="med-btn med-btn--reset"
+              onClick={reset}
+              disabled={timeLeft === WALK_DURATION && !running}
+            >
               Reset
             </button>
             {!finished && (
@@ -128,7 +172,9 @@ export function WalkTimer({ habitId, logged, onToggleLog, completionCount }) {
               </button>
             )}
             {finished && (
-              <button className="med-btn med-btn--primary" onClick={reset}>Start Again</button>
+              <button className="med-btn med-btn--primary" onClick={reset}>
+                Start Again
+              </button>
             )}
           </div>
         </div>
