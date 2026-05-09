@@ -1,30 +1,348 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../../supabase"; // Note: Adjust the path depending on where supabase.js is located!
+import { useSearchParams } from "react-router-dom";
+import { supabase } from "../../supabase";
 import "./LoginPage.css";
-
-// ─── Supabase client ───────────────────────────────────────────────────────────
-// Replace with your actual project values or set in .env
 
 // ─── Floating particle ────────────────────────────────────────────────────────
 function Particle({ style }) {
   return <span className="particle" style={style} aria-hidden="true" />;
 }
 
+// ─── Non-NEU Warning Modal ────────────────────────────────────────────────────
+function NonNEUWarningModal({ onClose, onTryAgain }) {
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        onClick={onClose}
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(10, 10, 10, 0.55)",
+          backdropFilter: "blur(4px)",
+          WebkitBackdropFilter: "blur(4px)",
+          zIndex: 9998,
+          animation: "fadeInBackdrop 0.2s ease",
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Modal */}
+      <div
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        aria-describedby="modal-desc"
+        style={{
+          position: "fixed",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 9999,
+          padding: "16px",
+        }}
+      >
+        <div
+          style={{
+            background: "#fff",
+            borderRadius: "20px",
+            width: "100%",
+            maxWidth: "420px",
+            boxShadow:
+              "0 24px 60px rgba(0,0,0,0.18), 0 4px 16px rgba(0,0,0,0.08)",
+            overflow: "hidden",
+            animation: "slideUpModal 0.28s cubic-bezier(0.34, 1.56, 0.64, 1)",
+          }}
+        >
+          {/* Red accent bar */}
+          <div
+            style={{
+              height: "5px",
+              background: "linear-gradient(90deg, #C62828 0%, #E53935 100%)",
+            }}
+          />
+
+          <div style={{ padding: "32px 32px 28px" }}>
+            {/* Icon */}
+            <div
+              style={{
+                width: "56px",
+                height: "56px",
+                borderRadius: "16px",
+                background: "rgba(198, 40, 40, 0.08)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: "20px",
+              }}
+            >
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                <path
+                  d="M14 2.625L25.375 22.75H2.625L14 2.625Z"
+                  stroke="#C62828"
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M14 11.375V15.75"
+                  stroke="#C62828"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <circle cx="14" cy="19.25" r="1.25" fill="#C62828" />
+              </svg>
+            </div>
+
+            {/* Title */}
+            <h2
+              id="modal-title"
+              style={{
+                fontFamily: "'Poppins', sans-serif",
+                fontSize: "20px",
+                fontWeight: 600,
+                color: "#1A1A1A",
+                margin: "0 0 10px",
+                lineHeight: 1.3,
+              }}
+            >
+              Access Restricted
+            </h2>
+
+            {/* Description */}
+            <p
+              id="modal-desc"
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: "14px",
+                color: "#616161",
+                lineHeight: 1.6,
+                margin: "0 0 20px",
+              }}
+            >
+              Only official{" "}
+              <strong style={{ color: "#1A1A1A" }}>
+                New Era University accounts
+              </strong>{" "}
+              are permitted to access this platform.
+            </p>
+
+            {/* Domain pill */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                background: "#F2F2F2",
+                borderRadius: "12px",
+                padding: "12px 16px",
+                marginBottom: "20px",
+              }}
+            >
+              <div
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "10px",
+                  background: "rgba(46, 125, 50, 0.1)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <rect
+                    x="1.5"
+                    y="4.5"
+                    width="15"
+                    height="10.5"
+                    rx="2"
+                    stroke="#2E7D32"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M1.5 7.5L9 12L16.5 7.5"
+                    stroke="#2E7D32"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p
+                  style={{
+                    fontFamily: "'Inter', sans-serif",
+                    fontSize: "11px",
+                    color: "#616161",
+                    margin: "0 0 2px",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                    fontWeight: 500,
+                  }}
+                >
+                  Required email domain
+                </p>
+                <p
+                  style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    color: "#2E7D32",
+                    margin: 0,
+                  }}
+                >
+                  @neu.edu.ph
+                </p>
+              </div>
+            </div>
+
+            {/* Help text */}
+            <div
+              style={{
+                display: "flex",
+                gap: "8px",
+                alignItems: "flex-start",
+                background: "rgba(245, 196, 0, 0.08)",
+                border: "1px solid rgba(245, 196, 0, 0.3)",
+                borderRadius: "10px",
+                padding: "10px 14px",
+                marginBottom: "24px",
+              }}
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                style={{ flexShrink: 0, marginTop: "1px" }}
+              >
+                <circle cx="8" cy="8" r="6.5" stroke="#F5C400" strokeWidth="1.5" />
+                <path
+                  d="M8 5v3.5M8 10v1"
+                  stroke="#F5C400"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <p
+                style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: "12.5px",
+                  color: "#616161",
+                  margin: 0,
+                  lineHeight: 1.55,
+                }}
+              >
+                If you are a student or faculty at NEU, please sign in using
+                your university-issued Google account. Contact your IT
+                department if you need assistance.
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button
+                onClick={onClose}
+                style={{
+                  flex: 1,
+                  padding: "11px 0",
+                  borderRadius: "10px",
+                  border: "1.5px solid #E0E0E0",
+                  background: "transparent",
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: "13.5px",
+                  fontWeight: 500,
+                  color: "#616161",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#F2F2F2";
+                  e.currentTarget.style.color = "#1A1A1A";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.color = "#616161";
+                }}
+              >
+                Dismiss
+              </button>
+              <button
+                onClick={onTryAgain}
+                style={{
+                  flex: 2,
+                  padding: "11px 0",
+                  borderRadius: "10px",
+                  border: "none",
+                  background: "linear-gradient(135deg, #2E7D32 0%, #388E3C 100%)",
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: "13.5px",
+                  fontWeight: 600,
+                  color: "#fff",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                  boxShadow: "0 2px 8px rgba(46, 125, 50, 0.3)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background =
+                    "linear-gradient(135deg, #256427 0%, #2E7D32 100%)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 14px rgba(46, 125, 50, 0.4)";
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background =
+                    "linear-gradient(135deg, #2E7D32 0%, #388E3C 100%)";
+                  e.currentTarget.style.boxShadow =
+                    "0 2px 8px rgba(46, 125, 50, 0.3)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
+                Try a Different Account
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes fadeInBackdrop {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        @keyframes slideUpModal {
+          from { opacity: 0; transform: translateY(24px) scale(0.96); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+      `}</style>
+    </>
+  );
+}
+
 // ─── Login Page ───────────────────────────────────────────────────────────────
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    // If redirected back after a rejected non-NEU login
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user && !session.user.email?.endsWith('@neu.edu.ph')) {
-        supabase.auth.signOut();
-        setError("Access denied. Please use your @neu.edu.ph account.");
-      }
-    });
-  }, []);
+  const [showNonNEUModal, setShowNonNEUModal] = useState(false);
   const [particles, setParticles] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Show modal if redirected back from AuthCallback with ?error=non_neu
+  useEffect(() => {
+    if (searchParams.get("error") === "non_neu") {
+      setShowNonNEUModal(true);
+      setSearchParams({}, { replace: true }); // clean the URL
+    }
+  }, []);
 
   // Generate decorative floating particles once on mount
   useEffect(() => {
@@ -40,19 +358,18 @@ export default function LoginPage() {
     setParticles(generated);
   }, []);
 
-  // ── Google OAuth (institutional domain restricted) ──────────────────────────
+  // ── Google OAuth ──────────────────────────────────────────────────────────
   const handleGoogleLogin = async () => {
     setError("");
     setLoading(true);
     try {
-      
-      await supabase.auth.signOut()
+      await supabase.auth.signOut();
 
       const { error: authError } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          prompt: 'select_account consent',
-          hd: "neu.edu.ph", // restrict to NEU accounts
+          prompt: "select_account consent",
+          hd: "neu.edu.ph",
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: { prompt: "select_account" },
         },
@@ -67,11 +384,23 @@ export default function LoginPage() {
     }
   };
 
+  const handleTryAgain = () => {
+    setShowNonNEUModal(false);
+    handleGoogleLogin();
+  };
+
   return (
     <div className="login-root">
+      {/* Non-NEU Warning Modal */}
+      {showNonNEUModal && (
+        <NonNEUWarningModal
+          onClose={() => setShowNonNEUModal(false)}
+          onTryAgain={handleTryAgain}
+        />
+      )}
+
       {/* ── LEFT PANEL ──────────────────────────────────────────────────────── */}
       <div className="login-left">
-        {/* Decorative floating gold dots */}
         {particles.map((p) => (
           <Particle
             key={p.id}
@@ -87,11 +416,9 @@ export default function LoginPage() {
           />
         ))}
 
-        {/* Decorative concentric rings */}
         <div className="left-circle" />
         <div className="left-circle-2" />
 
-        {/* NEU branding */}
         <div className="left-logo">
           <img
             src="/NEULogo1.png"
@@ -104,20 +431,17 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Headline */}
         <h1 className="left-headline">
           Your wellbeing
           <br />
           <em>matters here.</em>
         </h1>
 
-        {/* Description */}
         <p className="left-sub">
           A safe, supportive space for NEU students to track their mental
           health, connect with peers, and discover coping strategies together.
         </p>
 
-        {/* Feature list */}
         <div className="left-pills">
           {[
             "Track daily mood and wellness habits",
@@ -142,7 +466,6 @@ export default function LoginPage() {
             Sign in to access your wellness dashboard and community.
           </p>
 
-          {/* Institutional domain notice */}
           <div className="domain-badge">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path
@@ -157,7 +480,6 @@ export default function LoginPage() {
             &nbsp;accounts only
           </div>
 
-          {/* Error message */}
           {error && (
             <div className="error-box">
               <svg
@@ -167,13 +489,7 @@ export default function LoginPage() {
                 fill="none"
                 style={{ marginTop: 1, flexShrink: 0 }}
               >
-                <circle
-                  cx="8"
-                  cy="8"
-                  r="6.5"
-                  stroke="#C62828"
-                  strokeWidth="1.5"
-                />
+                <circle cx="8" cy="8" r="6.5" stroke="#C62828" strokeWidth="1.5" />
                 <path
                   d="M8 4.5v4M8 10.5v1"
                   stroke="#C62828"
@@ -185,7 +501,6 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Divider */}
           <div className="divider">
             <div className="divider-line" />
             <span className="divider-label">
@@ -194,7 +509,6 @@ export default function LoginPage() {
             <div className="divider-line" />
           </div>
 
-          {/* Google sign-in button */}
           <button
             className="btn-google"
             onClick={handleGoogleLogin}
@@ -235,7 +549,6 @@ export default function LoginPage() {
             {loading ? "Redirecting to Google…" : "Sign in with Google"}
           </button>
 
-          {/* Legal note */}
           <p className="login-note">
             By signing in, you agree to NEU's <a href="#">Privacy Policy</a> and{" "}
             <a href="#">Terms of Use</a>. Your mental health data is
