@@ -1,4 +1,4 @@
-# Student Mental Health & Wellness Tracker
+# Student Mental Health and Wellness Tracker
 
 A KM-driven anonymous student wellness platform based on the SECI model. This project supports students in monitoring their mental health and well-being through a safe, anonymous, and knowledge-informed environment — helping surface patterns and resources without compromising privacy.
 
@@ -12,7 +12,9 @@ A KM-driven anonymous student wellness platform based on the SECI model. This pr
 
 ---
 
-## Local Setup
+### Prerequisites
+1. Node.js installed on your machine.
+2. A `.env` file configured with the production Supabase keys.
 
 1. Clone the repo
 2. `cd src && npm install` — installs all project dependencies

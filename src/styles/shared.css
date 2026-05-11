@@ -1,0 +1,298 @@
+/* =============================================================================
+   shared.css
+   NEU MindSpace — Global shared styles used across ALL pages.
+   Import once in main.jsx:  import './styles/shared.css'
+   ============================================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=DM+Sans:wght@400;500&display=swap");
+
+/* ── CSS Variables ────────────────────────────────────────────────────────── */
+:root {
+  --color-primary: #2e7d32;
+  --color-primary-dark: #1b5e20;
+  --color-primary-light: #e8f5e9;
+  --color-primary-ring: rgba(46, 125, 50, 0.1);
+  --color-accent: #f5c400;
+  --color-accent-bg: #fffde7;
+  --color-danger: #c62828;
+  --color-danger-bg: #ffebee;
+  --color-danger-border: #ffcdd2;
+  --color-bg: #fafafa;
+  --color-surface: #ffffff;
+  --color-input-bg: #f2f2f2;
+  --color-border: #e8e8e8;
+  --color-text: #1a1a1a;
+  --color-text-body: #374151;
+  --color-text-muted: #616161;
+  --color-text-faint: #9e9e9e;
+  --font-heading: "Poppins", sans-serif;
+  --font-body: "DM Sans", sans-serif;
+  --topbar-height: 56px;
+}
+
+/* ── Page shell ───────────────────────────────────────────────────────────── */
+.page-shell {
+  width: 100%;
+  padding: 32px 40px;
+  background: var(--color-bg);
+  min-height: calc(100vh - var(--topbar-height));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.page-inner {
+  width: 100%;
+  max-width: 720px;
+}
+.page-inner--narrow {
+  max-width: 680px;
+}
+
+/* ── Page heading + subheading ────────────────────────────────────────────── */
+.page-heading {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 4px;
+}
+.page-heading--green {
+  color: var(--color-primary);
+}
+.page-sub {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-text-faint);
+  margin: 0 0 24px;
+}
+
+/* ── Form card ────────────────────────────────────────────────────────────── */
+.form-card {
+  background: var(--color-surface);
+  border-radius: 14px;
+  padding: 28px;
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Field label ──────────────────────────────────────────────────────────── */
+.field-label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-faint);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: block;
+  margin: 18px 0 7px;
+}
+.field-label:first-of-type {
+  margin-top: 0;
+}
+.field-label .req {
+  color: var(--color-danger);
+}
+
+/* ── Inputs ───────────────────────────────────────────────────────────────── */
+.field-input,
+.field-select,
+.field-textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text);
+  background: var(--color-input-bg);
+  outline: none;
+  display: block;
+  box-sizing: border-box;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.field-input:focus,
+.field-select:focus,
+.field-textarea:focus {
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 3px var(--color-primary-ring);
+}
+.field-textarea {
+  resize: vertical;
+  min-height: 130px;
+  line-height: 1.6;
+}
+
+/* ── Submit button ────────────────────────────────────────────────────────── */
+.btn-submit {
+  width: 100%;
+  padding: 13px;
+  background: var(--color-primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px;
+  transition:
+    background 0.15s ease,
+    transform 0.12s ease;
+}
+.btn-submit:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
+}
+.btn-submit:active {
+  transform: translateY(0);
+}
+
+/* ── Pill button ──────────────────────────────────────────────────────────── */
+.btn-pill {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 100px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+.btn-pill:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+.btn-pill--active {
+  background: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+}
+.btn-pill--active:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  color: #ffffff;
+}
+
+/* ── Content card ─────────────────────────────────────────────────────────── */
+.content-card {
+  background: var(--color-surface);
+  border-radius: 12px;
+  padding: 16px 20px;
+  border: 1px solid var(--color-border);
+  transition: box-shadow 0.15s ease;
+}
+.content-card:hover {
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+}
+.content-card--active {
+  background: var(--color-primary-light);
+  border-left: 3px solid var(--color-primary);
+}
+
+/* ── Empty state ──────────────────────────────────────────────────────────── */
+.empty-state {
+  font-family: var(--font-body);
+  color: var(--color-text-faint);
+  font-size: 14px;
+  text-align: center;
+  padding: 48px 0;
+  font-style: italic;
+}
+
+/* ── Notice banners ───────────────────────────────────────────────────────── */
+.notice--gold {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: #7c5800;
+  background: var(--color-accent-bg);
+  border-left: 3px solid var(--color-accent);
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-top: 4px;
+}
+.notice--red {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+  border-left: 3px solid var(--color-danger);
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-top: 4px;
+}
+.notice--green {
+  font-family: var(--font-body);
+  font-size: 13px;
+  background: var(--color-primary-light);
+  border-left: 3px solid var(--color-primary);
+  color: var(--color-primary);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-top: 14px;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .page-shell {
+    padding: 24px 20px;
+  }
+}
+@media (max-width: 480px) {
+  .page-shell {
+    padding: 18px 16px;
+  }
+  .form-card {
+    padding: 20px 16px;
+  }
+}
+.field-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--color-input-bg);
+  color: var(--color-text);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239E9E9E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+  cursor: pointer;
+}
+.cp-anon-row input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-input-bg);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  position: relative;
+}
+.cp-anon-row input[type="checkbox"]:checked {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.cp-anon-row input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 0px;
+  width: 5px;
+  height: 9px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}

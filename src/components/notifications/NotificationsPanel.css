@@ -1,0 +1,287 @@
+/* =============================================================================
+   NotificationsPanel.css
+   Styles for the notifications panel — used in both InboxPage and the
+   MobileLayout bell dropdown.
+============================================================================= */
+
+/* ── Panel wrapper ─────────────────────────────────────────────────────────── */
+.neu-notif-panel { padding: 4px 0; }
+
+/* ── Header ────────────────────────────────────────────────────────────────── */
+.neu-notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.neu-notif-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.neu-notif-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* Muted Red badge — used ONLY for alert counts per design rationale */
+.neu-notif-badge {
+  background: var(--color-danger);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 100px;
+  padding: 2px 7px;
+}
+
+.neu-mark-all-btn {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 4px 0;
+}
+.neu-mark-all-btn:hover { text-decoration: underline; }
+
+/* ── Empty state ───────────────────────────────────────────────────────────── */
+.neu-notif-empty {
+  font-family: var(--font-body);
+  color: var(--color-text-muted);
+  font-size: 14px;
+  text-align: center;
+  padding: 24px 0;
+}
+
+/* ── Notification list ─────────────────────────────────────────────────────── */
+.neu-notif-list { display: flex; flex-direction: column; gap: 8px; }
+
+.neu-notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+}
+
+/* Unread: green tint + green left border */
+.neu-notif-item--unread {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary-hover);
+  border-left: 3px solid var(--color-primary);
+}
+
+/* Read: muted gray */
+.neu-notif-item--read {
+  background: var(--color-surface);
+  border-left: 3px solid #E0E0E0;
+}
+
+/* ── Item internals ────────────────────────────────────────────────────────── */
+.neu-notif-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+}
+.neu-notif-body  { flex: 1; }
+.neu-notif-text {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-text);
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.neu-notif-time {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin: 3px 0 0;
+}
+
+/* ── Mark-read button ──────────────────────────────────────────────────────── */
+.neu-read-btn {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-primary);
+  background: var(--color-white);
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.neu-read-btn:hover {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.neu-notif-announcement-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary, #2e7d32);
+  opacity: 0.75;
+}
+
+/* Make sure the row doesn't let text overflow into the button */
+.neu-notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.neu-notif-body {
+  flex: 1;
+  min-width: 0; /* ← key: allows text to shrink */
+}
+
+.neu-notif-text,
+.neu-notif-time {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Keep the check button from shrinking away */
+.neu-read-btn {
+  flex-shrink: 0;
+}
+
+/* ── Announcement Modal ────────────────────────────────────────────────── */
+.announcement-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; /* High z-index to pop over everything */
+  padding: 16px;
+  animation: am-fade-in 0.15s ease;
+}
+
+.announcement-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 460px;
+  padding: 24px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+  animation: am-slide-up 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.announcement-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.announcement-modal-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--color-primary-light, #E8F5E9);
+  color: var(--color-primary, #2E7D32);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.announcement-modal-close {
+  background: none;
+  border: none;
+  color: var(--color-text-muted, #9e9e9e);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+.announcement-modal-close:hover {
+  background: var(--color-surface, #f2f2f2);
+  color: var(--color-text, #1a1a1a);
+}
+
+.announcement-modal-badge {
+  align-self: flex-start;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-primary, #2E7D32);
+  margin-bottom: 6px;
+}
+
+.announcement-modal-title {
+  font-family: var(--font-heading, 'Poppins', sans-serif);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text, #1a1a1a);
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+}
+
+.announcement-modal-date {
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 12px;
+  color: var(--color-text-muted, #9e9e9e);
+  margin: 0 0 16px 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border, #e8e8e8);
+}
+
+.announcement-modal-body {
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 14px;
+  color: var(--color-text-body, #374151);
+  line-height: 1.6;
+  white-space: pre-wrap; /* Preserves line breaks from the admin text area */
+  margin-bottom: 24px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.announcement-modal-btn {
+  align-self: flex-end;
+  background: var(--color-primary, #2E7D32);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-family: var(--font-heading, 'Poppins', sans-serif);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.1s, background 0.15s;
+}
+.announcement-modal-btn:hover {
+  background: var(--color-primary-dark, #1B5E20);
+}
+.announcement-modal-btn:active {
+  transform: scale(0.97);
+}
+
+@keyframes am-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes am-slide-up {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
