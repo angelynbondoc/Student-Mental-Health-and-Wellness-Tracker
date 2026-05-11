@@ -309,11 +309,8 @@ function StepCollege({ onBack, onSelect }) {
               className="ob-course-card"
               onClick={() => onSelect(c)}
             >
-              <div className="ob-course-name">
-                College of 
-              </div>
+              <div className="ob-course-name">College of</div>
               <div className="ob-course-code">{shortName(c.name)}</div>
-              
             </button>
           ))}
         </div>
@@ -393,7 +390,12 @@ function StepCommunities({ program, onBack, onSubmit, loading, error }) {
   useEffect(() => {
     async function fetch() {
       const [{ data: communities }, { data: mappings }] = await Promise.all([
-        supabase.from('communities').select('id, name, emoji').eq('status', 'approved').eq('is_general', false).order('name'),
+        supabase
+          .from("communities")
+          .select("id, name, emoji")
+          .eq("status", "approved")
+          .eq("is_general", false)
+          .order("name"),
         supabase
           .from("program_community_map")
           .select("community_id")
@@ -450,7 +452,9 @@ function StepCommunities({ program, onBack, onSubmit, loading, error }) {
                       className={`ob-course-card ob-course-card--community ${isSel ? "ob-course-card--selected" : ""}`}
                       onClick={() => toggle(c.id)}
                     >
-                      <div className="ob-community-emoji">{c.emoji ?? COMMUNITY_EMOJI[c.name] ?? "🌐"}</div>
+                      <div className="ob-community-emoji">
+                        {c.emoji ?? COMMUNITY_EMOJI[c.name] ?? "🌐"}
+                      </div>
                       <div className="ob-course-name">{c.name}</div>
                       <div className="ob-course-code ob-suggested-badge">
                         Suggested

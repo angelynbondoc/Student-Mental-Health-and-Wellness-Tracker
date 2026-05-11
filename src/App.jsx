@@ -26,7 +26,7 @@ function App() {
   const [authReady, setAuthReady] = useState(false);
   const [profileReady, setProfileReady] = useState(false);
 
-  useEffect(() => {
+    useEffect(() => {
     async function resolveUser(session) {
       if (!session?.user) return null;
       const email = session.user.email ?? "";
@@ -82,6 +82,7 @@ function App() {
 
     return () => subscription.unsubscribe();
   }, []);
+
 
   // ── Batch 1 ────────────────────────────────────────────────────────────────
   const [profiles, setProfiles] = useState([]);
