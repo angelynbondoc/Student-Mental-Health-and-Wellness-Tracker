@@ -1,5 +1,4 @@
 # Decision Log
-**Knowledge Management Mental Health App — Student Mental Health & Wellness Tracker**
 
 | # | Date | Decision Made | Options Considered | Who Was Consulted | Outcome |
 |---|------|---------------|--------------------|-------------------|---------|
