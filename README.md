@@ -1,41 +1,36 @@
 # Student Mental Health and Wellness Tracker
 
-## Cloud Backend Setup (Sprint 1)
+A KM-driven anonymous student wellness platform based on the SECI model. This project supports students in monitoring their mental health and well-being through a safe, anonymous, and knowledge-informed environment — helping surface patterns and resources without compromising privacy.
 
-This project uses a live Supabase Cloud instance for the database, authentication, and serverless Edge Functions. 
+---
+
+## Tech Stack
+
+- **Frontend:** React + Vite — fast, modern UI with component-based architecture
+- **Database & Auth:** Supabase (PostgreSQL) — handles secure data storage and user authentication
+- **Server-side Logic:** Supabase Edge Functions — lightweight serverless functions for backend processing
+
+---
 
 ### Prerequisites
 1. Node.js installed on your machine.
 2. A `.env` file configured with the production Supabase keys.
 
-### Wiring up the Frontend
-1. Clone the repository and navigate to the project root.
-2. Run `npm install` to install frontend dependencies.
-3. Create a `.env.local` file in your frontend root directory and add the following keys (request these from Dev 2):
-   ```env
-   VITE_SUPABASE_URL=https://<your-project-ref>.supabase.co
-   VITE_SUPABASE_ANON_KEY=<the-cloud-anon-key>
-
-## Authentication & Data Fetching API Contracts
-* Registration & Login: We now use Google Workspace SSO exclusively. Do NOT use standard email/password inputs. You must trigger the Google OAuth flow and enforce the hosted domain:
-```javascript
-await supabase.auth.signInWithOAuth({
-  provider: 'google',
-  options: {
-    queryParams: {
-      prompt: 'select_account',
-      hd: 'neu.edu.ph' // Asks the UI to restrict to school emails
-    }
-  }
-});
+1. Clone the repo
+2. `cd src && npm install` — installs all project dependencies
+3. Copy `.env.example` to `.env` and fill in your Supabase credentials — you'll need your Supabase project URL and anon key from the Supabase dashboard
+4. `npm run dev` — starts the local development server, usually at `http://localhost:5173`
 
 ---
 
-* (Note: Database-level triggers will forcefully reject any non-@neu.edu.ph emails that attempt to bypass this frontend UI).
+## Folder Structure
 
-- Anonymous Posting: When fetching the feed, you must query the posts_view instead of the raw posts table to ensure anonymous author IDs are correctly masked by the database.
+- `/src` — Application source code (components, pages, and application logic)
+- `/docs` — Project documentation, wireframes, ADRs, and KM artifacts
+- `/tests` — Test files for validating application behavior
 
-- Search Function: Do not fetch all posts to filter on the client. Call the custom RPC function to search and log history simultaneously:
+---
 
-```javascript
-await supabase.rpc('log_and_search', { search_term: 'your query' })
+## Deployment
+
+Deployment is currently in progress. This section will be updated once the production environment is finalized. Expected setup includes hosting the frontend on a static platform (such as Vercel or Netlify) and connecting it to the existing Supabase cloud instance for database and authentication services.
