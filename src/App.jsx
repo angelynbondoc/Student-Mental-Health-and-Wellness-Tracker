@@ -19,7 +19,7 @@ import OnboardingPage from "./pages/OnboardingPage/OnboardingPage";
 import AuthCallback from "./pages/AuthCallback";
 import { supabase } from "./supabase";
 import SuspendedPage from "./pages/SuspendedPage/SuspendedPage";
-
+import LoadingPage from "./components/LoadingPage/LoadingPage";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -250,11 +250,11 @@ useEffect(() => {
               path="/suspended" 
               element={
                 !authReady ? (
-                  <div>Loading...</div>
+                  <LoadingPage />
                 ) : !currentUser ? (
                   <Navigate to="/login" replace />
                 ) : !profileReady ? (
-                  <div>Loading...</div>
+                  <LoadingPage />
                 ) : currentUser.role !== "suspended" ? (
                   <Navigate to="/home" replace />
                 ) : (
@@ -277,11 +277,11 @@ useEffect(() => {
           <Route
             element={
               !authReady ? (
-                <div>Loading...</div>
+                <LoadingPage />
               ) : !currentUser ? (
                 <Navigate to="/login" replace />
               ) : !profileReady ? (
-                <div>Loading...</div>
+                <LoadingPage />
               ) : currentUser.role === "suspended" ? (
                 <Navigate to="/suspended" replace />
               )
