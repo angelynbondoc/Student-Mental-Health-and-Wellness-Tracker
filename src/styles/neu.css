@@ -1,0 +1,60 @@
+/* =============================================================================
+   neu.css — NEU Mental Health & Wellness Tracker
+   Global design tokens. Import in main.jsx / index.css.
+
+   Design Rationale (Section 1):
+     Primary   #2E7D32  Soft Green  — growth, calm, emotional balance
+     Accent    #F5C400  Warm Gold   — warmth, positivity (underlines, accents)
+     Danger    #C62828  Muted Red   — ONLY alerts / delete / clear
+     BG        #FAFAFA  Warm White  — reduces visual fatigue
+     Surface   #FFFFFF  White       — cards
+     Muted BG  #F2F2F2  Light Gray  — inputs, chips, muted areas
+     Text      #1A1A1A  Off Black   — readable, not harsh
+     Secondary #616161  Medium Gray — labels, captions
+
+   Typography (Section 1):
+     Headings    Poppins 600  24–32px
+     Subheadings Poppins 500  18–20px
+     Body        DM Sans 400  14–16px
+     Captions    DM Sans 400  12px
+
+   Responsive (Section 4):
+     Desktop  full width, web-first
+     Tablet   768px breakpoint
+     Mobile   480px breakpoint
+============================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap');
+
+:root {
+  --clr-primary:        #2E7D32;
+  --clr-primary-dark:   #1B5E20;
+  --clr-primary-tint:   #E8F5E9;
+  --clr-accent:         #F5C400;
+  --clr-accent-tint:    #FFFDE7;
+  --clr-danger:         #C62828;
+  --clr-danger-tint:    #FFEBEE;
+  --clr-bg:             #FAFAFA;
+  --clr-surface:        #FFFFFF;
+  --clr-muted:          #F2F2F2;
+  --clr-text:           #1A1A1A;
+  --clr-text-secondary: #616161;
+  --clr-border:         #E8E8E8;
+  --font-heading:       'Poppins', sans-serif;
+  --font-body:          'DM Sans', sans-serif;
+  --topbar-height:      56px;
+  --bottomnav-height:   64px;
+  --sidebar-width:      220px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--clr-bg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--clr-text);
+  -webkit-font-smoothing: antialiased;
+}
