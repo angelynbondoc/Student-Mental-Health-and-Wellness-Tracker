@@ -1,7 +1,7 @@
 // =============================================================================
 // NotificationsPanel.jsx
 // Renders filtered notifications for currentUser.
-// Used inside InboxPage (Alerts tab) AND the MobileLayout bell dropdown.
+// Used inside Notifications (Alerts tab) AND the MobileLayout bell dropdown.
 // =============================================================================
 import React from 'react';
 import useNotifications from '../../hooks/useNotifications';
@@ -16,7 +16,7 @@ export default function NotificationsPanel() {
 
       <div className="neu-notif-header">
         <div className="neu-notif-title-row">
-          <span className="neu-notif-title">Alerts</span>
+          
           {unreadCount > 0 && (
             <span className="neu-notif-badge">{unreadCount}</span>
           )}
@@ -28,12 +28,10 @@ export default function NotificationsPanel() {
         )}
       </div>
 
-      {myNotifs.length === 0 && (
-        <p className="neu-notif-empty">You're all caught up! 🎉</p>
-      )}
+    
 
       <div className="neu-notif-list">
-        {myNotifs.map((notif) => (
+        {myNotifs.slice(0, 8).map((notif) => (
           <NotificationItem
             key={notif.id}
             notif={notif}

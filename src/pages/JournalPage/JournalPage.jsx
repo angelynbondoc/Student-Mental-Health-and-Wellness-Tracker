@@ -12,7 +12,7 @@
 // =============================================================================
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import AppContext from '../../AppContext';
-import { generateUUID } from '../../mockData';
+import { supabase } from '../../supabase';
 import { PageShell, EmptyState } from '../../components/ui';
 import './JournalPage.css';
 
@@ -58,7 +58,8 @@ function getEncouragement(count) {
 }
 
 function formatDate(iso) {
-  return new Date(iso).toLocaleDateString('en-US', {
+  const utcString = iso.endsWith('Z') ? iso : iso + 'Z';
+  return new Date(utcString).toLocaleDateString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
   });
@@ -192,7 +193,21 @@ function StepIndicator({ current }) {
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function JournalPage() {
-  const { moodJournal, setMoodJournal, currentUser } = useContext(AppContext);
+  const { currentUser } = useContext(AppContext);
+  const [myEntries, setMyEntries] = useState([]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    async function fetchEntries() {
+      const { data } = await supabase
+        .from('mood_journal')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+      if (data) setMyEntries(data);
+    }
+    fetchEntries();
+  }, [currentUser?.id]);
 
   const [step,           setStep]           = useState(0);
   const [moodRating,     setMoodRating]     = useState(3);
@@ -213,37 +228,40 @@ export default function JournalPage() {
     if (step === 2) textareaRef.current?.focus();
   }, [step]);
 
-  const handleSubmit = () => {
-    if (!entryText.trim()) return;
-    const newEntry = {
-      id:              generateUUID(),
-      user_id:         currentUser.id,
-      mood_rating:     moodRating,
-      trigger_note:    triggerNote.trim(),
-      gratitude_note:  gratitudeNote.trim(),
-      reflection_note: reflectionNote.trim(),
-      entry_text:      entryText.trim(),
-      created_at:      new Date().toISOString(),
-    };
-    setMoodJournal(prev => [newEntry, ...prev]);
-    // Reset
-    setStep(0);
-    setMoodRating(3);
-    setTriggerNote('');
-    setGratitudeNote('');
-    setReflectionNote('');
-    setEntryText('');
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
+  const handleSubmit = async () => {
+    if (!entryText.trim() || !currentUser) return;
+    const { data, error } = await supabase
+      .from('mood_journal')
+      .insert({
+        user_id:         currentUser.id,
+        mood_rating:     moodRating,
+        trigger_note:    triggerNote.trim(),
+        gratitude_note:  gratitudeNote.trim(),
+        reflection_note: reflectionNote.trim(),
+        entry_text:      entryText.trim(),
+      })
+      .select()
+      .single();
+    if (!error && data) {
+      setMyEntries(prev => [data, ...prev]);
+      setStep(0);
+      setMoodRating(3);
+      setTriggerNote('');
+      setGratitudeNote('');
+      setReflectionNote('');
+      setEntryText('');
+      setSubmitted(true);
+      setTimeout(() => setSubmitted(false), 3000);
+    }
   };
 
-  const handleDelete = (id) => {
-    setMoodJournal(prev => prev.filter(e => e.id !== id));
+  const handleDelete = async (id) => {
+    const { error } = await supabase
+      .from('mood_journal')
+      .delete()
+      .eq('id', id);
+    if (!error) setMyEntries(prev => prev.filter(e => e.id !== id));
   };
-
-  const myEntries = moodJournal
-    .filter(e => e.user_id === currentUser.id)
-    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   const shufflePrompt = () =>
     setPromptIdx(i => (i + 1) % WRITING_PROMPTS.length);
@@ -311,7 +329,7 @@ export default function JournalPage() {
 
             <div className="jp-context-fields">
               <div className="jp-context-field">
-                <label className="jp-field-label">⚡ What triggered this mood?</label>
+                <label className="jp-field-label">What triggered this mood?</label>
                 <input
                   className="jp-input"
                   value={triggerNote}
@@ -320,7 +338,7 @@ export default function JournalPage() {
                 />
               </div>
               <div className="jp-context-field">
-                <label className="jp-field-label">🙏 What are you grateful for?</label>
+                <label className="jp-field-label">What are you grateful for?</label>
                 <input
                   className="jp-input"
                   value={gratitudeNote}
@@ -329,7 +347,7 @@ export default function JournalPage() {
                 />
               </div>
               <div className="jp-context-field">
-                <label className="jp-field-label">💡 One thing you'd do differently?</label>
+                <label className="jp-field-label">One thing you'd do differently?</label>
                 <input
                   className="jp-input"
                   value={reflectionNote}
@@ -356,7 +374,6 @@ export default function JournalPage() {
 
             {/* Prompt suggestion */}
             <div className="jp-prompt-chip" onClick={shufflePrompt} title="Click for a new prompt">
-              <span className="jp-prompt-icon">💬</span>
               <span className="jp-prompt-text">{WRITING_PROMPTS[promptIdx]}</span>
               <span className="jp-prompt-shuffle">↻</span>
             </div>
@@ -395,7 +412,7 @@ export default function JournalPage() {
                 disabled={!entryText.trim()}
                 style={{ background: entryText.trim() ? moodColors.text : undefined }}
               >
-                Save Entry ✓
+                Save Entry 
               </button>
             </div>
           </div>

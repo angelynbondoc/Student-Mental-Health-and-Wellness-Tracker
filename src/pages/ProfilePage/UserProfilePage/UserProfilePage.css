@@ -157,6 +157,12 @@
   margin-top: 1px;
 }
 
+.up-college {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
 /* ── tab bar ── */
 .up-tab-bar {
   display: flex;

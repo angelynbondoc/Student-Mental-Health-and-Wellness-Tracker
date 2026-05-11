@@ -5,7 +5,6 @@ import { supabase } from "../../supabase";
 export default function usePostCard(post) {
   const { currentUser, setPosts } = useContext(AppContext);
 
-
   const [showConfirm, setShowConfirm] = useState(false);
   const [showComments, setShowComments] = useState(false);
 
@@ -46,6 +45,16 @@ export default function usePostCard(post) {
         .select("id")
         .single();
       if (data) setMyReactionId(data.id);
+
+      // Notify post author on like only (not unlike)
+      if (post.author_id && post.author_id !== currentUser.id) {
+        await supabase.from("notifications").insert({
+          user_id: post.author_id,
+          type: "reaction",
+          content: `${currentUser.display_name ?? "Someone"} liked your post.`,
+          post_id: post.id,
+        });
+      }
     }
     reactingRef.current = false;
   };
@@ -64,26 +73,67 @@ export default function usePostCard(post) {
     fetchCount();
   }, [post.id]);
 
-  const handleAddComment = async (content) => {
+  const handleAddComment = async (content, isAnonymous = false) => {
     if (!currentUser) return;
     const { error } = await supabase
       .from("comments")
-      .insert({ post_id: post.id, author_id: currentUser.id, content });
-    if (!error) setCommentCount((n) => n + 1);
+      .insert({ post_id: post.id, author_id: currentUser.id, content, is_anonymous: isAnonymous });
+    if (!error) {
+      setCommentCount((n) => n + 1);
+      // Notify post author on comment
+      if (post.author_id && post.author_id !== currentUser.id) {
+        await supabase.from("notifications").insert({
+          user_id: post.author_id,
+          type: "comment",
+          content: isAnonymous
+            ? "Someone commented on your post."
+            : `${currentUser.display_name ?? "Someone"} commented on your post.`,
+          post_id: post.id,
+        });
+      }
+    }
   };
 
   // ── Share ──────────────────────────────────────────────────────────────────
   const handleShare = async () => {
-    if (!currentUser) return;
-    const { error } = await supabase.from("posts").insert({
-      author_id: currentUser.id,
-      community_id: post.community_id,
-      content: `[Shared Post]: ${post.content}`,
-      is_anonymous: false,
-      is_flagged: false,
-    });
+  if (!currentUser) return;
+
+  const trueOriginalAuthorId = post.original_author_id ?? post.author_id;
+
+  let originalContent = post.content;
+  if (originalContent.startsWith("[Shared Post]:")) {
+    originalContent = originalContent.replace("[Shared Post]:", "").trim();
+  }
+
+  const { error } = await supabase.from("posts").insert({
+    author_id: currentUser.id,
+    original_author_id: trueOriginalAuthorId,  
+    community_id: post.community_id,
+    content: `[Shared Post]: ${originalContent}`,
+    is_anonymous: false,
+    is_flagged: false
+  });
+
     if (!error) {
       setShowConfirm(false);
+
+      // Notify original post author
+      if (post.author_id && post.author_id !== currentUser.id) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("display_name")
+          .eq("id", currentUser.id)
+          .single();
+
+        const { error: notifError } = await supabase.from("notifications").insert({
+          user_id: post.author_id,
+          type: "share",
+          content: `${profile?.display_name ?? "Someone"} shared your post.`,
+          post_id: post.id,
+        });
+        if (notifError) console.error("notif insert failed:", notifError);
+      }
+
       const { data } = await supabase
         .from("posts")
         .select("*")

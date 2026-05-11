@@ -76,7 +76,8 @@ export default function UserProfilePage() {
           (p) =>
             p.author_id === userId &&
             !p.is_anonymous &&
-            !p.content.startsWith("[Shared Post]:"),
+            !p.content?.startsWith("[Shared Post]:") &&
+            !p.content?.startsWith("[Admin Broadcast]\n"),
         )
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)),
     [posts, userId],
@@ -141,16 +142,21 @@ export default function UserProfilePage() {
 
         <div className="up-header-card">
           <div className="up-avatar" aria-hidden="true">
-            {profile.avatar_url ? (
-              <img src={profile.avatar_url} alt={profile.display_name} />
+            {profile.photo_url ? (
+              <img src={profile.photo_url} alt={profile.display_name} />
             ) : (
-              <span>{getInitials(profile.display_name)}</span>
+              <span>{getInitials(profile.display_name ?? "")}</span>
             )}
           </div>
 
           <div className="up-identity">
             <h1 className="up-display-name">{profile.display_name}</h1>
-            {profile.program && <p className="up-program">{profile.program}</p>}
+            {profile.program && (
+              <>
+                <p className="up-program">{profile.program.name}</p>
+                <p className="up-college">{profile.program.college?.name}</p>
+              </>
+            )}
             {profile.bio && <p className="up-bio">{profile.bio}</p>}
             <p className="up-joined">
               Joined {formatJoinDate(profile.created_at)}

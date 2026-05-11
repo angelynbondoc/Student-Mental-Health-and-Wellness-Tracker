@@ -3,6 +3,59 @@
    Shared styles (page-shell, content-card, empty-state) live in shared.css.
    ============================================================================= */
 
+/* ──────────────────────────────────────────────────────────────────────────
+   DESKTOP-ONLY: widen the PageShell so the home feed uses more screen.
+   Stays inactive on tablet/mobile so MobileLayout renders normally.
+   ────────────────────────────────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  /* Widen the shell */
+  .page-shell:has(.hp-filter),
+  .page-shell:has(.hp-filter) .page-inner,
+  .page-shell:has(.hfeed-header),
+  .page-shell:has(.hfeed-header) .page-inner {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding-left: 32px;
+    padding-right: 32px;
+    box-sizing: border-box;
+  }
+
+  /* Center the feed header so it aligns with the centered post list below */
+  .hfeed-header {
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+  }
+
+  /* Keep posts at a comfortable reading width, centered in the page */
+  .hfeed-list {
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+  }
+
+  .hfeed-post-wrapper {
+    width: 100%;
+  }
+
+  /* Filter chips can span the full width — they're scannable nav, not reading */
+  .hp-filter {
+    max-width: 1400px;   /* 1200px - 64px page padding */
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Empty state stays at reading width too */
+  .hfeed-empty {
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
 /* ── Filter section ───────────────────────────────────────────────────────── */
 .hp-filter       { margin-bottom: 28px; }
 .hp-filter-label-row {
@@ -69,4 +122,14 @@
   .hfeed-header { flex-direction: column; align-items: flex-start; }
   .hfeed-title  { font-size: 16px; }
   .chip         { font-size: 11px; padding: 5px 13px; }
+}
+
+.hfeed-post-wrapper {
+  border-radius: 12px;
+  transition: box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.hfeed-post-wrapper--highlight {
+  box-shadow: 0 0 0 3px var(--color-primary, #6c63ff);
+  background: var(--surface-alt, #f5f3ff);
 }

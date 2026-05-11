@@ -1,0 +1,307 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap');
+
+/* ── Root ── */
+.sp-root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FAFAFA;
+  padding: 2rem 1.25rem;
+  font-family: 'Inter', sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative background blobs */
+.sp-root::before,
+.sp-root::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sp-root::before {
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(198, 40, 40, 0.06) 0%, transparent 70%);
+  top: -100px;
+  right: -80px;
+}
+
+.sp-root::after {
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(46, 125, 50, 0.05) 0%, transparent 70%);
+  bottom: -60px;
+  left: -60px;
+}
+
+/* ── Card ── */
+.sp-card {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow:
+    0 1px 3px rgba(0,0,0,0.04),
+    0 8px 32px rgba(0,0,0,0.07),
+    0 0 0 1px rgba(0,0,0,0.04);
+  padding: 2.75rem 2.25rem 2rem;
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  animation: sp-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes sp-rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Icon ── */
+.sp-icon-wrap {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fde8e8 0%, #fecaca 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  box-shadow: 0 4px 16px rgba(198, 40, 40, 0.15);
+}
+
+.sp-icon { color: #C62828; }
+
+/* ── Heading block ── */
+.sp-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #C62828;
+  margin: 0 0 0.4rem;
+  letter-spacing: -0.01em;
+}
+
+.sp-sub {
+  font-size: 0.875rem;
+  color: #616161;
+  margin: 0 0 1.75rem;
+  line-height: 1.55;
+}
+
+/* ── Divider ── */
+.sp-divider {
+  height: 1px;
+  background: #F2F2F2;
+  margin: 0 0 1.75rem;
+  border: none;
+}
+
+/* ── Admin message box ── */
+.sp-message-box {
+  background: #FFFDF0;
+  border: 1.5px solid #F5C400;
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  margin-bottom: 1.75rem;
+  text-align: left;
+}
+
+.sp-message-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #92400e;
+  margin: 0 0 0.45rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sp-message-label::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #F5C400;
+  flex-shrink: 0;
+}
+
+.sp-message-text {
+  font-size: 0.875rem;
+  color: #1A1A1A;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Actions ── */
+.sp-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin-bottom: 1.75rem;
+}
+
+/* ── Buttons ── */
+.sp-btn {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  letter-spacing: 0.01em;
+}
+
+.sp-btn:hover:not(:disabled) { transform: translateY(-1px); }
+.sp-btn:active:not(:disabled) { transform: translateY(0); }
+.sp-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.sp-btn--primary {
+  background: #C62828;
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(198, 40, 40, 0.22);
+}
+.sp-btn--primary:hover:not(:disabled) {
+  background: #b71c1c;
+  box-shadow: 0 4px 16px rgba(198, 40, 40, 0.28);
+}
+
+.sp-btn--ghost {
+  background: #F9F9F9;
+  border: 1.5px solid #E8E8E8;
+  color: #374151;
+}
+.sp-btn--ghost:hover:not(:disabled) {
+  background: #F2F2F2;
+  border-color: #D1D5DB;
+}
+
+.sp-btn--submit {
+  background: #2E7D32;
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(46, 125, 50, 0.22);
+}
+.sp-btn--submit:hover:not(:disabled) {
+  background: #256428;
+  box-shadow: 0 4px 16px rgba(46, 125, 50, 0.28);
+}
+
+.sp-btn--sm {
+  padding: 0.65rem 1.1rem;
+  font-size: 0.82rem;
+  width: auto;
+}
+
+/* ── Appeal form ── */
+.sp-appeal-form {
+  background: #F9FAFB;
+  border: 1.5px solid #EFEFEF;
+  border-radius: 16px;
+  padding: 1.25rem;
+  text-align: left;
+  animation: sp-rise 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.sp-appeal-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin: 0 0 0.3rem;
+}
+
+.sp-appeal-hint {
+  font-size: 0.8rem;
+  color: #616161;
+  margin: 0 0 0.9rem;
+  line-height: 1.55;
+}
+
+.sp-appeal-textarea {
+  width: 100%;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 0.7rem 0.875rem;
+  font-size: 0.85rem;
+  font-family: 'Inter', sans-serif;
+  color: #1A1A1A;
+  background: #fff;
+  resize: vertical;
+  box-sizing: border-box;
+  margin-bottom: 0.6rem;
+  transition: border-color 0.15s;
+  min-height: 100px;
+  line-height: 1.55;
+}
+
+.sp-appeal-textarea:focus {
+  outline: none;
+  border-color: #2E7D32;
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.08);
+}
+
+.sp-appeal-textarea::placeholder { color: #A0AEC0; }
+
+.sp-appeal-error {
+  font-size: 0.78rem;
+  color: #C62828;
+  margin: -0.2rem 0 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sp-appeal-btns {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+/* ── Appeal success ── */
+.sp-appeal-success {
+  background: linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%);
+  border: 1.5px solid #BBF7D0;
+  border-radius: 16px;
+  padding: 1.25rem 1rem;
+  color: #166534;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  animation: sp-rise 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.sp-appeal-success p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.sp-appeal-success p:first-of-type { font-weight: 600; }
+
+.sp-appeal-success-icon {
+  color: #16A34A;
+  margin-bottom: 4px;
+}
+
+/* ── Footer ── */
+.sp-footer {
+  font-size: 0.72rem;
+  color: #BDBDBD;
+  margin: 0;
+  letter-spacing: 0.02em;
+}

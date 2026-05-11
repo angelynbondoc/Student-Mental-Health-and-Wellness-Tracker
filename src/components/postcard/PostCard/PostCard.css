@@ -81,6 +81,8 @@
   color: #374151;
   line-height: 1.7;
   margin: 0 0 16px;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 /* ── Action bar ───────────────────────────────────────────────────────────── */
@@ -276,4 +278,11 @@
  
 .pc-undo-btn:hover {
   background: #e8f5e9;
+}
+
+.pc-shared-origin {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #888);
+  margin: 0 0 6px 0;
+  padding: 0 1rem;
 }

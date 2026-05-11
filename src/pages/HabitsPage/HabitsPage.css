@@ -4,6 +4,43 @@
      Water tracker · Meditation breathing animation · Walk countdown timer
 ============================================================================= */
 
+/* ──────────────────────────────────────────────────────────────────────────
+   DESKTOP-ONLY: widen the PageShell so the habit list uses more screen.
+   The habit list itself stays at a comfortable max-width and centers within
+   the wider page — habits are interactive cards, not a grid.
+   Stays inactive on tablet/mobile so MobileLayout renders normally.
+   ────────────────────────────────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .page-shell:has(.hp-list),
+  .page-shell:has(.hp-list) .page-inner,
+  .page-shell:has(.hp-admin-box),
+  .page-shell:has(.hp-admin-box) .page-inner {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding-left: 32px;
+    padding-right: 32px;
+    box-sizing: border-box;
+  }
+
+  /* Keep the habit list at a comfortable interaction width, centered.
+     Each row has emoji + name + button — pushing this to 1200px would
+     leave the button awkwardly far from the name. */
+  .hp-list {
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+  }
+
+  /* Admin box matches the list width so the layout stays cohesive */
+  .hp-admin-box {
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
 /* ── Habit list ───────────────────────────────────────────────────────────── */
 .hp-list {
   display: flex;

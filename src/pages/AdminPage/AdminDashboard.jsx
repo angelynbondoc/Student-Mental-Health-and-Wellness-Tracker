@@ -8,6 +8,10 @@ import ReportedUsersTab from "../../components/admin/ReportedUserTab"
 import UserManagementTab from "../../components/admin/UserManagementTab"
 import PostReportModal from "../../components/admin/PostReportModal";
 import UserReportModal from "../../components/admin/UserReportModal";
+import CommunityReviewTab from "../../components/admin/CommunityReviewTab/CommunityReviewTab";
+import ResourceReviewTab from "../../components/admin/ResourceReviewTab"; 
+import BroadcastTab from "../../components/admin/BroadcastTab/BroadcastTab";
+import AppealsTab from "../../components/admin/AppealsTab";
 
 export default function AdminDashboard() {
   const {
@@ -25,6 +29,16 @@ export default function AdminDashboard() {
     search, setSearch,
     pendingPosts, pendingUsers, resolved, suspended,
     resolvePost, resolveUserReport, toggleUser,
+    pendingCommunities,
+    approveCommunity, rejectCommunity,
+    pendingCommunityCount,
+    pendingResources,      
+    approveResource,      
+    rejectResource,        
+    pendingResourceCount,  
+    broadcastNotification,
+    createAdminPost,
+    appeals, resolveAppeal, rejectAppeal, appealCount,
   } = useAdminDashboard();
 
   return (
@@ -47,16 +61,20 @@ export default function AdminDashboard() {
           pendingUsers={pendingUsers}
           resolved={resolved}
           suspended={suspended}
+          pendingCommunityCount={pendingCommunityCount}
+          pendingResourceCount={pendingResourceCount}
+          appealCount={appealCount}
         />
 
         <main className="admin-main">
 
-          {/* Stats row */}
-          <div className="admin-stats-grid">
-            <StatCard label="Pending Post Reports" value={pendingPosts} sub="Awaiting review" accent="var(--warn)" />
-            <StatCard label="Pending User Reports" value={pendingUsers} sub="Awaiting review" accent="#E65100" />
-            <StatCard label="Resolved Reports"     value={resolved}     sub="All time"        accent="var(--primary)" />
-            <StatCard label="Suspended Users"      value={suspended}    sub="Currently restricted" accent="var(--danger)" />
+          <div className="admin-stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+            <StatCard label="Pending Post Reports" value={pendingPosts}          sub="Awaiting review"      accent="var(--warn)" />
+            <StatCard label="Pending User Reports" value={pendingUsers}          sub="Awaiting review"      accent="#E65100" />
+            <StatCard label="Pending Communities"  value={pendingCommunityCount} sub="Awaiting approval"    accent="var(--primary)" />
+            <StatCard label="Pending Resources"    value={pendingResourceCount}  sub="Awaiting approval"    accent="var(--primary)" />
+            <StatCard label="Resolved Reports"     value={resolved}              sub="All time"             accent="var(--primary)" />
+            <StatCard label="Suspended Users"      value={suspended}             sub="Currently restricted" accent="var(--danger)" />
           </div>
 
           {tab === "reports" && (
@@ -79,6 +97,21 @@ export default function AdminDashboard() {
             />
           )}
 
+          {tab === "communities" && (
+            <CommunityReviewTab
+              communities={pendingCommunities}
+              onApprove={approveCommunity}
+              onReject={rejectCommunity}
+            />
+          )}
+          {tab === "resources" && (
+            <ResourceReviewTab
+              resources={pendingResources}
+              onApprove={approveResource}
+              onReject={rejectResource}
+            />
+          )}
+
           {tab === "users" && (
             <UserManagementTab
               users={users}
@@ -88,10 +121,25 @@ export default function AdminDashboard() {
             />
           )}
 
+          {tab === "appeals" && (
+            <AppealsTab
+              appeals={appeals}
+              onResolve={resolveAppeal}
+              onReject={rejectAppeal}
+            />
+          )}
+
+          {tab === "broadcast" && (
+            <BroadcastTab
+              users={users}
+              broadcastNotification={broadcastNotification}
+              createAdminPost={createAdminPost}
+            />
+          )}
+
         </main>
       </div>
 
-      {/* Modals */}
       <PostReportModal
         report={selReport}
         mode={postModal}
@@ -110,7 +158,6 @@ export default function AdminDashboard() {
         onResolve={resolveUserReport}
       />
 
-      {/* Toast */}
       {toast && (
         <div className={`toast toast--${toast.type}`}>{toast.msg}</div>
       )}

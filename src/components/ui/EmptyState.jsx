@@ -5,7 +5,7 @@
 //
 // Usage:
 //   <EmptyState message="No habits yet. Ask an admin to add some!" />
-//   <EmptyState icon="🌱" message="No posts." hint="Be the first to post!" />
+//   <EmptyState  message="No posts." hint="Be the first to post!" />
 // =============================================================================
 import React from 'react';
 

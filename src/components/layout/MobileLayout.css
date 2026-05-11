@@ -38,10 +38,10 @@
   display: flex;
   flex-direction: column;
   width: 100vw;
-  min-height: 100vh;
+  height: 100vh;
   background: var(--color-bg);
   position: relative;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 /* ── Top bar ───────────────────────────────────────────────────────────────── */
@@ -51,10 +51,9 @@
   justify-content: space-between;
   width: 100%;
   height: var(--topbar-height);
+  flex-shrink: 0;
   padding: 0 24px;
   background: var(--color-primary);
-  position: sticky;
-  top: 0;
   z-index: 200;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
 }
@@ -185,6 +184,7 @@
   display: flex;
   flex: 1;
   width: 100%;
+  overflow: hidden;
 }
 
 /* ── Sidebar — desktop only ────────────────────────────────────────────────── */
@@ -195,9 +195,7 @@
   background: var(--color-white);
   border-right: 1px solid var(--color-border);
   padding: 24px 0;
-  position: sticky;
-  top: var(--topbar-height);
-  height: calc(100vh - var(--topbar-height));
+  height: 100%;
   overflow-y: auto;
 }
 
@@ -246,6 +244,7 @@
 .neu-main {
   flex: 1;
   min-width: 0;
+  height: 100%;
   overflow-y: auto;
   background: var(--color-bg);
 }
@@ -391,7 +390,7 @@
 
 /* ── Mobile search trigger button ──────────────────────────────────────────── */
 .neu-mobile-search-btn {
-  display: none; /* hidden on desktop */
+  display: none;
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 50%;
@@ -407,7 +406,7 @@
 
 /* ── Mobile search overlay bar ─────────────────────────────────────────────── */
 .neu-mobile-search-bar {
-  display: none; /* shown via media query below */
+  display: none;
   position: absolute;
   top: 0;
   left: 0;
@@ -444,18 +443,12 @@
 
 /* ── Responsive toggles ────────────────────────────────────────────────────── */
 @media (max-width: 1023px) {
-  /* Show mobile search icon */
   .neu-mobile-search-btn { display: flex; }
-
-  /* Hide desktop inline search */
   .neu-search-wrap { display: none; }
-
-  /* Show overlay bar when rendered */
   .neu-mobile-search-bar { display: flex; }
 }
 
 @media (min-width: 1024px) {
-  /* Hide mobile-only elements on desktop */
   .neu-mobile-search-btn { display: none; }
   .neu-mobile-search-bar { display: none !important; }
 }

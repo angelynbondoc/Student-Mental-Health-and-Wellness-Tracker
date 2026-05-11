@@ -33,12 +33,10 @@ export default function ActionBar({
         {commentCount}
       </button>
 
-      {!isShared && (
-        <button className="pc-btn" onClick={onShare}>
-          <Repeat2 size={14} strokeWidth={2} />
-          Share
-        </button>
-      )}
+      <button className="pc-btn" onClick={onShare}>
+        <Repeat2 size={14} strokeWidth={2} />
+        Share
+      </button>
     </div>
   );
 }
