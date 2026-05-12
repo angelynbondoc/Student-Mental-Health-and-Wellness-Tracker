@@ -2,6 +2,14 @@ import { useContext } from 'react';
 import AppContext from '../AppContext';
 import { supabase } from '../supabase';
 
+/**
+ * Custom hook for managing the current user's notification feed.
+ * Filters global notifications for the logged-in user, calculates the unread badge count,
+ * and provides methods to mark individual or all notifications as read.
+ *
+ * @returns {Object} { myNotifs, unreadCount, markOneRead, markAllRead }
+ */
+
 export default function useNotifications() {
   const { currentUser, notifications, setNotifications } = useContext(AppContext);
 

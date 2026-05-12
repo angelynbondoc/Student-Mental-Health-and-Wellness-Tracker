@@ -1,3 +1,10 @@
+/**
+ * @fileoverview Defines a comprehensive dictionary of crisis-related keywords and phrases 
+ * in both English and Filipino/Taglish. Provides utility functions to scan user-generated 
+ * content for self-harm or suicidal ideation, enabling the platform's automated 
+ * moderation and admin alert systems.
+ */
+
 // src/utils/crisisKeywords.js
 // Shared crisis keyword list + detection helper.
 // Used by useCreatePost (auto-flag) and ModeratorView (highlight).

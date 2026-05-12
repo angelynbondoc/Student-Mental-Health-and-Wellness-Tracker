@@ -3,6 +3,16 @@ import AppContext from "../../AppContext";
 import { supabase } from "../../supabase";
 import { containsCrisisKeywords } from "../../utils/crisisKeywords";
 
+/**
+ * Custom hook that encapsulates the interactive business logic for a single post card.
+ * Manages local state and database synchronisation for upvoting, commenting, and sharing.
+ * Includes automated crisis keyword detection on new comments to immediately flag 
+ * the parent post and notify administrators.
+ *
+ * @param {Object} post - The post object containing ID, author, and content metadata.
+ * @returns {Object} State variables and handler functions (handleReaction, handleAddComment, handleShare).
+ */
+
 export default function usePostCard(post) {
   const { currentUser, setPosts } = useContext(AppContext);
 
