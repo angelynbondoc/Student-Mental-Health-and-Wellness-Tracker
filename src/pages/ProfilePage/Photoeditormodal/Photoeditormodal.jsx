@@ -11,7 +11,7 @@
 // =============================================================================
 import React, { useState, useRef, useCallback,  } from "react";
 import { X, Upload, ZoomIn, ZoomOut, Check, RefreshCw } from "lucide-react";
-import "./PhotoEditorModal.css";
+import "./Photoeditormodal.css";
 
 // ── Preset avatars — DiceBear "thumbs" style (SVG, no attribution needed) ────
 // Each seed produces a unique illustrated character
