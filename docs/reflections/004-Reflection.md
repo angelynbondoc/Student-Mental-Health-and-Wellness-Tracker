@@ -16,6 +16,7 @@ One of the hardest decisions I faced was figuring out which knowledge from each 
 **Root Cause:** No shared reflection template was given before the sprint ended
 **Action Taken:** Standardized only the headings, metadata, and footer of each file while preserving each author's original body text
 **Outcome:** All four reflection files now follow the same structure without losing individual voice
+The biggest blocker I ran into was that the three reflection files were written in different formats and used different heading styles. Bringing them into a consistent structure without rewriting what each person actually said took more time than expected. I handled it by only touching the skeleton of each file — the headings, the metadata, and the footer — while leaving the body paragraphs exactly as each person wrote them. That way the structure matches across all files but the voice of each author is still there.
 
 ## What I Would Do Differently
 
