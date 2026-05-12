@@ -3,6 +3,15 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase";
 
+/**
+ * Custom hook that manages the global state and data fetching for the Admin Dashboard.
+ * Handles the retrieval, filtering, and resolution of user reports, post reports, 
+ * community approvals, resource library management, and suspension appeals.
+ *
+ * @returns {Object} An object containing dashboard state variables and operational methods 
+ * (e.g., resolvePost, toggleUser, approveCommunity, broadcastNotification).
+ */
+
 export function useAdminDashboard() {
   const [tab, setTab] = useState("reports");
   const [sidebarOpen, setSidebarOpen] = useState(false);

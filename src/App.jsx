@@ -21,6 +21,15 @@ import { supabase } from "./supabase";
 import SuspendedPage from "./pages/SuspendedPage/SuspendedPage";
 import LoadingPage from "./components/LoadingPage/LoadingPage";
 
+/**
+ * The root application component responsible for global state initialization and routing.
+ * Establishes the Supabase authentication listener to manage user sessions and roles.
+ * Fetches and distributes core application data (profiles, communities, posts, notifications)
+ * via React Context to avoid prop drilling across the component tree.
+ *
+ * @component
+ */
+
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [authReady, setAuthReady] = useState(false);
