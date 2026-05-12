@@ -314,3 +314,102 @@
   flex-direction: column;
   gap: 10px;
 }
+
+/* ── Comments in Mod View ── */
+.mv-comments-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--mv-border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mv-comments-toggle {
+  background: none;
+  border: none;
+  color: var(--mv-text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  transition: color 0.15s ease;
+}
+.mv-comments-toggle:hover { color: var(--mv-text); }
+
+.mv-comment-alert {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--mv-danger);
+  font-size: 11px;
+  margin-left: 6px;
+  font-weight: 600;
+}
+
+.mv-comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.mv-comment {
+  padding: 12px 14px;
+  background: var(--mv-bg);
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+}
+
+.mv-comment--anon { border-left-color: #7B1FA2; }
+.mv-comment--flagged { border-left-color: var(--mv-danger); background: #FFFAFA; }
+
+.mv-comment-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.mv-avatar--sm {
+  width: 28px;
+  height: 28px;
+  font-size: 11px;
+}
+
+.mv-comment-author-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mv-comment-author-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mv-text);
+}
+
+.mv-anon-reveal--sm {
+  padding: 2px 6px;
+  font-size: 10px;
+}
+
+.mv-comment-time {
+  font-size: 11px;
+  color: var(--mv-text-muted);
+}
+
+.mv-comment-body {
+  font-size: 13px;
+  color: #374151;
+  margin-left: 38px;
+  line-height: 1.55;
+}
+
+.mv-comment-body .mv-post-body {
+  margin: 0;
+}

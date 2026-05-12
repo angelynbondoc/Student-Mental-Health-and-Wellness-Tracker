@@ -1,9 +1,10 @@
 // src/pages/AdminPage/ModeratorView/ModeratorView.jsx
 // "See-through mirror" — shows all posts including anonymous ones
 // with the author's real name and photo visible only to admins.
+// Now includes visibility into Anonymous Comments as well.
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Eye, Search, AlertTriangle, Shield, Users, Filter } from 'lucide-react';
+import { Eye, Search, AlertTriangle, Shield, Users, MessageSquare } from 'lucide-react';
 import { supabase } from '../../../supabase';
 import { containsCrisisKeywords, getMatchedKeyword } from '../../../utils/crisisKeywords';
 import './ModeratorView.css';
@@ -27,13 +28,57 @@ function HighlightedText({ text }) {
   );
 }
 
+/* ── Single Comment Item ── */
+function ModCommentItem({ comment }) {
+  const isAnon = comment.is_anonymous;
+  const isFlagged = containsCrisisKeywords(comment.content ?? '');
+  const author = comment.author;
+  const displayName = author?.display_name ?? 'Unknown User';
+  const initial = displayName[0]?.toUpperCase() ?? '?';
+
+  const avatarColors = ['#2E7D32', '#1565C0', '#6A1B9A', '#E65100', '#AD1457'];
+  const colorIndex = displayName.charCodeAt(0) % avatarColors.length;
+
+  const fmtDate = (iso) =>
+    new Date(iso).toLocaleString('en-US', {
+      month: 'short', day: 'numeric',
+      hour: 'numeric', minute: '2-digit',
+    });
+
+  return (
+    <div className={`mv-comment ${isFlagged ? 'mv-comment--flagged' : isAnon ? 'mv-comment--anon' : ''}`}>
+      <div className="mv-comment-header">
+        <div className="mv-avatar mv-avatar--sm" style={{ background: avatarColors[colorIndex] }}>
+          {author?.photo_url ? <img src={author.photo_url} alt={displayName} /> : initial}
+        </div>
+        <div className="mv-comment-author-info">
+          <span className="mv-comment-author-name">{displayName}</span>
+          {isAnon && (
+            <span className="mv-anon-reveal mv-anon-reveal--sm">
+              <Eye size={10} /> Anon
+            </span>
+          )}
+          <span className="mv-comment-time">· {fmtDate(comment.created_at)}</span>
+        </div>
+      </div>
+      <div className="mv-comment-body">
+        <HighlightedText text={comment.content ?? ''} />
+      </div>
+    </div>
+  );
+}
+
 /* ── Single post card ── */
 function ModPostCard({ post }) {
+  const [showComments, setShowComments] = useState(false);
+
   const isAnon    = post.is_anonymous;
   const isFlagged = post.is_flagged || containsCrisisKeywords(post.content ?? '');
   const author    = post.author;
   const displayName = author?.display_name ?? 'Unknown User';
   const initial   = displayName[0]?.toUpperCase() ?? '?';
+  const comments = post.comments || [];
+  const hasFlaggedComment = comments.some(c => containsCrisisKeywords(c.content ?? ''));
 
   const avatarColors = ['#2E7D32', '#1565C0', '#6A1B9A', '#E65100', '#AD1457'];
   const colorIndex   = displayName.charCodeAt(0) % avatarColors.length;
@@ -47,10 +92,10 @@ function ModPostCard({ post }) {
     });
 
   return (
-    <div className={`mv-card ${isFlagged ? 'mv-card--flagged' : isAnon ? 'mv-card--anon' : ''}`}>
-      {isFlagged && (
+    <div className={`mv-card ${isFlagged || hasFlaggedComment ? 'mv-card--flagged' : isAnon ? 'mv-card--anon' : ''}`}>
+      {(isFlagged || hasFlaggedComment) && (
         <div className="mv-crisis-badge">
-          <AlertTriangle size={11} /> Crisis Content Detected
+          <AlertTriangle size={11} /> Crisis Content Detected {hasFlaggedComment && !isFlagged ? '(in comments)' : ''}
         </div>
       )}
 
@@ -86,6 +131,30 @@ function ModPostCard({ post }) {
       </div>
 
       <HighlightedText text={post.content ?? ''} />
+
+      {comments.length > 0 && (
+        <div className="mv-comments-section">
+          <button className="mv-comments-toggle" onClick={() => setShowComments(!showComments)}>
+            <MessageSquare size={14} />
+            {showComments ? 'Hide Comments' : `View ${comments.length} Comment${comments.length > 1 ? 's' : ''}`}
+            {hasFlaggedComment && !showComments && (
+              <span className="mv-comment-alert">
+                <AlertTriangle size={12} /> Crisis Comment Inside
+              </span>
+            )}
+          </button>
+          
+          {showComments && (
+            <div className="mv-comments-list">
+              {comments
+                .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+                .map(c => (
+                  <ModCommentItem key={c.id} comment={c} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -122,8 +191,6 @@ export default function ModeratorView() {
     async function fetchAll() {
       setLoading(true);
 
-      // Query posts table directly (not posts_view) to get real author info
-      // regardless of is_anonymous flag
       const { data, error } = await supabase
         .from('posts')
         .select(`
@@ -133,6 +200,12 @@ export default function ModeratorView() {
           ),
           community:communities (
             id, name
+          ),
+          comments (
+            id, content, is_anonymous, created_at,
+            author:profiles!author_id (
+              id, display_name, photo_url
+            )
           )
         `)
         .order('created_at', { ascending: false })
@@ -154,11 +227,15 @@ export default function ModeratorView() {
   const filtered = useMemo(() => {
     let result = posts;
 
-    // Apply filter tab
+    // Apply filter tab (checks both posts and comments)
     if (filter === 'anonymous') {
-      result = result.filter(p => p.is_anonymous);
+      result = result.filter(p => p.is_anonymous || p.comments?.some(c => c.is_anonymous));
     } else if (filter === 'crisis') {
-      result = result.filter(p => p.is_flagged || containsCrisisKeywords(p.content ?? ''));
+      result = result.filter(p => 
+        p.is_flagged || 
+        containsCrisisKeywords(p.content ?? '') || 
+        p.comments?.some(c => containsCrisisKeywords(c.content ?? ''))
+      );
     } else if (filter === 'flagged') {
       result = result.filter(p => p.is_flagged);
     }
@@ -169,7 +246,11 @@ export default function ModeratorView() {
       result = result.filter(p =>
         p.content?.toLowerCase().includes(q) ||
         p.author?.display_name?.toLowerCase().includes(q) ||
-        p.community?.name?.toLowerCase().includes(q)
+        p.community?.name?.toLowerCase().includes(q) ||
+        p.comments?.some(c => 
+          c.content?.toLowerCase().includes(q) || 
+          c.author?.display_name?.toLowerCase().includes(q)
+        )
       );
     }
 
@@ -178,8 +259,12 @@ export default function ModeratorView() {
 
   const stats = useMemo(() => ({
     total:   posts.length,
-    anon:    posts.filter(p => p.is_anonymous).length,
-    crisis:  posts.filter(p => p.is_flagged || containsCrisisKeywords(p.content ?? '')).length,
+    anon:    posts.filter(p => p.is_anonymous || p.comments?.some(c => c.is_anonymous)).length,
+    crisis:  posts.filter(p => 
+      p.is_flagged || 
+      containsCrisisKeywords(p.content ?? '') ||
+      p.comments?.some(c => containsCrisisKeywords(c.content ?? ''))
+    ).length,
   }), [posts]);
 
   const FILTERS = [
@@ -199,8 +284,8 @@ export default function ModeratorView() {
         <div>
           <h2 className="mv-header__title">Moderator View</h2>
           <p className="mv-header__sub">
-            See-through mirror of the homepage — all posts with real identities revealed.
-            Anonymous posts show the author's true name and photo only visible to admins.
+            See-through mirror of the homepage — all posts and comments with real identities revealed.
+            Anonymous records show the author's true name and photo only visible to admins.
           </p>
         </div>
       </div>
@@ -212,7 +297,7 @@ export default function ModeratorView() {
             <Users size={12} /> {stats.total} total posts
           </span>
           <span className="mv-stat-chip mv-stat-chip--anon">
-            <Eye size={12} /> {stats.anon} anonymous
+            <Eye size={12} /> {stats.anon} anonymous interactions
           </span>
           {stats.crisis > 0 && (
             <span className="mv-stat-chip mv-stat-chip--crisis">
@@ -229,7 +314,7 @@ export default function ModeratorView() {
           <input
             className="mv-search"
             type="text"
-            placeholder="Search posts, real names, communities…"
+            placeholder="Search posts, comments, real names, communities…"
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
