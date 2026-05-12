@@ -45,9 +45,9 @@ export function useAdminDashboard() {
 
       const normalized = data.map(r => ({
         id: r.id,
-        reason: r.reason,
+        reason: r.reason, 
         description: r.reason === 'crisis_auto_flagged'
-          ? (r.details || '🚨 Auto-flagged: potential crisis content detected by keyword system.')
+          ? (r.details || 'Auto-flagged: potential crisis content detected by keyword system.')
           : (r.details || ''),
         status: r.status || (r.posts_view?.is_flagged ? 'pending' : 'resolved'),
         resolution: r.resolution || null,
