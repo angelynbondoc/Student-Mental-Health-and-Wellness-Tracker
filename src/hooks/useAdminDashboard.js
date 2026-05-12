@@ -30,7 +30,7 @@ export function useAdminDashboard() {
       const { data, error } = await supabase
         .from('reports')
         .select(`
-          id, reason, created_at, post_id, reporter_id,
+          id, reason, details, status, resolution, created_at, post_id, reporter_id,
           posts_view (
             id, content, author_id, is_flagged, created_at
           ),
@@ -38,6 +38,7 @@ export function useAdminDashboard() {
             id, display_name, email
           )
         `)
+        .eq('type', 'post')
         .order('created_at', { ascending: false });
 
       if (error) { console.error('fetch reports error:', error); return; }
@@ -46,10 +47,10 @@ export function useAdminDashboard() {
         id: r.id,
         reason: r.reason,
         description: r.reason === 'crisis_auto_flagged'
-          ? '🚨 Auto-flagged: potential crisis content detected by keyword system.'
-          : '',
-        status: r.posts_view?.is_flagged ? 'pending' : 'resolved',
-        resolution: null,
+          ? (r.details || '🚨 Auto-flagged: potential crisis content detected by keyword system.')
+          : (r.details || ''),
+        status: r.status || (r.posts_view?.is_flagged ? 'pending' : 'resolved'),
+        resolution: r.resolution || null,
         adminNote: '',
         reportedAt: r.created_at,
         post: {

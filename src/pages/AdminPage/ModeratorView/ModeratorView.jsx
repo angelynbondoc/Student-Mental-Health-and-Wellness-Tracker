@@ -158,7 +158,7 @@ export default function ModeratorView() {
     if (filter === 'anonymous') {
       result = result.filter(p => p.is_anonymous);
     } else if (filter === 'crisis') {
-      result = result.filter(p => containsCrisisKeywords(p.content ?? ''));
+      result = result.filter(p => p.is_flagged || containsCrisisKeywords(p.content ?? ''));
     } else if (filter === 'flagged') {
       result = result.filter(p => p.is_flagged);
     }
@@ -179,7 +179,7 @@ export default function ModeratorView() {
   const stats = useMemo(() => ({
     total:   posts.length,
     anon:    posts.filter(p => p.is_anonymous).length,
-    crisis:  posts.filter(p => containsCrisisKeywords(p.content ?? '')).length,
+    crisis:  posts.filter(p => p.is_flagged || containsCrisisKeywords(p.content ?? '')).length,
   }), [posts]);
 
   const FILTERS = [
