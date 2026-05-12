@@ -1,6 +1,4 @@
 // src/hooks/useAdminDashboard.js
-// Added: crisisCount — count of auto-flagged crisis posts awaiting review.
-// Added: fetchUsers now actually joins program names and counts posts/reports.
 
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase";
@@ -18,7 +16,7 @@ export function useAdminDashboard() {
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState("");
   const [pendingCommunities, setPendingCommunities] = useState([]);
-  const [pendingResources, setPendingResources] = useState([]);
+  const [resourcesList, setResourcesList] = useState([]);
 
   const showToast = (msg, type = "success") => {
     setToast({ msg, type });
@@ -96,36 +94,41 @@ export function useAdminDashboard() {
     fetchPendingCommunities();
   }, []);
 
+  // ── Modified: Fetch ALL resources so admins can manage the published library ──
   useEffect(() => {
-    async function fetchPendingResources() {
+    async function fetchAllResources() {
       const { data, error } = await supabase
         .from('resources')
         .select(`
-          id, title, year, key_idea, findings, citation, url, created_at,
+          id, title, year, key_idea, findings, citation, url, created_at, status,
           submitter:profiles!resources_submitted_by_fkey (
             id, display_name
           )
         `)
-        .eq('status', 'pending')
-        .order('created_at', { ascending: true });
+        .order('created_at', { ascending: false });
 
-      if (error) { console.error('fetch pending resources error:', error); return; }
-      setPendingResources(data ?? []);
+      if (error) { console.error('fetch resources error:', error); return; }
+      setResourcesList(data ?? []);
     }
-    fetchPendingResources();
+    fetchAllResources();
   }, []);
+
+  const pendingResources = resourcesList.filter(r => r.status === 'pending');
+  const publishedResources = resourcesList.filter(r => r.status === 'approved');
 
   const approveResource = async (id) => {
     const resource = pendingResources.find(r => r.id === id);
     const { error } = await supabase.from('resources').update({ status: 'approved' }).eq('id', id);
     if (error) { console.error(error); return; }
-    setPendingResources(prev => prev.filter(r => r.id !== id));
+    
+    setResourcesList(prev => prev.map(r => r.id === id ? { ...r, status: 'approved' } : r));
+    
     if (resource?.submitter?.id) {
       await supabase.from('notifications').insert({
         user_id: resource.submitter.id,
         type: 'system',
         title: 'Resource Approved',
-        content: `Your resource submission "${resource.title}" has been approved and is now public!`,
+        content: `Your resource submission "${resource.title || resource.key_idea}" has been approved and is now public!`,
       });
     }
     showToast('Resource approved!');
@@ -135,16 +138,38 @@ export function useAdminDashboard() {
     const resource = pendingResources.find(r => r.id === id);
     const { error } = await supabase.from('resources').update({ status: 'rejected' }).eq('id', id);
     if (error) { console.error(error); return; }
-    setPendingResources(prev => prev.filter(r => r.id !== id));
+    
+    setResourcesList(prev => prev.filter(r => r.id !== id));
+    
     if (resource?.submitter?.id) {
       await supabase.from('notifications').insert({
         user_id: resource.submitter.id,
         type: 'moderation',
         title: 'Resource Rejected',
-        content: `Your resource submission "${resource.title}" was not approved by the admin.`,
+        content: `Your resource submission "${resource.title || resource.key_idea}" was not approved by the admin.`,
       });
     }
     showToast('Resource rejected.', 'danger');
+  };
+
+  const deleteResource = async (id) => {
+    const { error } = await supabase.from('resources').delete().eq('id', id);
+    if (error) { console.error(error); return; }
+    setResourcesList(prev => prev.filter(r => r.id !== id));
+    showToast('Resource deleted.', 'danger');
+  };
+
+  
+  /**
+   * Updates an existing resource in the local state array.
+   * @param {Object} updatedResource - The modified resource object from the database.
+   */
+  const updateResourceInState = (updatedResource) => {
+    setResourcesList(prev => prev.map(r => r.id === updatedResource.id ? updatedResource : r));
+  };
+
+  const addResourceToState = (newResource) => {
+    setResourcesList(prev => [newResource, ...prev]);
   };
 
   const approveCommunity = async (id) => {
@@ -180,7 +205,6 @@ export function useAdminDashboard() {
 
   useEffect(() => {
     async function fetchUsers() {
-      // Parallel fetch to gather profiles, post references, and report references
       const [
         { data: profilesData, error },
         { data: postsData },
@@ -196,7 +220,6 @@ export function useAdminDashboard() {
 
       if (error) { console.error('fetch users error:', error); return; }
 
-      // Map out who authored which post, and tally up their total posts
       const postAuthors = {};
       const postCounts = {};
       postsData?.forEach(p => {
@@ -206,7 +229,6 @@ export function useAdminDashboard() {
         }
       });
 
-      // Tally up reports. If it's a post report, trace it back to the author.
       const reportCounts = {};
       reportsData?.forEach(r => {
         let target = r.target_user_id;
@@ -281,7 +303,6 @@ export function useAdminDashboard() {
     fetchUserReports();
   }, []);
 
-  // ── Appeals ──
   const [appeals, setAppeals] = useState([]);
 
   useEffect(() => {
@@ -456,7 +477,6 @@ export function useAdminDashboard() {
   const pendingUsers  = userReports.filter(r => r.status === 'pending').length;
   const appealCount   = appeals.filter(a => a.status === 'pending').length;
 
-  // ── NEW: crisis count from auto-flagged reports ──────────────────────────
   const crisisCount = reports.filter(
     r => r.reason === 'crisis_auto_flagged' && r.status === 'pending'
   ).length;
@@ -480,12 +500,16 @@ export function useAdminDashboard() {
     approveCommunity, rejectCommunity,
     pendingCommunityCount: pendingCommunities.length,
     pendingResources,
+    publishedResources,
     approveResource,
     rejectResource,
+    deleteResource,
+    addResourceToState,
+    updateResourceInState,
     pendingResourceCount: pendingResources.length,
     broadcastNotification,
     createAdminPost,
     appeals, resolveAppeal, rejectAppeal, appealCount,
     crisisCount,
   };
-}
+} 
