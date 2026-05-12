@@ -1,12 +1,16 @@
 # KM Analyst Reflection
 
-## What Decisions Were Hardest
+**Document Type:** Sprint Retrospective — Individual Reflection
+**Role:** KM Analyst
+**Project:** Student Mental Health and Wellness Tracker
+
+## Key Technical Lesson Learned
 
 One of the hardest decisions I faced was figuring out which knowledge from each reflection was worth preserving versus which was too specific to this sprint to matter to anyone else. My groupmates each wrote their reflections in different ways, and I had to read through all of them carefully to find the parts that a future team could actually use. Deciding how much structure to add without changing the meaning or voice of each person was also difficult. Adding too little means the knowledge stays buried. Adding too much means people stop reading.
 
 ## How I Handled a Conflict or Blocker
 
-The biggest blocker I ran into was that the three reflection files were written in different formats and used different heading styles. Bringing them into a consistent structure without rewriting what each person actually said took more time than expected. I handled it by only touching the skeleton of each file while leaving the body paragraphs exactly as each person wrote them.
+The biggest blocker I ran into was that the three reflection files were written in different formats and used different heading styles. Bringing them into a consistent structure without rewriting what each person actually said took more time than expected. I handled it by only touching the skeleton of each file — the headings, the metadata, and the footer — while leaving the body paragraphs exactly as each person wrote them. That way the structure matches across all files but the voice of each author is still there.
 
 ## What I Would Do Differently
 
