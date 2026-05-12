@@ -1,5 +1,4 @@
 // src/pages/AdminPage/AdminDashboard.jsx
-// Added: modview tab + crisisCount prop threading.
 
 import "./AdminDashboard.css";
 import { useAdminDashboard } from "../../hooks/useAdminDashboard";
@@ -15,7 +14,7 @@ import CommunityReviewTab from "../../components/admin/CommunityReviewTab/Commun
 import ResourceReviewTab from "../../components/admin/ResourceReviewTab";
 import BroadcastTab from "../../components/admin/BroadcastTab/BroadcastTab";
 import AppealsTab from "../../components/admin/AppealsTab";
-import ModeratorView from "./ModeratorView/ModeratorView";   // ← NEW
+import ModeratorView from "./ModeratorView/ModeratorView";
 
 export default function AdminDashboard() {
   const {
@@ -37,13 +36,17 @@ export default function AdminDashboard() {
     approveCommunity, rejectCommunity,
     pendingCommunityCount,
     pendingResources,
+    publishedResources, // ← Grab published array
     approveResource,
     rejectResource,
+    deleteResource,     // ← Pass deletion capability
+    addResourceToState,
+    updateResourceInState,
     pendingResourceCount,
     broadcastNotification,
     createAdminPost,
     appeals, resolveAppeal, rejectAppeal, appealCount,
-    crisisCount,   // ← NEW
+    crisisCount,
   } = useAdminDashboard();
 
   return (
@@ -69,7 +72,7 @@ export default function AdminDashboard() {
           pendingCommunityCount={pendingCommunityCount}
           pendingResourceCount={pendingResourceCount}
           appealCount={appealCount}
-          crisisCount={crisisCount}   // ← NEW
+          crisisCount={crisisCount}
         />
 
         <main className="admin-main">
@@ -104,7 +107,6 @@ export default function AdminDashboard() {
             />
           )}
 
-          {/* ── NEW: Moderator View tab ── */}
           {tab === "modview" && <ModeratorView />}
 
           {tab === "communities" && (
@@ -115,11 +117,16 @@ export default function AdminDashboard() {
             />
           )}
 
+          {/* ── Updated to handle newly published content and deletions ── */}
           {tab === "resources" && (
             <ResourceReviewTab
-              resources={pendingResources}
+              pendingResources={pendingResources}
+              publishedResources={publishedResources}
               onApprove={approveResource}
               onReject={rejectResource}
+              onDelete={deleteResource}
+              onAddResource={addResourceToState}
+              onUpdateResource={updateResourceInState}
             />
           )}
 
