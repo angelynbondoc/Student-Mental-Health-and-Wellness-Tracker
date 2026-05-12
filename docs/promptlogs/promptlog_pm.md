@@ -1,9 +1,9 @@
-# Prompt Log — Angelyn Bondoc (Project Manager)
+# Prompt Log
 
 ---
 
 ## Entry 1
-**Date:** March 10, 2026
+**Date:** March 28, 2026
 **Task:** Drafting the initial project proposal
 
 **Prompt given to AI:**
@@ -28,7 +28,7 @@ avoids confusion during development.
 ---
 
 ## Entry 2
-**Date:** March 18, 2026
+**Date:** April 5, 2026
 **Task:** Filing Decision Log entry #2 about tech stack choice
 
 **Prompt given to AI:**
@@ -53,7 +53,7 @@ record what actually happened, not what was ideal.
 ---
 
 ## Entry 3
-**Date:** March 25, 2026
+**Date:** April 5, 2026
 **Task:** Preparing questions for the weekly standup
 
 **Prompt given to AI:**
@@ -78,7 +78,7 @@ if the work is moving forward or stuck.
 ---
 
 ## Entry 4
-**Date:** April 2, 2026
+**Date:** April 5, 2026
 **Task:** Writing the PM reflection draft
 
 **Prompt given to AI:**
