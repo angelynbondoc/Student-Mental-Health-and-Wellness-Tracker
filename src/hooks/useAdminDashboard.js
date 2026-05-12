@@ -1,6 +1,6 @@
 // src/hooks/useAdminDashboard.js
 // Added: crisisCount — count of auto-flagged crisis posts awaiting review.
-// Everything else unchanged from original.
+// Added: fetchUsers now actually joins program names and counts posts/reports.
 
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase";
@@ -180,20 +180,51 @@ export function useAdminDashboard() {
 
   useEffect(() => {
     async function fetchUsers() {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, display_name, email, role, created_at')
-        .order('created_at', { ascending: false });
+      // Parallel fetch to gather profiles, post references, and report references
+      const [
+        { data: profilesData, error },
+        { data: postsData },
+        { data: reportsData }
+      ] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('id, display_name, email, role, created_at, program:program_id(name)')
+          .order('created_at', { ascending: false }),
+        supabase.from('posts').select('id, author_id'),
+        supabase.from('reports').select('target_user_id, type, post_id')
+      ]);
 
       if (error) { console.error('fetch users error:', error); return; }
 
-      const normalized = data.map(u => ({
+      // Map out who authored which post, and tally up their total posts
+      const postAuthors = {};
+      const postCounts = {};
+      postsData?.forEach(p => {
+        if (p.id && p.author_id) {
+          postAuthors[p.id] = p.author_id;
+          postCounts[p.author_id] = (postCounts[p.author_id] || 0) + 1;
+        }
+      });
+
+      // Tally up reports. If it's a post report, trace it back to the author.
+      const reportCounts = {};
+      reportsData?.forEach(r => {
+        let target = r.target_user_id;
+        if (r.type === 'post' && r.post_id) {
+          target = postAuthors[r.post_id];
+        }
+        if (target) {
+          reportCounts[target] = (reportCounts[target] || 0) + 1;
+        }
+      });
+
+      const normalized = profilesData.map(u => ({
         id: u.id,
         name: u.display_name ?? u.email,
         avatar: (u.display_name?.[0] ?? u.email?.[0] ?? 'U').toUpperCase(),
-        program: '',
-        postCount: 0,
-        reportCount: 0,
+        program: u.program?.name || '—',
+        postCount: postCounts[u.id] || 0,
+        reportCount: reportCounts[u.id] || 0,
         joinedAt: u.created_at,
         status: u.role === 'suspended' ? 'suspended' : 'active',
         role: u.role,
@@ -455,6 +486,6 @@ export function useAdminDashboard() {
     broadcastNotification,
     createAdminPost,
     appeals, resolveAppeal, rejectAppeal, appealCount,
-    crisisCount,   // ← NEW
+    crisisCount,
   };
 }
