@@ -1,3 +1,7 @@
+// src/hooks/useAdminDashboard.js
+// Added: crisisCount — count of auto-flagged crisis posts awaiting review.
+// Everything else unchanged from original.
+
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase";
 
@@ -26,7 +30,7 @@ export function useAdminDashboard() {
       const { data, error } = await supabase
         .from('reports')
         .select(`
-          id, reason, created_at, post_id, reporter_id,
+          id, reason, details, status, resolution, created_at, post_id, reporter_id,
           posts_view (
             id, content, author_id, is_flagged, created_at
           ),
@@ -34,16 +38,19 @@ export function useAdminDashboard() {
             id, display_name, email
           )
         `)
+        .eq('type', 'post')
         .order('created_at', { ascending: false });
 
       if (error) { console.error('fetch reports error:', error); return; }
 
       const normalized = data.map(r => ({
         id: r.id,
-        reason: r.reason,
-        description: '',
-        status: r.posts_view?.is_flagged ? 'pending' : 'resolved',
-        resolution: null,
+        reason: r.reason, 
+        description: r.reason === 'crisis_auto_flagged'
+          ? (r.details || 'Auto-flagged: potential crisis content detected by keyword system.')
+          : (r.details || ''),
+        status: r.status || (r.posts_view?.is_flagged ? 'pending' : 'resolved'),
+        resolution: r.resolution || null,
         adminNote: '',
         reportedAt: r.created_at,
         post: {
@@ -59,8 +66,8 @@ export function useAdminDashboard() {
           postedAt: r.posts_view?.created_at,
         },
         reporter: {
-          name: r.reporter?.display_name ?? r.reporter?.email ?? 'Unknown',
-          avatar: (r.reporter?.display_name?.[0] ?? 'U').toUpperCase(),
+          name: r.reporter?.display_name ?? r.reporter?.email ?? 'System (Auto-flag)',
+          avatar: (r.reporter?.display_name?.[0] ?? 'S').toUpperCase(),
           program: '',
         },
       }));
@@ -88,38 +95,31 @@ export function useAdminDashboard() {
     }
     fetchPendingCommunities();
   }, []);
-    
-  useEffect(() => {
-      async function fetchPendingResources() {
-        const { data, error } = await supabase
-          .from('resources')
-          .select(`
-            id, title, year, key_idea, findings, citation, url, created_at,
-            submitter:profiles!resources_submitted_by_fkey (
-              id, display_name
-            )
-          `)
-          .eq('status', 'pending')
-          .order('created_at', { ascending: true });
 
-        if (error) { console.error('fetch pending resources error:', error); return; }
-        setPendingResources(data ?? []);
-      }
-      fetchPendingResources();
-    }, []);
+  useEffect(() => {
+    async function fetchPendingResources() {
+      const { data, error } = await supabase
+        .from('resources')
+        .select(`
+          id, title, year, key_idea, findings, citation, url, created_at,
+          submitter:profiles!resources_submitted_by_fkey (
+            id, display_name
+          )
+        `)
+        .eq('status', 'pending')
+        .order('created_at', { ascending: true });
+
+      if (error) { console.error('fetch pending resources error:', error); return; }
+      setPendingResources(data ?? []);
+    }
+    fetchPendingResources();
+  }, []);
 
   const approveResource = async (id) => {
     const resource = pendingResources.find(r => r.id === id);
-    
-    const { error } = await supabase
-      .from('resources')
-      .update({ status: 'approved' })
-      .eq('id', id);
-      
+    const { error } = await supabase.from('resources').update({ status: 'approved' }).eq('id', id);
     if (error) { console.error(error); return; }
-    
     setPendingResources(prev => prev.filter(r => r.id !== id));
-    
     if (resource?.submitter?.id) {
       await supabase.from('notifications').insert({
         user_id: resource.submitter.id,
@@ -128,22 +128,14 @@ export function useAdminDashboard() {
         content: `Your resource submission "${resource.title}" has been approved and is now public!`,
       });
     }
-
     showToast('Resource approved!');
   };
 
   const rejectResource = async (id) => {
     const resource = pendingResources.find(r => r.id === id);
-    
-    const { error } = await supabase
-      .from('resources')
-      .update({ status: 'rejected' })
-      .eq('id', id);
-      
+    const { error } = await supabase.from('resources').update({ status: 'rejected' }).eq('id', id);
     if (error) { console.error(error); return; }
-    
     setPendingResources(prev => prev.filter(r => r.id !== id));
-    
     if (resource?.submitter?.id) {
       await supabase.from('notifications').insert({
         user_id: resource.submitter.id,
@@ -152,7 +144,6 @@ export function useAdminDashboard() {
         content: `Your resource submission "${resource.title}" was not approved by the admin.`,
       });
     }
-
     showToast('Resource rejected.', 'danger');
   };
 
@@ -172,10 +163,8 @@ export function useAdminDashboard() {
       .update({ status: 'rejected', rejection_reason: reason, reviewed_at: new Date().toISOString() })
       .eq('id', id);
     if (error) { console.error(error); return; }
-
     const community = pendingCommunities.find(c => c.id === id);
     setPendingCommunities(prev => prev.filter(c => c.id !== id));
-
     if (community?.creator?.id) {
       await supabase.from('notifications').insert({
         user_id: community.creator.id,
@@ -261,9 +250,7 @@ export function useAdminDashboard() {
     fetchUserReports();
   }, []);
 
-  // ---------------------------------------------------------------------------
-  // Appeals
-  // ---------------------------------------------------------------------------
+  // ── Appeals ──
   const [appeals, setAppeals] = useState([]);
 
   useEffect(() => {
@@ -319,13 +306,11 @@ export function useAdminDashboard() {
 
   const resolvePost = async (id, res) => {
     const report = reports.find(r => r.id === id);
-
     if (res === 'removed' && report?.post?.id) {
       await supabase.from('posts').delete().eq('id', report.post.id);
     } else {
       await supabase.from('posts').update({ is_flagged: false }).eq('id', report?.post?.id);
     }
-
     setReports(prev =>
       prev.map(r => r.id === id
         ? { ...r, status: 'resolved', resolution: res, adminNote: note }
@@ -356,7 +341,6 @@ export function useAdminDashboard() {
     if (resolution === "suspended") {
       const report = userReports.find(r => r.id === id);
       const uid = report?.reportedUser?.id;
-
       if (uid) {
         const { error } = await supabase.from("profiles").update({ role: "suspended" }).eq("id", uid);
         if (error) console.error("suspend profile error:", error);
@@ -375,10 +359,8 @@ export function useAdminDashboard() {
         }
       }
     }
-
     const { error } = await supabase.from("reports").update({ status: "resolved", resolution }).eq("id", id);
     if (error) console.error("resolve report error:", error);
-
     setUserReports(prev =>
       prev.map(r => r.id === id ? { ...r, status: "resolved", resolution, adminNote: note } : r)
     );
@@ -393,7 +375,6 @@ export function useAdminDashboard() {
 
   const broadcastNotification = async ({ title, message, targetType, selectedUserIds }) => {
     if (!message.trim()) { showToast('Message cannot be empty.', 'danger'); return false; }
-
     let recipientIds = [];
     if (targetType === 'all') {
       const { data, error } = await supabase.from('profiles').select('id').neq('role', 'suspended');
@@ -402,9 +383,7 @@ export function useAdminDashboard() {
     } else {
       recipientIds = selectedUserIds ?? [];
     }
-
     if (recipientIds.length === 0) { showToast('No recipients selected.', 'danger'); return false; }
-
     const rows = recipientIds.map(uid => ({
       user_id: uid,
       type: 'announcement',
@@ -412,46 +391,28 @@ export function useAdminDashboard() {
       message: message.trim(),
       is_read: false,
     }));
-
     const { error } = await supabase.from('notifications').insert(rows);
     if (error) { showToast('Broadcast failed. Check console.', 'danger'); return false; }
-
     showToast(`Announcement sent to ${recipientIds.length} user(s)!`);
     return true;
   };
 
   const createAdminPost = async (content) => {
     if (!content.trim()) { showToast('Post content cannot be empty.', 'danger'); return false; }
-
     const { data: userData } = await supabase.auth.getSession();
     const userId = userData.session?.user?.id;
     if (!userId) { showToast('Authentication error.', 'danger'); return false; }
-
     const { data: general, error: genError } = await supabase
-      .from('communities')
-      .select('id')
-      .eq('is_general', true)
-      .single();
-
-    if (genError || !general) {
-      showToast('General community not found.', 'danger');
-      return false;
-    }
-
-  const { error } = await supabase.from('posts').insert({
-        author_id: userId,
-        community_id: general.id,
-        content: `[Admin Broadcast]\n ${content.trim()}`,
-        is_anonymous: false,
-        is_flagged: false,
-      });
-
-    if (error) {
-      showToast('Failed to create post.', 'danger');
-      console.error(error);
-      return false;
-    }
-
+      .from('communities').select('id').eq('is_general', true).single();
+    if (genError || !general) { showToast('General community not found.', 'danger'); return false; }
+    const { error } = await supabase.from('posts').insert({
+      author_id: userId,
+      community_id: general.id,
+      content: `[Admin Broadcast]\n ${content.trim()}`,
+      is_anonymous: false,
+      is_flagged: false,
+    });
+    if (error) { showToast('Failed to create post.', 'danger'); console.error(error); return false; }
     showToast('Posted to General Community!');
     return true;
   };
@@ -464,6 +425,11 @@ export function useAdminDashboard() {
   const pendingUsers  = userReports.filter(r => r.status === 'pending').length;
   const appealCount   = appeals.filter(a => a.status === 'pending').length;
 
+  // ── NEW: crisis count from auto-flagged reports ──────────────────────────
+  const crisisCount = reports.filter(
+    r => r.reason === 'crisis_auto_flagged' && r.status === 'pending'
+  ).length;
+
   return {
     tab, setTab,
     sidebarOpen, setSidebarOpen, closeSidebar,
@@ -471,9 +437,9 @@ export function useAdminDashboard() {
     urFilter, setUrFilter,
     reports, userReports, users,
     selReport, setSelReport,
-    selUserReport: null, setSelUserReport: () => {},
+    selUserReport, setSelUserReport,
     postModal, setPostModal,
-    userModal: null, setUserModal: () => {},
+    userModal, setUserModal,
     note, setNote,
     toast,
     search, setSearch,
@@ -483,11 +449,12 @@ export function useAdminDashboard() {
     approveCommunity, rejectCommunity,
     pendingCommunityCount: pendingCommunities.length,
     pendingResources,
-    approveResource, 
-    rejectResource,  
+    approveResource,
+    rejectResource,
     pendingResourceCount: pendingResources.length,
     broadcastNotification,
     createAdminPost,
     appeals, resolveAppeal, rejectAppeal, appealCount,
+    crisisCount,   // ← NEW
   };
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import AppContext from "../../AppContext";
 import { supabase } from "../../supabase";
+import { containsCrisisKeywords } from "../../utils/crisisKeywords";
 
 export default function usePostCard(post) {
   const { currentUser, setPosts } = useContext(AppContext);
@@ -75,6 +76,9 @@ export default function usePostCard(post) {
 
   const handleAddComment = async (content, isAnonymous = false) => {
     if (!currentUser) return;
+
+    const isCrisis = containsCrisisKeywords(content.trim());
+
     const { error } = await supabase
       .from("comments")
       .insert({ post_id: post.id, author_id: currentUser.id, content, is_anonymous: isAnonymous });
@@ -91,6 +95,43 @@ export default function usePostCard(post) {
           post_id: post.id,
         });
       }
+
+      // --- CRISIS AUTO-FLAG FLOW FOR COMMENTS ---
+      if (isCrisis) {
+        try {
+          // 🚨 ADD THIS: Flag the parent post so the dashboard doesn't hide the report
+          await supabase.from('posts').update({ is_flagged: true }).eq('id', post.id);
+
+          // Insert a report linking to the parent post
+          await supabase.from('reports').insert({
+            type:        'post',
+            post_id:     post.id,
+            reporter_id: currentUser.id, 
+            reason:      'crisis_auto_flagged',
+            details:     `Auto-flagged from a COMMENT: "${content.trim()}"`,
+            status:      'pending',
+          });
+
+          const { data: admins } = await supabase
+            .from('profiles')
+            .select('id')
+            .in('role', ['admin', 'superadmin']);
+
+          if (admins && admins.length > 0) {
+            const notifRows = admins.map(a => ({
+              user_id:  a.id,
+              type:     'system',
+              title:    '🚨 Crisis Comment Detected',
+              message:  'A comment was auto-flagged for potential crisis content. Review the reported post now.',
+              is_read:  false,
+            }));
+            await supabase.from('notifications').insert(notifRows);
+          }
+        } catch (flagErr) {
+          console.error('Crisis flag error on comment:', flagErr);
+        }
+      }
+      // --- END CRISIS FLOW ---
     }
   };
 
