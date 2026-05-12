@@ -4,7 +4,7 @@
 **Role:** KM Analyst
 **Project:** Student Mental Health and Wellness Tracker
 
-## What Decisions Were Hardest
+## Key Technical Lesson Learned
 
 One of the hardest decisions I faced was figuring out which knowledge from each reflection was worth preserving versus which was too specific to this sprint to matter to anyone else. My groupmates each wrote their reflections in different ways, and I had to read through all of them carefully to find the parts that a future team could actually use. Deciding how much structure to add without changing the meaning or voice of each person was also difficult. Adding too little means the knowledge stays buried. Adding too much means people stop reading.
 
