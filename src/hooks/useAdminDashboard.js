@@ -456,6 +456,7 @@ export function useAdminDashboard() {
   const pendingUsers  = userReports.filter(r => r.status === 'pending').length;
   const appealCount   = appeals.filter(a => a.status === 'pending').length;
 
+  // ── NEW: crisis count from auto-flagged reports ──────────────────────────
   const crisisCount = reports.filter(
     r => r.reason === 'crisis_auto_flagged' && r.status === 'pending'
   ).length;
