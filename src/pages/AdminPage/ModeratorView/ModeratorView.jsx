@@ -181,6 +181,15 @@ function ModSkeleton() {
 }
 
 /* ── Main component ── */
+/**
+ * Renders the Moderator View dashboard, allowing administrators to bypass anonymity.
+ * Fetches the latest posts and comments, exposing the true identities (name and photo) 
+ * of users who posted anonymously. Provides filtering options for anonymous records, 
+ * flagged content, and posts/comments containing detected crisis keywords.
+ *
+ * @component
+ */
+
 export default function ModeratorView() {
   const [posts, setPosts]     = useState([]);
   const [loading, setLoading] = useState(true);

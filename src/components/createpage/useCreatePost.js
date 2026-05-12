@@ -8,6 +8,15 @@ import AppContext from '../../AppContext';
 import { supabase } from '../../supabase';
 import { containsCrisisKeywords } from '../../utils/crisisKeywords';
 
+/**
+ * Custom hook managing the state and submission logic for creating a new community post.
+ * Validates inputs, handles database insertion, and automatically scans the content 
+ * for crisis keywords. If crisis content is detected, it silently flags the post, 
+ * generates a system report, and alerts all administrators.
+ *
+ * @returns {Object} State variables and the handleSubmit function for the post creation form.
+ */
+
 export default function useCreatePost() {
   const { communities, setPosts, currentUser } = useContext(AppContext);
   const navigate = useNavigate();

@@ -36,6 +36,18 @@ function InputAvatar({ photoUrl, initials, isAnonymous }) {
   );
 }
 
+/**
+ * Renders the comment thread for a specific post, supporting top-level comments 
+ * and single-level nested replies. Manages local state for optimistic UI updates 
+ * and interfaces with the Supabase database for fetching, inserting, and deleting comments.
+ *
+ * @component
+ * @param {Object} props
+ * @param {string} props.postId - The UUID of the parent post.
+ * @param {Array} props.profiles - Array of user profiles for mapping author IDs to display names/avatars.
+ * @param {Function} props.onAddComment - Callback invoked when a new top-level comment is submitted.
+ */
+
 export default function CommentSection({ postId, profiles, onAddComment }) {
   const { currentUser } = useContext(AppContext);
 
