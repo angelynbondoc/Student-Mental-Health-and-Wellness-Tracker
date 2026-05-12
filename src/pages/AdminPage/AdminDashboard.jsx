@@ -80,7 +80,7 @@ export default function AdminDashboard() {
           <div className="admin-stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
             <StatCard label="Pending Post Reports" value={pendingPosts}          sub="Awaiting review"      accent="var(--warn)" />
             <StatCard label="Pending User Reports" value={pendingUsers}          sub="Awaiting review"      accent="#E65100" />
-            <StatCard label="🚨 Crisis Flagged"    value={crisisCount}           sub="Auto-detected"        accent="var(--danger)" />
+            <StatCard label="Crisis Flagged"    value={crisisCount}           sub="Auto-detected"        accent="var(--danger)" />
             <StatCard label="Pending Communities"  value={pendingCommunityCount} sub="Awaiting approval"    accent="var(--primary)" />
             <StatCard label="Pending Resources"    value={pendingResourceCount}  sub="Awaiting approval"    accent="var(--primary)" />
             <StatCard label="Resolved Reports"     value={resolved}              sub="All time"             accent="var(--primary)" />
@@ -176,9 +176,6 @@ export default function AdminDashboard() {
         onResolve={resolveUserReport}
       />
 
-      {toast && (
-        <div className={`toast toast--${toast.type}`}>{toast.msg}</div>
-      )}
 
     </div>
   );

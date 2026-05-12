@@ -52,7 +52,6 @@ export default function NotificationsPage() {
       <div className="np-list">
         {filtered.length === 0 ? (
           <div className="np-empty">
-            <p className="np-empty-icon">🔔</p>
             <p className="np-empty-msg">You're all caught up! No notifications yet.</p>
           </div>
         ) : (
