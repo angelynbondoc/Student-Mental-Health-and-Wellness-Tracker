@@ -1,4 +1,7 @@
-import { Flag, ShieldAlert, Users, LayoutGrid, Megaphone, LogOut, FileText, BookMarked } from "lucide-react";
+// src/components/admin/AdminSidebar.jsx
+// Added: "Mod View" nav item + crisisCount badge passed in as prop.
+
+import { Flag, ShieldAlert, Users, LayoutGrid, Megaphone, LogOut, FileText, BookMarked, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabase";
@@ -6,6 +9,7 @@ import { supabase } from "../../supabase";
 const NAV_ITEMS = [
   { key: "reports",      label: "Reported Posts",   Icon: Flag },
   { key: "userreports",  label: "Reported Users",   Icon: ShieldAlert },
+  { key: "modview",      label: "Mod View",         Icon: Shield },        // ← NEW
   { key: "users",        label: "User Management",  Icon: Users },
   { key: "communities",  label: "Community Review", Icon: LayoutGrid },
   { key: "appeals",      label: "Appeals",          Icon: FileText },
@@ -17,6 +21,7 @@ export default function AdminSidebar({
   tab, setTab, sidebarOpen, closeSidebar,
   pendingPosts, pendingUsers, resolved, suspended,
   pendingCommunityCount, pendingResourceCount, appealCount,
+  crisisCount = 0,   // ← NEW: auto-flagged crisis posts
 }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -30,6 +35,7 @@ export default function AdminSidebar({
   const badges = {
     reports:      pendingPosts,
     userreports:  pendingUsers,
+    modview:      crisisCount,     // ← show crisis count on Mod View
     users:        0,
     communities:  pendingCommunityCount,
     resources:    pendingResourceCount,
@@ -59,7 +65,12 @@ export default function AdminSidebar({
             <item.Icon size={16} />
             {item.label}
             {badges[item.key] > 0 && (
-              <span className="nav-badge">{badges[item.key]}</span>
+              <span
+                className="nav-badge"
+                style={item.key === 'modview' ? { background: '#C62828' } : {}}
+              >
+                {badges[item.key]}
+              </span>
             )}
           </button>
         ))}
@@ -70,6 +81,7 @@ export default function AdminSidebar({
         {[
           ["Post Reports",        pendingPosts,          "var(--warn)"],
           ["User Reports",        pendingUsers,          "var(--warn)"],
+          ["Crisis Flagged",      crisisCount,           "var(--danger)"],
           ["Pending Communities", pendingCommunityCount, "var(--primary)"],
           ["Pending Resources",   pendingResourceCount,  "var(--primary)"],
           ["Resolved",            resolved,              "var(--primary)"],
