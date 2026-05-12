@@ -12,6 +12,10 @@ One of the hardest decisions I faced was figuring out which knowledge from each 
 
 ## How I Handled a Conflict or Blocker
 
+**Conflict Type:** Inconsistent document formats across team members
+**Root Cause:** No shared reflection template was given before the sprint ended
+**Action Taken:** Standardized only the headings, metadata, and footer of each file while preserving each author's original body text
+**Outcome:** All four reflection files now follow the same structure without losing individual voice
 The biggest blocker I ran into was that the three reflection files were written in different formats and used different heading styles. Bringing them into a consistent structure without rewriting what each person actually said took more time than expected. I handled it by only touching the skeleton of each file — the headings, the metadata, and the footer — while leaving the body paragraphs exactly as each person wrote them. That way the structure matches across all files but the voice of each author is still there.
 
 ## What I Would Do Differently
@@ -20,4 +24,14 @@ If I could start over, I would share a reflection template with the team before 
 
 The lesson: KM works best when it is built into the process, not added at the end.
 
+**Applicable to:** Future sprints where a KM role is assigned, or any team that needs consistent documentation across multiple contributors.
+
+---
+
+## Related Documents
+
+- `001-Reflection.md` — Developer Reflection (Frontend / Integration)
+- `002-Reflection.md` — Developer Reflection (Backend / DB / Auth)
+- `003-Reflection.md` — PM Reflection
+- `004-Reflection.md` — KM Analyst Reflection
 **Applicable to:** Future sprints where a KM role is assigned, or any team that needs consistent documentation across multiple contributors.
