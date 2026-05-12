@@ -198,9 +198,7 @@ function MoodTrendChart({ entries }) {
       </div>
 
       {/* Scale legend */}
-      <div className="jp-scale-legend">
-        <span>😢</span><span>😕</span><span>😐</span><span>🙂</span><span>😄</span>
-      </div>
+    
 
       {/* Insight — only if there's a meaningful pattern */}
       {trendIsBad && (
@@ -216,7 +214,7 @@ function MoodTrendChart({ entries }) {
       )}
       {trendIsGood && (
         <div className="jp-insight-box jp-insight-box--positive">
-          <div className="jp-insight-icon-wrap">🌱</div>
+       
           <div>
             <p className="jp-insight-title">Things are looking up</p>
             <p className="jp-insight-body">
