@@ -1,6 +1,6 @@
 // =============================================================================
 // FormField.jsx
-// Reusable label + input/select/textarea — used by CreatePage and JournalPage.
+// Reusable label + input/select/textarea with optional hint/error — used by CreatePage and JournalPage.
 //
 // Replaces the repeated .neu-flabel + .neu-fselect / .neu-ftextarea / .neu-jinput
 // pattern copy-pasted across both form pages.
