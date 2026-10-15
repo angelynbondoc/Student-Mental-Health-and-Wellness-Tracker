@@ -114,3 +114,11 @@ body { line-height: 1.6; }
 @media (max-width: 380px) { .wellness-feed-intro { flex-wrap: wrap; } }
 /* Compatibility tokens for the onboarding and administration screens. */
 :root { --border: #dfe6de; --text-h: #233b30; --accent: #28634d; --shadow: 0 8px 28px #25463212; }
+
+.field-hint,
+.field-error { margin: 6px 2px 0; font-size: 12px; }
+.field-hint { color: #53665a; }
+.field-error { color: #b3261e; }
+.field-input[aria-invalid="true"],
+.field-select[aria-invalid="true"],
+.field-textarea[aria-invalid="true"] { border-color: #b3261e; }
