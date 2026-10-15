@@ -18,15 +18,17 @@ import React, { useId } from 'react';
 export default function FormField({
   label,
   htmlFor,
+  id: controlId,
   required = false,
   hint,                // optional helper text under the control
   error,               // optional error message; marks the control invalid
   as = 'input',        // 'input' | 'textarea' | 'select' — or pass children
   children,
+  'aria-describedby': describedBy,
   ...inputProps        // value, onChange, placeholder, rows, etc.
 }) {
   const autoId = useId();
-  const id = htmlFor ?? autoId;
+  const id = htmlFor ?? controlId ?? autoId;
   const msgId = `${id}-msg`;
   const message = error || hint;
 
@@ -35,19 +37,19 @@ export default function FormField({
   const a11y = {
     id,
     required,
-    'aria-invalid': error ? true : undefined,
-    'aria-describedby': message ? msgId : undefined,
+    'aria-invalid': error ? true : inputProps['aria-invalid'],
+    'aria-describedby': [describedBy, message ? msgId : null].filter(Boolean).join(' ') || undefined,
   };
 
   const renderControl = () => {
     if (children) return children;
     if (as === 'textarea') {
-      return <textarea className="field-textarea" {...a11y} {...inputProps} />;
+      return <textarea className="field-textarea" {...inputProps} {...a11y} />;
     }
     if (as === 'select') {
-      return <select className="field-select" {...a11y} {...inputProps} />;
+      return <select className="field-select" {...inputProps} {...a11y} />;
     }
-    return <input type="text" className="field-input" {...a11y} {...inputProps} />;
+    return <input type="text" className="field-input" {...inputProps} {...a11y} />;
   };
 
   return (
