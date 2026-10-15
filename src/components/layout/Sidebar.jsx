@@ -19,6 +19,7 @@ export default function Sidebar() {
           {item.label}
         </NavLink>
       ))}
+      <div className="neu-sidebar-note"><span>ONE DAY AT A TIME</span><p>Make a little space for yourself today.</p><NavLink to="/resources">Explore wellness resources <span aria-hidden="true">↗</span></NavLink></div>
     </aside>
   );
 }

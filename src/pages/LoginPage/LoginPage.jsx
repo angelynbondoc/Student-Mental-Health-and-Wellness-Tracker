@@ -460,6 +460,7 @@ export default function LoginPage() {
       {/* ── RIGHT PANEL ─────────────────────────────────────────────────────── */}
       <div className="login-right">
         <div className="card">
+          <div className="login-mobile-brand"><img src="/NEULogo1.png" alt="New Era University" /><span>NEU Wellness Tracker</span></div>
           <p className="card-eyebrow">Student Portal</p>
           <h2 className="card-title">Welcome back</h2>
           <p className="card-sub">
@@ -481,7 +482,7 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className="error-box">
+            <div className="error-box" role="alert">
               <svg
                 width="16"
                 height="16"

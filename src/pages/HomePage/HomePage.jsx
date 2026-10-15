@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { ArrowUpRight, BookHeart, Sprout, MessageCircle, Plus } from "lucide-react";
 import AppContext from "../../AppContext";
 import { PostCard } from "../../components/postcard";
 import "./HomePage.css";
@@ -61,6 +62,27 @@ export default function HomePage() {
   return (
     <div className="page-shell">
       <div className="page-inner">
+        <header className="wellness-welcome">
+          <div>
+            <p className="wellness-eyebrow">YOUR CAMPUS. YOUR COMMUNITY.</p>
+            <h1>A little connection goes a long way.</h1>
+            <p>Check in with yourself, share what’s on your mind, and grow together.</p>
+          </div>
+          <span className="wellness-welcome-icon" aria-hidden="true"><Sprout size={48} strokeWidth={1.3} /></span>
+        </header>
+        <div className="wellness-shortcuts">
+          <Link to="/journal" className="wellness-shortcut">
+            <BookHeart size={24} strokeWidth={1.6} />
+            <span><strong>How are you feeling?</strong><small>Take a moment to reflect</small></span>
+            <ArrowUpRight size={18} />
+          </Link>
+          <Link to="/habits" className="wellness-shortcut">
+            <Sprout size={24} strokeWidth={1.6} />
+            <span><strong>Small steps, every day</strong><small>Make time for your habits</small></span>
+            <ArrowUpRight size={18} />
+          </Link>
+        </div>
+        <div className="wellness-feed-intro"><div><p className="wellness-eyebrow">BETTER TOGETHER</p><h2>Your community space</h2></div><Link to="/create" className="wellness-post-link"><Plus size={17} /> Share a thought</Link></div>
         <div className="hp-filter">
           <div className="hp-filter-label-row">
             <p className="hp-filter-label">Browse by community:</p>
@@ -71,6 +93,7 @@ export default function HomePage() {
               return (
                 <button
                   key={community.id}
+                  aria-pressed={isActive}
                   className={`chip${isActive ? " chip--active" : ""}`}
                   onClick={() => setSelectedCommunityId(isActive ? null : community.id)}
                 >
@@ -97,8 +120,10 @@ export default function HomePage() {
 
         {filteredPosts.length === 0 ? (
           <div className="hfeed-empty">
-            <p className="hfeed-empty__msg">No posts in this community yet.</p>
-            <p className="hfeed-empty__hint">Be the first to post here!</p>
+            <span className="wellness-empty-icon"><MessageCircle size={28} strokeWidth={1.5} /></span>
+            <p className="hfeed-empty__msg">{searchQuery ? "No matching conversations" : "Every conversation starts with someone"}</p>
+            <p className="hfeed-empty__hint">{searchQuery ? "Try a different search or community." : "Share a thought, ask a question, or simply say hello."}</p>
+            {!searchQuery && <Link to="/create" className="wellness-empty-link">Start a conversation <ArrowUpRight size={16} /></Link>}
           </div>
         ) : (
           <div className="hfeed-list">

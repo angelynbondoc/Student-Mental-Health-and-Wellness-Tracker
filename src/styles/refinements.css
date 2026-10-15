@@ -1,0 +1,116 @@
+/* Shared visual system: calm evergreen, warm paper, and restrained gold. */
+:root {
+  --color-primary: #28634d;
+  --color-primary-dark: #194733;
+  --color-primary-light: #eaf2e9;
+  --color-primary-hover: #dbe9dc;
+  --color-primary-ring: #28634d20;
+  --color-accent: #dbbc69;
+  --color-bg: #f5f7f3;
+  --color-surface: #fff;
+  --color-border: #dfe6de;
+  --color-text: #233b30;
+  --color-text-body: #405349;
+  --color-text-secondary: #58685e;
+  --color-text-muted: #627267;
+  --color-text-faint: #68766d;
+  --color-input-bg: #f7f9f5;
+  --sidebar-width: 240px;
+  --topbar-height: 68px;
+}
+body { line-height: 1.6; }
+.neu-topbar { background: #214f3d; box-shadow: none; gap: 16px; }
+.neu-sidebar { padding: 32px 14px; background: #fcfdfb; }
+.neu-sidebar-label { padding: 0 14px; margin-bottom: 16px; font-size: 10px; letter-spacing: .14em; }
+.neu-sidebar-link { border-left: 0; border-radius: 10px; padding: 13px 14px; margin-bottom: 5px; gap: 13px; }
+.neu-sidebar-link.active { background: #e7efe3; color: #245339; }
+.neu-sidebar-icon { width: 19px; height: 19px; }
+.neu-search-wrap { height: 40px; border-radius: 9px; }
+.page-shell { padding: 40px 44px; }
+.page-inner { max-width: 860px; }
+.page-inner--narrow { max-width: 680px; }
+.page-heading { font-size: 28px; letter-spacing: -.8px; line-height: 1.3; }
+.page-sub { font-size: 14px; margin-top: 8px; line-height: 1.7; }
+.form-card, .pc-card { border-radius: 16px; box-shadow: 0 4px 20px #25463204; }
+.field-label { color: #53665a; font-size: 11px; font-weight: 600; }
+.field-input, .field-select, .field-textarea { border-radius: 10px; padding: 13px 15px; }
+.wellness-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: .14em; color: #536d52; }
+.wellness-welcome { display: flex; align-items: center; gap: 28px; padding: 32px; background: #e9efdf; border: 1px solid #dce5d1; border-radius: 18px; margin-bottom: 18px; }
+.wellness-welcome h1 { font-family: var(--font-heading); font-size: clamp(25px, 2.5vw, 34px); font-weight: 600; line-height: 1.28; letter-spacing: -1px; margin: 12px 0; color: #244631; max-width: 500px; }
+.wellness-welcome p:last-child { font-size: 14px; color: #52634e; max-width: 470px; }
+.wellness-welcome-icon { display: grid; place-items: center; width: 100px; height: 100px; flex-shrink: 0; border: 1px solid #c8d7bb; border-radius: 50%; color: #557950; background: #f4f6e8; }
+.wellness-shortcuts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 38px; }
+.wellness-shortcut { display: flex; align-items: center; gap: 14px; padding: 22px 20px; background: white; border: 1px solid var(--color-border); border-radius: 13px; text-decoration: none; color: #32654c; transition: border-color .2s, box-shadow .2s; }
+.wellness-shortcut:hover { border-color: #9bb596; box-shadow: 0 4px 16px #214f3d0c; }
+.wellness-shortcut span { flex: 1; }
+.wellness-shortcut strong { display: block; font-size: 14px; color: #304738; font-weight: 600; }
+.wellness-shortcut small { font-size: 12px; color: #68766d; }
+.wellness-feed-intro { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.wellness-feed-intro h2 { font-family: var(--font-heading); color: #263e30; font-size: 22px; font-weight: 600; letter-spacing: -.5px; margin: 4px 0 0; }
+.wellness-post-link { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 11px 16px; border-radius: 9px; background: #28634d; color: white; font-size: 12px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.wellness-post-link:hover { background: #194733; }
+.hp-filter { background: transparent; padding: 0 0 22px; border: 0; border-bottom: 1px solid var(--color-border); border-radius: 0; }
+.hp-filter-label { color: #637164; }
+.chip { min-height: 36px; border-radius: 8px; background: white; }
+.chip--active { background: var(--color-primary); }
+.hfeed-title { font-size: 16px; }
+.hfeed-count { background: #e7eee2; color: #3c603c; }
+.hfeed-empty { border: 1px solid var(--color-border); border-radius: 16px; padding: 44px 24px; }
+.wellness-empty-icon { display: grid; place-items: center; width: 62px; height: 62px; border-radius: 50%; background: #eff4e9; color: #66805a; margin-bottom: 18px; }
+.wellness-empty-link { display: inline-flex; gap: 7px; align-items: center; margin-top: 20px; color: #28634d; font-size: 13px; font-weight: 600; text-decoration: none; }
+.login-root { background: #f8f9f5; }
+.login-left { background: #234f3d; padding: 64px clamp(32px, 5vw, 88px); }
+.login-left::before { background: radial-gradient(ellipse at 100% 100%, #6e8e5538, transparent 65%); }
+.login-left .left-logo { margin-bottom: 64px; }
+.login-left .logo-img { width: 64px; height: 64px; }
+.login-left .logo-text-top { color: #ecdfaf; font-size: 11px; letter-spacing: 1.5px; }
+.login-left .logo-text-btm { font-size: 10px; }
+.login-left .left-headline { font-size: clamp(36px, 4vw, 56px); font-weight: 500; line-height: 1.18; letter-spacing: -2px; max-width: 490px; }
+.login-left .left-headline em { color: #e5ce8c; }
+.login-left .left-sub { max-width: 410px; color: #d0decf; font-size: 15px; margin-bottom: 32px; }
+.login-left .left-circle, .login-left .left-circle-2 { top: 90%; opacity: .45; }
+.login-left .particle { display: none; }
+.login-left .left-pill { background: transparent; border: 0; border-radius: 0; padding: 7px 0; font-size: 13px; color: #d6e2d3; }
+.login-right { background: #f8f9f5; padding: 64px 40px; }
+.login-right::before { display: none; }
+.login-right .card { width: 100%; max-width: 440px; padding: 38px; border: 1px solid #e0e6db; border-radius: 20px; background: #fff; box-shadow: 0 16px 50px #284b3510; }
+.login-right .card-eyebrow { color: #67805b; letter-spacing: .15em; font-size: 10px; }
+.login-right .card-title { color: #243e2e; font-size: 32px; letter-spacing: -1px; margin-top: 10px; }
+.login-right .card-sub { color: #697366; line-height: 1.7; }
+.login-right .domain-badge { background: #f1f5eb; color: #3c633d; border: 1px solid #e0e8d5; font-size: 11px; flex-wrap: wrap; }
+.login-right .btn-google { border-radius: 10px; min-height: 52px; box-shadow: none; }
+.login-right .login-note { color: #6b7569; font-size: 11px; }
+.login-right .bottom-brand { color: #6b7767; }
+@media (max-width: 1023px) { .page-shell { padding: 28px 24px; } .neu-bottom-nav { padding-bottom: env(safe-area-inset-bottom); height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom)); } .neu-main { padding-bottom: calc(78px + env(safe-area-inset-bottom)); } }
+@media (max-width: 900px) { .login-left { display: none; } .login-right { min-height: 100svh; } }
+@media (max-width: 600px) {
+ .page-shell { padding: 24px 16px; }
+ .wellness-welcome { padding: 24px; }
+ .wellness-welcome-icon { display: none; }
+ .wellness-shortcuts { grid-template-columns: 1fr; gap: 10px; margin-bottom: 28px; }
+ .wellness-shortcut { padding: 16px 18px; }
+ .wellness-feed-intro { align-items: flex-start; }
+ .wellness-feed-intro h2 { font-size: 18px; }
+ .wellness-post-link { padding: 10px; font-size: 11px; }
+ .wellness-eyebrow { font-size: 9px; }
+ .hfeed-header { flex-direction: row; align-items: center; }
+ .login-right { padding: 48px 20px 72px; }
+ .login-right .card { padding: 28px 24px; }
+ .login-right .card-title { font-size: 28px; }
+ .form-card { padding: 22px; }
+}
+.login-mobile-brand { display: none; }
+.neu-sidebar-note { margin: auto 4px 0; padding: 24px 10px 4px; border-top: 1px solid var(--color-border); }
+.neu-sidebar-note > span { font-size: 9px; font-weight: 700; letter-spacing: .12em; color: #718065; }
+.neu-sidebar-note p { font-size: 14px; line-height: 1.6; color: #52634e; margin: 8px 0 14px; }
+.neu-sidebar-note a { font-size: 11px; font-weight: 600; color: #28634d; text-decoration: none; }
+@media (max-width: 900px) {
+ .login-mobile-brand { display: flex; align-items: center; gap: 10px; padding-bottom: 24px; margin-bottom: 24px; border-bottom: 1px solid #e0e6db; color: #345c43; font-size: 13px; font-weight: 600; }
+ .login-mobile-brand img { width: 38px; height: 38px; object-fit: contain; }
+}
+.neu-shell { width: 100%; height: 100dvh; }
+.neu-topbar-appname { white-space: nowrap; }
+.login-right .domain-badge { gap: 6px; }
+@media (max-width: 380px) { .wellness-feed-intro { flex-wrap: wrap; } }
+/* Compatibility tokens for the onboarding and administration screens. */
+:root { --border: #dfe6de; --text-h: #233b30; --accent: #28634d; --shadow: 0 8px 28px #25463212; }
