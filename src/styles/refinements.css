@@ -116,9 +116,15 @@ body { line-height: 1.6; }
 :root { --border: #dfe6de; --text-h: #233b30; --accent: #28634d; --shadow: 0 8px 28px #25463212; }
 
 .field-hint,
-.field-error { margin: 6px 2px 0; font-size: 12px; }
+.field-error { margin: 6px 2px 0; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
 .field-hint { color: #53665a; }
 .field-error { color: #b3261e; }
 .field-input[aria-invalid="true"],
 .field-select[aria-invalid="true"],
 .field-textarea[aria-invalid="true"] { border-color: #b3261e; }
+.field-input[aria-invalid="true"]:focus,
+.field-select[aria-invalid="true"]:focus,
+.field-textarea[aria-invalid="true"]:focus {
+  border-color: #b3261e;
+  box-shadow: 0 0 0 3px #b3261e1a;
+}
